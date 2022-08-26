@@ -1,0 +1,57 @@
+# This transaction exercises the 'return-funds' function from the faucet
+# contract. We'll return funds from the test-user account.
+#
+# To execute this request:
+# ./run-request.js --send return-funds --signers test-user,goliath-faucet
+
+networkId: "development"
+type: exec
+
+# To return funds from our test user account we should use the (return-funds)
+# function from the faucet contract. This will credit the transfer against our
+# overall account limit.
+code: (free.goliath-faucet.return-funds (read-msg "account") (read-decimal "amount"))
+
+# Our transaction data supplies the data our code will read from. The 'account'
+# is our test user account, and the 'amount' is the amount of funds we want to
+# return to the faucet.
+data:
+  account: "k:eed1f83db0fcced5a668c2e397bedfe3ed33643f0f919426edca52bbd2e215c0"
+  amount: 20.0
+
+# Next, we'll turn to the transaction signers. The (return-funds) function
+# relies on the (coin.transfer) function to send funds from the user account to
+# the faucet account, which means the user account must sign the transaction
+# with the (coin.TRANSFER) capability:
+# https://github.com/kadena-io/chainweb-node/blob/b06b17da1ce22e63852993af26571fa6e0a0a8b0/pact/coin-contract/v4/coin-v4.pact#L77-L81
+#
+# As usual, the faucet will pay the gas, so that account will sign the
+# transaction as well.
+signers:
+  # This is the public key for the user account.
+  - public: eed1f83db0fcced5a668c2e397bedfe3ed33643f0f919426edca52bbd2e215c0
+    caps:
+      - name: "coin.TRANSFER"
+        args: [
+            # The sender argument is the user account
+            "k:eed1f83db0fcced5a668c2e397bedfe3ed33643f0f919426edca52bbd2e215c0",
+            # The receiver argument is the faucet account
+            "goliath-faucet",
+            # The amount matches the amount specified in transaction data.
+            20.0,
+          ]
+
+  # This is the public key for the faucet account, which will pay the gas fees.
+  - public: 550fdb22682e109b207a19b6b0ee0d069007d9a3eccedcb2eb7809f4f56b5ecf
+    caps:
+      - name: "coin.GAS"
+        args: []
+
+publicMeta:
+  chainId: "0"
+  sender: "goliath-faucet"
+  # In the faucet.repl file we calculated the gas consumption for a call to the
+  # (return-funds) function. We've rounded that number up for our gas limit.
+  gasLimit: 900
+  gasPrice: 0.0000001
+  ttl: 600

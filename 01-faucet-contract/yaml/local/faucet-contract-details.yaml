@@ -1,0 +1,14 @@
+# This local request looks up the details associated with the 'goliath-faucet
+# smart contract. It will return the contents of the smart contract, if it has
+# been deployed to the Chainweb node.
+#
+# To execute this request:
+# ./run-request --local faucet-contract-details
+#
+# If you would like to deploy the faucet smart contract, please see the
+# `yaml/send/deploy-faucet-contract.yaml` request file.
+
+code: (describe-module "free.goliath-faucet")
+publicMeta:
+  chainId: "0"
+  gasLimit: 600

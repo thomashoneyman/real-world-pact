@@ -1,0 +1,54 @@
+; The faucet.setup.repl file sets up the REPL environment by loading in our
+; dependencies (such as the coin contract), initializing accounts like the
+; faucet account and a test user account, and loading our faucet contract. It's
+; a useful base file. Here, we use it to set up our test environment so we can
+; get right to testing.
+(load "faucet.setup.repl")
+
+(verify "free.goliath-faucet")
+
+; Now the tests can begin. First we try requesting funds.
+(env-sigs [{"key": "goliath-faucet-public-key", "caps": [(coin.TRANSFER "goliath-faucet" "user" 1000.0)]}])
+(begin-tx)
+(free.goliath-faucet.request-funds "user" (describe-keyset "user-keyset") 20.0)
+(expect "User account has been created and has 20 KDA." 20.0 (coin.get-balance "user"))
+(expect "Faucet has spent 20 KDA and has 980 KDA remaining." 980.0 (coin.get-balance "goliath-faucet"))
+(commit-tx)
+(env-sigs [])
+
+; Then we exceed the per-request limit, then adjust it upwards, then succeed.
+(env-sigs [{"key": "goliath-faucet-public-key", "caps": [(coin.TRANSFER "goliath-faucet" "user" 1000.0), (free.goliath-faucet.ADMIN)]}])
+(begin-tx)
+(expect-failure "80.0 would exceed per-request limit." (free.goliath-faucet.request-funds "user" (describe-keyset "user-keyset") 80.0))
+
+(free.goliath-faucet.set-request-limit "user" 200.0)
+(expect "User request limit has been raised to 200.0." { "account-limit": 100.0, "request-limit": 200.0, "account-limit-remaining": 80.0 } (free.goliath-faucet.get-limits "user"))
+
+(free.goliath-faucet.request-funds "user" (describe-keyset "user-keyset") 80.0)
+(expect "User account has 100.0 KDA." 100.0 (coin.get-balance "user"))
+(commit-tx)
+(env-sigs [])
+
+; Then we exceed the per-account limit, then adjust it upwards, then succeed.
+(env-sigs [{"key": "goliath-faucet-public-key", "caps": [(coin.TRANSFER "goliath-faucet" "user" 1000.0), (free.goliath-faucet.ADMIN)]}])
+(begin-tx)
+(expect-failure "Would exceed per-account limit." (free.goliath-faucet.request-funds "user" (describe-keyset "user-keyset") 1.0))
+
+(free.goliath-faucet.set-account-limit "user" 200.0)
+(expect "User account limit has been raised to 200.0." { "account-limit": 200.0, "request-limit": 200.0, "account-limit-remaining": 100.0 } (free.goliath-faucet.get-limits "user"))
+
+(free.goliath-faucet.request-funds "user" (describe-keyset "user-keyset") 100.0)
+(expect "User account has 200.0 KDA." 200.0 (coin.get-balance "user"))
+(commit-tx)
+(env-sigs [])
+
+; Then we exceed the per-account limit again, then return funds, then succeed
+(env-sigs [{"key": "user-public-key", "caps": [(coin.TRANSFER "user" "goliath-faucet" 1000.0)]}])
+(begin-tx)
+(expect "User account has reached its account limit." { "account-limit": 200.0, "request-limit": 200.0, "account-limit-remaining": 0.0 } (free.goliath-faucet.get-limits "user"))
+
+(free.goliath-faucet.return-funds "user" 50.0)
+(expect "User account limit is no longer reached." { "account-limit": 200.0, "request-limit": 200.0, "account-limit-remaining": 50.0 } (free.goliath-faucet.get-limits "user"))
+
+(commit-tx)
+(env-sigs [])

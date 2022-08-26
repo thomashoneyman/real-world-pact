@@ -1,0 +1,14 @@
+# This local request looks up the details associated with the 'goliath-faucet
+# address. If this account does not yet exist then this request will fail with
+# a "row not found: goliath-faucet" error.
+#
+# To execute this request:
+# ./run-request --local faucet-details
+#
+# If you would like to fund the faucet account, please see the
+# `yaml/send/fund-faucet-account.yaml` request file.
+
+code: (coin.details "goliath-faucet")
+publicMeta:
+  chainId: "0"
+  gasLimit: 600

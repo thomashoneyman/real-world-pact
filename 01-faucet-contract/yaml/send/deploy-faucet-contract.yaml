@@ -1,0 +1,71 @@
+# This YAML file describes a transaction that, when executed, will deploy the
+# faucet contract to Chainweb.
+#
+# To execute this request (you must have funded the faucet account):
+# ./run-request --send deploy-faucet-contract --signers goliath-faucet
+#
+# Alternately, to fund the faucet account _and_ deploy the contract:
+# ./run-deploy-contract.js
+
+networkId: "development"
+type: "exec"
+
+# To deploy our contract we need to send its entire contents to Chainweb as a
+# transaction. When a Chainweb node receives a module it will attempt to
+# register it in the given namespace.
+codeFile: "../../faucet.pact"
+
+# The 'data' key is for JSON data we want to include with our transaction. As a
+# general rule, any use of (read-msg) or (read-keyset) in your contract
+# indicates data that must be included here.
+#
+# Our contract reads the transaction data twice:
+#   - (read-keyset "goliath-faucet-keyset")
+#   - (read-msg "upgrade")
+data:
+  goliath-faucet-keyset:
+    # On deployment, our contract will register a new keyset on Chainweb named
+    # 'goliath-faucet-keyset. We'll use this keyset to govern the faucet
+    # contract, which means the contract can only be upgraded by this keyset.
+    #
+    # We want the contract to be controlled by our faucet account, which means
+    # our keyset should assert that the goliath-faucet.yaml keys were used to
+    # sign the transaction. The public key below is from the goliath-faucet.yaml
+    # key pair file.
+    keys:
+      - "550fdb22682e109b207a19b6b0ee0d069007d9a3eccedcb2eb7809f4f56b5ecf"
+    pred: "keys-all"
+
+  # Next, our contract looks for an 'upgrade' key to determine whether it should
+  # initialize data (for example, whether it should create tables). This request
+  # deploys the contract, so we'll set this to false.
+  upgrade: false
+
+signers:
+  # We need the Goliath faucet account to sign the transaction, because we want
+  # the faucet to deploy the contract. This is the Goliath faucet public key. It
+  # should match the keyset above.
+  - public: "550fdb22682e109b207a19b6b0ee0d069007d9a3eccedcb2eb7809f4f56b5ecf"
+
+publicMeta:
+  # The faucet contract only works on chain 0, so that's where we'll deploy it.
+  chainId: "0"
+
+  # The contract should be deployed by the faucet account, which means the
+  # faucet account is responsible for paying the gas for this transaction. You
+  # must have used the 'fund-faucet-account.yaml' request to fund the faucet
+  # account before you can use this deployment request file.
+  sender: "goliath-faucet"
+
+  # To determine the gas limit for most requests you can simply execute the Pact
+  # code in the REPL, use (env-gaslog) to measure consumption, and round up the
+  # result. However, deployment is different; you can't simply measure a call to
+  # (load "faucet.pact") as it will provide an inaccurate measure.
+  #
+  # Instead, I first set the gas limit to 150000 (the maximum) and deploy the
+  # contract to our local simulation Chainweb. Then, I recorded the gas
+  # consumption that the node reported and round it up.
+  gasLimit: 4000
+
+  gasPrice: 0.0000001
+  ttl: 600

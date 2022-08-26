@@ -1,0 +1,45 @@
+# This transaction can be used to update the per-request transfer limit enforced
+# in the faucet contract. This operation can only be taken by the Goliath faucet
+# account, so this transaction must be signed with those keys.
+#
+# To execute this request:
+# ./run-request --send set-user-request-limit --signers goliath-faucet
+
+networkId: "development"
+type: exec
+
+# We can use the 'set-request-limit' function to change the per-account limit
+# for a particular account.
+code: (free.goliath-faucet.set-request-limit (read-msg "receiver") (read-decimal "new-limit"))
+
+# Our transaction data supplies the data our code will read from. The receiver
+# should be the k: account for our test user account and new-limit should be the
+# desired amount of KDA to serve as the new account limit.
+#
+# For this test request we'll raise the limit from 20.0 KDA to 50.0 KDA per
+# account. Note that the contract disallows lowering the limit or setting it
+# to the same value as the old limit. Try sending this request twice and you'll
+# see it fail.
+data:
+  receiver: "k:eed1f83db0fcced5a668c2e397bedfe3ed33643f0f919426edca52bbd2e215c0"
+  new-limit: 50.0
+
+# Next, this function is guarded by the ADMIN capability, which in turn requires
+# that the Goliath faucet keys signed the transaction.
+signers:
+  - public: 550fdb22682e109b207a19b6b0ee0d069007d9a3eccedcb2eb7809f4f56b5ecf
+    caps:
+      - name: "free.goliath-faucet.ADMIN"
+        args: []
+
+      - name: "coin.GAS"
+        args: []
+
+publicMeta:
+  chainId: "0"
+  sender: "goliath-faucet"
+  # In the faucet.repl file we calculated the gas consumption for a call to the
+  # (set-request-limit) function. We've rounded that number up for our gas limit.
+  gasLimit: 250
+  gasPrice: 0.0000001
+  ttl: 600

@@ -1,0 +1,18 @@
+# This request asks the Goliath faucet contract for details on the per-request
+# and per-account limits set for the user account.
+#
+# You can execute this request:
+# ./run-request.js --local user-account-details
+#
+# This request will only succeed if the user account exists (ie. has received
+# funds). To create this account, deploy the faucet smart contract and then
+# request funds for the user account:
+# ./run-deploy-contract.js
+# ./run-request --send request-funds --signers goliath-faucet
+#
+# Then you can run this request to see account limits.
+
+code: (free.goliath-faucet.get-limits "k:eed1f83db0fcced5a668c2e397bedfe3ed33643f0f919426edca52bbd2e215c0")
+publicMeta:
+  chainId: "0"
+  gasLimit: 600

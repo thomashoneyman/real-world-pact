@@ -1,0 +1,9 @@
+# This file contains a keypair usable for creating a test user account on devnet
+# that can exercise the Goliath faucet API. We can use this account to request
+# funds and ensure that they were received properly. On testnet, this would be
+# an actual user account that wishes to use the faucet.
+#
+# These keys were generated via the Pact v4.3.1 CLI:
+#     pact --genkey > api/keys/test-user.yaml
+public: eed1f83db0fcced5a668c2e397bedfe3ed33643f0f919426edca52bbd2e215c0
+secret: 73ee51d18cdd0bbc3a944b9dcd6cd6f109082974753216043cf157db8cdbdeb1

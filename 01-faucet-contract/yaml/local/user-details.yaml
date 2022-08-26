@@ -1,0 +1,24 @@
+# Accounts on Chainweb are generally referred to using a k: prefix and then
+# their public key. This is preferred to vanity accounts like 'goliath-faucet'.
+# Below, we're looking up the account associated with the public key from the
+# test-user.yaml keys. This is the account that requests funds in our tests.
+#
+# The response will contain, among other things, the current balance associated
+# with the account. Therefore you can use this request to verify that requesting
+# funds to this account succeeded and the correct amount arrived!
+#
+# You can execute this request:
+# ./run-request.js --local user-account-details
+#
+# This request will only succeed if the user account exists (ie. has received
+# funds). To create this account, deploy the faucet smart contract and then
+# request funds for the user account:
+# ./run-deploy-contract.js
+# ./run-request --send request-funds --signers goliath-faucet
+#
+# Then you can look up details on the user account.
+
+code: (coin.details "k:eed1f83db0fcced5a668c2e397bedfe3ed33643f0f919426edca52bbd2e215c0")
+publicMeta:
+  chainId: "0"
+  gasLimit: 600

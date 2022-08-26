@@ -1,0 +1,45 @@
+; Create the free namespace
+(env-data { "namespace-keyset": { "keys": [ "namespace-public-key" ], "pred": "keys-all" }, "goliath-faucet-keyset": { "keys": [ "goliath-faucet-public-key" ], "pred": "keys-all" } })
+(begin-tx)
+(define-namespace "free" (read-keyset "goliath-faucet-keyset") (read-keyset "namespace-keyset"))
+(commit-tx)
+(env-data {})
+
+; Load and initialize dependencies
+(begin-tx)
+(load "./root/fungible-v2.pact")
+(load "./root/fungible-xchain-v1.pact")
+(load "./root/coin-v4.pact")
+(create-table coin.coin-table)
+(create-table coin.allocation-table)
+(commit-tx)
+
+; Load the faucet contract
+(env-sigs [{"key": "goliath-faucet-public-key", "caps": []}])
+(env-data { "goliath-faucet-keyset": { "keys": [ "goliath-faucet-public-key" ], "pred": "keys-all" }, "upgrade": false })
+(begin-tx)
+(load "./faucet.pact")
+(commit-tx)
+(env-data {})
+(env-sigs [])
+
+; Register the user keyset so we can refer to it later
+(env-data { "user-keyset": { "keys": [ "user-public-key" ], "pred": "keys-all" } })
+(begin-tx)
+(define-keyset "user-keyset" (read-keyset "user-keyset"))
+(commit-tx)
+(env-data {})
+
+; Fund the various accounts that need funding
+(begin-tx)
+(coin.create-account "goliath-faucet" (describe-keyset "goliath-faucet-keyset"))
+(coin.create-account "user" (describe-keyset "user-keyset"))
+(test-capability (coin.COINBASE))
+(coin.coinbase "goliath-faucet" (describe-keyset "goliath-faucet-keyset") 1000.0)
+(commit-tx)
+
+; Print out useful info.
+(print "----------")
+(print "'goliath-faucet' account created:\n  - keyset: 'goliath-faucet-keyset'\n  - public key: 'goliath-faucet-public-key'\n  - balance: 1000.0 KDA")
+(print "'user' account created:\n  - keyset: 'user-keyset'\n  - public key: 'user-public-key'\n  - balance: 0.0 KDA")
+(print "----------")

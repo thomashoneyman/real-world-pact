@@ -1,0 +1,102 @@
+# This transaction can be used to create the Goliath faucet account on an
+# instance of devnet where it doesn't yet exist. The account will be guarded by
+# the keypair listed in the faucet-keys.yaml file.
+#
+# We can create an account by transferring funds to it and specifying what
+# keyset should guard the account. In the real world you'd likely fund your
+# admin account by purchasing KDA on an exchange and transferring it to a new
+# address. In our tests, we'll use the 'sender00' account that already exists
+# on devnet to transfer funds to our faucet address.
+#
+# To execute this request:
+# ./run-request --send fund-faucet-account --signers sender00
+#
+# Alternately, to fund the faucet account and then use it to deploy the faucet
+# smart contract:
+# ./run-deploy-contract.js
+
+networkId: "development"
+type: exec
+
+# To create our faucet account we need to use the 'transfer-create' function
+# from the coin contract:
+# https://github.com/kadena-io/chainweb-node/blob/7c4a3c4839b00e0024ab971cf88de752c3af284f/pact/coin-contract/v4/coin-v4.pact#L352-L356
+#
+# This function requires a sender address, a receiver address, a keyset for the
+# receiver address, and the amount of KDA to transfer. In our case, we will use
+# the pre-existing 'sender00' account to transfer funds to our faucet account,
+# which will have the address 'goliath-faucet'.
+#
+# We can choose to either write these values directly into our Pact code, or we
+# can use (read-msg) and (read-keyset) to read values from the transaction data.
+# It's typical to provide structured data like keysets via the transaction data,
+# and simple data like numbers and strings inline in the code. However, this is
+# a matter of personal preference.
+#
+# In this case I've opted to provide all arguments to transfer-create via the
+# transaction data.
+code: (coin.transfer-create (read-msg "sender") (read-msg "receiver") (read-keyset "receiver-guard") (read-decimal "amount"))
+
+# Our transaction data will supply each argument that our code is looking up.
+data:
+  sender: "sender00"
+  receiver: "goliath-faucet"
+  amount: 1000.0
+  # To take sensitive actions on behalf of the faucet account, we'll use the
+  # keyset below to ensure the goliath-faucet.yaml keys were used to sign the
+  # transaction.
+  receiver-guard:
+    keys:
+      - "550fdb22682e109b207a19b6b0ee0d069007d9a3eccedcb2eb7809f4f56b5ecf"
+    pred: "keys-all"
+
+# Next, we'll turn to the transaction signers.
+#
+# The `coin.transfer-create` function has a call to (with-capability). When you
+# see this, it's an indicator that the transaction will need to be signed so the
+# capability can be granted. Here's the specific line:
+# https://github.com/kadena-io/chainweb-node/blob/7c4a3c4839b00e0024ab971cf88de752c3af284f/pact/coin-contract/v4/coin-v4.pact#L371
+#
+# The TRANSFER capability takes three arguments: sender, receiver, and amount.
+# It is a 'managed' capability, which means that the transaction must be signed
+# with the signature scoped to this capability. But how do we know what keys
+# must be used to sign this capability?
+#
+# The sender's signature must be scoped to the TRANSFER capability. We know that
+# because the TRANSFER capability is composed of two other capabilities, CREDIT
+# and DEBIT, which means signing for TRANSFER grants access to both of these:
+# https://github.com/kadena-io/chainweb-node/blob/7c4a3c4839b00e0024ab971cf88de752c3af284f/pact/coin-contract/v4/coin-v4.pact#L63-L70
+#
+# If you review those capabilities you will see that the CREDIT capability is
+# a simple enforcement that the receiver address is not an empty string. The
+# DEBIT capability, though, looks up a keyset guard stored in the coin table
+# and enforces it. Enforcing a keyset guard for the sender account means that
+# this transaction must be signed according to the rules of that keyset.
+#
+# Therefore, the sender must sign this transaction and scope its signature to
+# the TRANSFER capability. In our case the sender is the 'sender00' account that
+# already exists on devnet.
+signers:
+  # This is the public key of the 'sender00' account, taken from the
+  # 'keys/sender00.yaml' file.
+  - public: 368820f80c324bbc7c2b0610688a7da43e39f91d118732671cd9c7500ff43cca
+    # We must scope this signature to the TRANSFER capability. The arguments are
+    # the same sender, receiver, and amount used in our Pact transaction data.
+    # Also, since this account is paying for the gas associated with this
+    # transaction, we must sign for the GAS capability as well.
+    caps:
+      - name: "coin.TRANSFER"
+        args: ["sender00", "goliath-faucet", 1000.0]
+
+      - name: "coin.GAS"
+        args: []
+
+publicMeta:
+  chainId: "0"
+  sender: "sender00"
+  # This is a reasonable limit for a transfer-create operation. You can measure
+  # calculate this for yourself by calling 'transfer-create' in a REPL file and
+  # using the (env-gas) functions to measure gas consumption.
+  gasLimit: 600
+  gasPrice: 0.0000001
+  ttl: 600

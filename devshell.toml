@@ -1,0 +1,93 @@
+# https://numtide.github.io/devshell
+
+# Faucet Contract
+
+[[commands]]
+name = "faucet-deploy"
+category = "01 faucet contract"
+command = """
+  cd $(git rev-parse --show-toplevel)/01-faucet-contract
+  echo "./01-faucet-contract/run-deploy-contract.js" 
+  ./run-deploy-contract.js
+  """
+help = "Deploy the faucet contract to devnet"
+
+# Goliath Wallet
+
+[[commands]]
+name = "goliath-start"
+category = "02 goliath wallet"
+command = """
+  cd $(git rev-parse --show-toplevel)/02-goliath-wallet
+  pnpm install
+  pnpm run dev
+  """
+help = "Start the Goliath wallet frontend (Ctrl+C to stop)"
+
+# Charkha Lending Protocol
+
+[[commands]]
+name = "charkha-start"
+category = "03 charkha lending"
+command = "echo 'unimplemented'"
+help = "Start the Charkha lending dapp (Ctrl+C to stop)"
+
+# Devnet
+
+[[commands]]
+name = "devnet-start"
+category = "devnet"
+command = """
+  cd $(git rev-parse --show-toplevel)/devnet
+  echo "Starting devnet (takes about 60 seconds...)"
+  docker compose -f docker-compose.minimal.yaml up --detach --remove-orphans
+  """
+help = "Start the devnet blockchain simulator"
+
+[[commands]]
+name = "devnet-clean"
+category = "devnet"
+command = """
+  cd $(git rev-parse --show-toplevel)/devnet
+  docker compose -f docker-compose.minimal.yaml down
+  sudo rm -rf db
+  """
+help = "Stop the devnet blockchain simulator and reset the database."
+
+[[commands]]
+name = "devnet-stop"
+category = "devnet"
+command = "docker compose -f $(git rev-parse --show-toplevel)/devnet/docker-compose.minimal.yaml down"
+help = "Stop the devnet blockchain simulator"
+
+# Tools
+
+[[commands]]
+package = "nodejs-16_x"
+category = "tools"
+name = "node"
+help = "The Node runtime and NPM package manager"
+
+[[commands]]
+package = "pact"
+category = "tools"
+name = "pact"
+help = "The Pact programming language"
+
+[[commands]]
+package = "nodePackages.pnpm"
+category = "tools"
+name = "pnpm"
+help = "The performant node package manager"
+
+[[commands]]
+package = "z3"
+category = "tools"
+name = "z3"
+help = "The Z3 theorem prover"
+
+# Shell
+
+[devshell]
+name = "real-world-pact"
+motd = "{202}🔨 Welcome to the Real World Pact developer shell!{reset}\n$(type -p menu &>/dev/null && menu)\n"

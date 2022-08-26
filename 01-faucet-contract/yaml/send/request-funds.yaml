@@ -1,0 +1,71 @@
+# This transaction exercises the 'request-funds' function from the faucet
+# contract. By default it transfers 20.0 KDA, but feel free to change the amount
+# so you can explore how the contract responds!
+#
+# We'll use the request-funds operation on behalf of an account that we control
+# for testing's sake. The request-funds function in the faucet contract uses the
+# `coin.transfer-create` function under the hood, which has a few requirements:
+#
+# - The request must be signed with the TRANSFER capability
+# - The request must include a keyset for the destination address. If the
+#   address does not exist, then the transfer will create the account and guard
+#   it with the given keyset. If the address does exist, then the transfer will
+#   verify the guard, and only transfer the funds if it matches.
+#
+# To execute this request:
+# ./run-request --send request-funds --signers goliath-faucet
+
+networkId: "development"
+type: exec
+
+# To fund our new test user account we should use the 'request-funds' function
+# from the faucet contract. This function requires the account that should
+# receive funds, the intended keyset to guard that account, and the amount of
+# KDA to transfer.
+code: (free.goliath-faucet.request-funds (read-msg "receiver") (read-keyset "receiver-guard") (read-decimal "amount"))
+
+# Our transaction data supplies the data our code will read from. The receiver
+# should be the k: account for our test user account and the keyset should
+# ensure that the keys from the test-user.yaml key pair must have signed any
+# transaction that takes sensitive actions on behalf of the user account.
+#
+# The contract only allows transfers of up to 20.0 KDA at a time initially, so
+# we'll stick to that limit. (Try tweaking the amount, though, and see what
+# happens when we exceed the limit!)
+data:
+  receiver: "k:eed1f83db0fcced5a668c2e397bedfe3ed33643f0f919426edca52bbd2e215c0"
+  amount: 20.0
+  receiver-guard:
+    # The public key is taken from the test-user.yaml key pair.
+    keys:
+      - "eed1f83db0fcced5a668c2e397bedfe3ed33643f0f919426edca52bbd2e215c0"
+    pred: "keys-all"
+
+# Next, we'll turn to the transaction signers. The (request-funds) function
+# relies on the (coin.transfer) function, which in turn requires that the
+# transaction has been signed with the (coin.TRANSFER) capability:
+# https://github.com/kadena-io/chainweb-node/blob/b06b17da1ce22e63852993af26571fa6e0a0a8b0/pact/coin-contract/v4/coin-v4.pact#L77-L81
+signers:
+  - public: 550fdb22682e109b207a19b6b0ee0d069007d9a3eccedcb2eb7809f4f56b5ecf
+    caps:
+      - name: "coin.TRANSFER"
+        args: [
+            # The sender argument is the faucet account
+            "goliath-faucet",
+            # The receiver argument is the user account
+            "k:eed1f83db0fcced5a668c2e397bedfe3ed33643f0f919426edca52bbd2e215c0",
+            # The amount matches the amount specified in transaction data.
+            20.0,
+          ]
+
+      - name: "coin.GAS"
+        args: []
+
+publicMeta:
+  chainId: "0"
+  sender: "goliath-faucet"
+  # In the faucet.repl file we calculated the gas consumption for a call to the
+  # (request-funds) function. We've rounded that number up for our gas limit.
+  gasLimit: 900
+  gasPrice: 0.0000001
+  ttl: 600
