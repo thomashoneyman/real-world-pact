@@ -20,7 +20,7 @@ type: exec
 
 # To create our faucet account we need to use the 'transfer-create' function
 # from the coin contract:
-# https://github.com/kadena-io/chainweb-node/blob/7c4a3c4839b00e0024ab971cf88de752c3af284f/pact/coin-contract/v4/coin-v4.pact#L352-L356
+# https://github.com/kadena-io/chainweb-node/blob/56e99ae421d2269a657e3bb3780c6d707e5149a0/pact/coin-contract/v5/coin-v5.pact#L358-L362
 #
 # This function requires a sender address, a receiver address, a keyset for the
 # receiver address, and the amount of KDA to transfer. In our case, we will use
@@ -55,7 +55,7 @@ data:
 # The `coin.transfer-create` function has a call to (with-capability). When you
 # see this, it's an indicator that the transaction will need to be signed so the
 # capability can be granted. Here's the specific line:
-# https://github.com/kadena-io/chainweb-node/blob/7c4a3c4839b00e0024ab971cf88de752c3af284f/pact/coin-contract/v4/coin-v4.pact#L371
+# https://github.com/kadena-io/chainweb-node/blob/56e99ae421d2269a657e3bb3780c6d707e5149a0/pact/coin-contract/v5/coin-v5.pact#L377
 #
 # The TRANSFER capability takes three arguments: sender, receiver, and amount.
 # It is a 'managed' capability, which means that the transaction must be signed
@@ -65,7 +65,7 @@ data:
 # The sender's signature must be scoped to the TRANSFER capability. We know that
 # because the TRANSFER capability is composed of two other capabilities, CREDIT
 # and DEBIT, which means signing for TRANSFER grants access to both of these:
-# https://github.com/kadena-io/chainweb-node/blob/7c4a3c4839b00e0024ab971cf88de752c3af284f/pact/coin-contract/v4/coin-v4.pact#L63-L70
+# https://github.com/kadena-io/chainweb-node/blob/56e99ae421d2269a657e3bb3780c6d707e5149a0/pact/coin-contract/v5/coin-v5.pact#L66-L73
 #
 # If you review those capabilities you will see that the CREDIT capability is
 # a simple enforcement that the receiver address is not an empty string. The

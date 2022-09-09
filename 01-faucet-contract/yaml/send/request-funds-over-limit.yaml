@@ -1,0 +1,43 @@
+# This transaction uses the 'request-funds' function from the faucet to request
+# more than the default 20.0 KDA limit. To successfully send this request, you
+# must first use the 'set-user-request-limit' request file to update the limit.
+#
+# To execute this request:
+# ./run-request.js --send request-funds-over-limit --signers goliath-faucet
+#
+# This request is uncommented. For details on (request-funds), please see the
+# companion file:
+# ./yaml/send/request-funds.yaml
+
+networkId: "development"
+type: exec
+code: (free.goliath-faucet.request-funds (read-msg "receiver") (read-keyset "receiver-guard") (read-decimal "amount"))
+
+data:
+  receiver: "k:eed1f83db0fcced5a668c2e397bedfe3ed33643f0f919426edca52bbd2e215c0"
+  amount: 50.0
+  receiver-guard:
+    keys:
+      - "eed1f83db0fcced5a668c2e397bedfe3ed33643f0f919426edca52bbd2e215c0"
+    pred: "keys-all"
+
+signers:
+  - public: 550fdb22682e109b207a19b6b0ee0d069007d9a3eccedcb2eb7809f4f56b5ecf
+    caps:
+      - name: "coin.TRANSFER"
+        args:
+          [
+            "goliath-faucet",
+            "k:eed1f83db0fcced5a668c2e397bedfe3ed33643f0f919426edca52bbd2e215c0",
+            50.0,
+          ]
+
+      - name: "coin.GAS"
+        args: []
+
+publicMeta:
+  chainId: "0"
+  sender: "goliath-faucet"
+  gasLimit: 900
+  gasPrice: 0.0000001
+  ttl: 600

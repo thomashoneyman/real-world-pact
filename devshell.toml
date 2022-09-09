@@ -7,10 +7,19 @@ name = "faucet-deploy"
 category = "01 faucet contract"
 command = """
   cd $(git rev-parse --show-toplevel)/01-faucet-contract
-  echo "./01-faucet-contract/run-deploy-contract.js" 
+  echo "./01-faucet-contract/run-deploy-contract.js"
   ./run-deploy-contract.js
   """
 help = "Deploy the faucet contract to devnet"
+
+[[commands]]
+name = "faucet-request"
+category = "01 faucet contract"
+command = """
+  cd $(git rev-parse --show-toplevel)/01-faucet-contract
+  ./run-request.js $@
+  """
+help = "Use a request file to send a request to the faucet contract on devnet"
 
 # Goliath Wallet
 
@@ -40,6 +49,8 @@ category = "devnet"
 command = """
   cd $(git rev-parse --show-toplevel)/devnet
   echo "Starting devnet (takes about 60 seconds...)"
+  git submodule update --init
+  docker compose pull
   docker compose -f docker-compose.minimal.yaml up --detach --remove-orphans
   """
 help = "Start the devnet blockchain simulator"

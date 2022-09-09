@@ -11,25 +11,27 @@ This faucet smart contract project will teach you the fundamentals of developing
 
 The Goliath faucet is a fully-functioning smart contract. I encourage you to deploy it yourself, execute transactions from the `yaml/send` directory, and query the state of the contract and its related accounts using the requests in the `yaml/local` directory. If you are using the provided Nix shell, then you can use the following commands to deploy the contract and run requests against it:
 
-```console
+```sh
 # Enter the Nix shell
 nix develop
 
 # Start the simulation blockchain (run devnet-stop to stop the simulation)
 devnet-start
 
-# Fund the faucet account and deploy the faucet contract
-./run-deploy-contract.js
+# Fund the faucet account and deploy the faucet contract. (This command aliases
+# to run-deploy-contract.js; run that script if you aren't using Nix.)
+faucet-deploy
 
-# Send transactions and query information about the contract. For more
-# details, see the yaml/README.md instructions
-./run-request.js
+# Send transactions and query information about the contract. For more details,
+# see the yaml/README.md instructions. (This command aliases to run-request.js;
+# run that script if you aren't using Nix.)
+faucet-request
 
 # For example, see details about the faucet account we just created:
-./run-request.js --local faucet-details
+faucet-request --local faucet-details
 
 # Or request funds from the faucet to a user account:
-./run-request.js --send request-funds --signers goliath-faucet
+faucet-request --send request-funds --signers goliath-faucet
 
 # If you ever want to reset the simulation blockchain to its initial state
 # so you can test deploying from scratch:
@@ -64,19 +66,18 @@ There are also two directories (well, three, but `internal` is just helper code 
 
 Finally, there are some scripts that you can use to deploy the contract and interact with it on devnet (our development Chainweb node):
 
-- `run-request.js` allows you to run any request from the `yaml` directory and review the result. Feel free to add more request files and this script will pick them up automatically!
-- `run-deploy-contract.js` chains together several calls to `run-request.js` to create the faucet account and deploy the faucet contract. The contract must be deployed before any of its functions can be called.
-- `run-integration-test.js` replicates the `faucet.repl` file's tests, but this time running on our local Chainweb node in a simulation of a real-world session using the contract! It's slow, as each transaction has to be mined into a block, but it gives us confidence the code will work as expected when deployed to a more real-world network.
+- `run-request.js` allows you to run any request from the `yaml` directory and review the result. Feel free to add more request files and this script will pick them up automatically! If you're in a Nix shell, this can be run from anywhere in the repository with `faucet-request`.
+- `run-deploy-contract.js` chains together several calls to `run-request.js` to create the faucet account and deploy the faucet contract. The contract must be deployed before any of its functions can be called. If you're in a Nix shell, this is aliased to `faucet-deploy`.
 
 ## Usage
 
 There are two ways you can interact with the faucet contract: the REPL environment and the devnet environment (via request.yaml files). The REPL allows you to rapidly test and interact with your contract, and it's the best tool to use during development. The devnet environment is a simulation of Chainweb, and it's the best tool to use to test out deployments and requests that you'll make against your contract when it is actually on Chainweb. We use both in our project.
 
-In fact, you'll notice that we have two similar files: `faucet.repl` and `run-integration-test.js`. The REPL file exercises our contract in the REPL environment, and it's what I used to iterate on and develop the contract in the first place. The integration test exercises our contract again, but this time in the devnet environment that mirrors a production environment. I highly encourage you to look at these two files side-by-side to see how Pact code translates in the two different environments.
-
 ### REPL File
 
-The first way to use the contract is the `faucet.repl` file. The REPL environment is a fantastic way to rapidly test and iterate on your contract. You can use the file in two ways. First, you can simply execute the repl file, which will log the results (including a failure if any test failed):
+The first way to use the contract is the `faucet.repl` file. I used this file to iterate on the contract while I developed.
+
+The REPL environment is a fantastic way to rapidly test and iterate on your contract. You can use the file in two ways. First, you can simply execute the repl file, which will log the results (including a failure if any test failed):
 
 ```
 $ pact faucet.repl
@@ -88,6 +89,91 @@ Alternately, you can run `pact` to enter an interactive repl. Then, load the `fa
 pact> (load "faucet.repl")
 ```
 
+If you just want to set up an environment with the faucet contract and some accounts (but no tests), then you can use the setup file:
+
+```
+pact> (load "faucet.setup.repl")
+----------
+'goliath-faucet' account created:
+  - keyset: 'goliath-faucet-keyset'
+  - public key: 'goliath-faucet-public-key'
+  - balance: 1000.0 KDA
+
+'user' account created:
+  - keyset: 'user-keyset'
+  - public key: 'user-public-key'
+  - balance: 0.0 KDA
+----------
+```
+
+For example, now that we're set up, we can interactively request funds for the user account:
+
+```
+pact> (env-sigs [{"key": "goliath-faucet-public-key", "caps": [(coin.TRANSFER "goliath-faucet" "user" 20.0)]}])
+"Setting transaction signatures/caps"
+
+pact> (free.goliath-faucet.request-funds "user" (describe-keyset "free.user-keyset") 20.0)
+"Write succeeded"
+
+pact> (free.goliath-faucet.get-limits "user")
+{"account-limit": 100.0,"request-limit": 20.0,"account-limit-remaining": 80.0}
+```
+
+Or we can just run formal verification:
+
+```
+pact> (verify "free.goliath-faucet")
+```
+
 ### Request Files
 
-The second way to interact with the faucet contract is by deploying it to [devnet](https://github.com/kadena-io/devnet) and then making requests to the local devnet Chainweb node. A full application might use the [pact-lang-api](https://github.com/kadena-io/pact-lang-api) JavaScript library to make requests in a frontend application, but for this project we're doing contract development with no frontend. For that reason, we'll use Pact's [request formatter](https://pact-language.readthedocs.io/en/stable/pact-reference.html#api-request-formatter) to turn `request.yaml` files into valid JSON that can be sent to our Chainweb node. To learn more about how to use `request.yaml` files, including a full walkthrough of building and sending a request of your own, please refer to the [README in the `yaml` directory](./yaml/).
+The second way to interact with the faucet contract is to deploy it to [devnet](https://github.com/kadena-io/devnet) and then make requests to devnet. We _could_ use a client library like [pact-lang-api](https://github.com/kadena-io/pact-lang-api) to make these requests, but for this project we're sticking with vanilla Pact. For that reason, we'll use Pact's [request formatter](https://pact-language.readthedocs.io/en/stable/pact-reference.html#api-request-formatter) to turn `request.yaml` files into valid JSON that can be sent to our Chainweb node.
+
+To learn more about how to use `request.yaml` files, including a full walkthrough of building and sending a request of your own, please refer to the [README in the `yaml` directory](./yaml).
+
+There's a little utility included in this project to help you make these requests. If you're in the Nix shell, you can send requests to your local devnet node with `faucet-request`. For example, here's a full session interacting with the contract:
+
+```sh
+# Ensure devnet is running
+devnet-clean && devnet-start
+
+# Ensure the contract is deployed
+faucet-deploy
+
+# Request funds to create the 'user' account
+faucet-request --send request-funds --signers goliath-faucet
+
+# Verify the 'user' account has received funds (balance should be '20')
+faucet-request --local user-details
+
+# Another way to check is to call (free.goliath-faucet.get-limits)
+faucet-request --local user-limits
+
+# Request funds again, this time over the request limit (this will fail; look
+# for the 'message' part of the response)
+faucet-request --send request-funds-over-limit --signers goliath-faucet
+
+# Update the per-request limit for the user account
+faucet-request --send set-user-request-limit --signers goliath-faucet
+
+# Verify the limit has been updated
+faucet-request --local user-limits
+
+# This time, requesting funds over the default limit will succeed.
+faucet-request --send request-funds-over-limit --signers goliath-faucet
+
+# The user account will now receive their requested 50.0 KDA
+faucet-request --local user-details
+
+# We can also update the the per-account limit for the user account
+faucet-request --send set-user-account-limit --signers goliath-faucet
+
+# The user limits are now above the defaults
+faucet-request --local user-limits
+
+# Finally, we can return funds to the faucet.
+faucet-request --send return-funds --signers goliath-faucet,test-user
+
+# The user account has returned 20.0 KDA
+faucet-request --local user-limits
+```

@@ -24,12 +24,12 @@ data:
   receiver: "k:eed1f83db0fcced5a668c2e397bedfe3ed33643f0f919426edca52bbd2e215c0"
   new-limit: 200.0
 
-# Next, this function is guarded by the ADMIN capability, which in turn requires
-# that the Goliath faucet keys signed the transaction.
+# Next, this function is guarded by the SET_LIMIT capability, which in turn
+# requires that the Goliath faucet keys signed the transaction.
 signers:
   - public: 550fdb22682e109b207a19b6b0ee0d069007d9a3eccedcb2eb7809f4f56b5ecf
     caps:
-      - name: "free.goliath-faucet.ADMIN"
+      - name: "free.goliath-faucet.SET_LIMIT"
         args: []
 
       - name: "coin.GAS"

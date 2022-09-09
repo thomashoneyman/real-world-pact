@@ -1,4 +1,4 @@
-;; The coin-v4 contract implements two interfaces: fungible-v2 and
+;; The coin-v5 contract implements two interfaces: fungible-v2 and
 ;; fungible-xchain-v1. To verify the contract implements these interfaces
 ;; correctly, we need to be able to load their contents. This is a copy of the
 ;; fungible-v2 interface deployed to Chainweb.

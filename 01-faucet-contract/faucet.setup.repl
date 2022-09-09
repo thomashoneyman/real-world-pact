@@ -9,7 +9,7 @@
 (begin-tx)
 (load "./root/fungible-v2.pact")
 (load "./root/fungible-xchain-v1.pact")
-(load "./root/coin-v4.pact")
+(load "./root/coin-v5.pact")
 (create-table coin.coin-table)
 (create-table coin.allocation-table)
 (commit-tx)
@@ -25,17 +25,19 @@
 
 ; Register the user keyset so we can refer to it later
 (env-data { "user-keyset": { "keys": [ "user-public-key" ], "pred": "keys-all" } })
+(env-sigs [{"key": "goliath-faucet-public-key", "caps": []}]) ; seriously? we have to do this?
 (begin-tx)
-(define-keyset "user-keyset" (read-keyset "user-keyset"))
+(namespace "free")
+(define-keyset "free.user-keyset" (read-keyset "user-keyset"))
 (commit-tx)
 (env-data {})
 
 ; Fund the various accounts that need funding
 (begin-tx)
-(coin.create-account "goliath-faucet" (describe-keyset "goliath-faucet-keyset"))
-(coin.create-account "user" (describe-keyset "user-keyset"))
+(coin.create-account "goliath-faucet" (describe-keyset "free.goliath-faucet-keyset"))
+(coin.create-account "user" (describe-keyset "free.user-keyset"))
 (test-capability (coin.COINBASE))
-(coin.coinbase "goliath-faucet" (describe-keyset "goliath-faucet-keyset") 1000.0)
+(coin.coinbase "goliath-faucet" (describe-keyset "free.goliath-faucet-keyset") 1000.0)
 (commit-tx)
 
 ; Print out useful info.

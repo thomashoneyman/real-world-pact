@@ -1,9 +1,9 @@
-; This is a copy of the Kadena coin-v4 contract. At the time of writing, this is
+; This is a copy of the Kadena coin-v5 contract. At the time of writing, this is
 ; the latest version deployed to Chainweb. We're going to be calling functions
 ; from this contract in our tests, but without access to mainnet Chainweb, so we
 ; copy the contents locally.
 ;
-; https://github.com/kadena-io/chainweb-node/blob/master/pact/coin-contract/v4/coin-v4.pact
+; https://github.com/kadena-io/chainweb-node/blob/master/pact/coin-contract/v5/coin-v5.pact
 (module coin GOVERNANCE
 
   @doc "'coin' represents the Kadena Coin Contract. This contract provides both the \
@@ -30,6 +30,9 @@
 
   ;; coin v3
   (bless "1os_sLAUYvBzspn5jjawtRpJWiH1WPfhyNraeVvSIwU")
+
+  ;; coin v4
+  (bless "BjZW0T2ac6qE_I5X8GE4fal6tTqjhLTC7my0ytQSxLU")
 
   ; --------------------------------------------------------------------------
   ; Schemas and Tables
@@ -158,6 +161,9 @@
 
   (defconst MAXIMUM_ACCOUNT_LENGTH 256
     "Maximum account name length admissible for coin accounts")
+
+  (defconst VALID_CHAIN_IDS (map (int-to-str 10) (enumerate 0 19))
+    "List of all valid Chainweb chain ids")
 
   ; --------------------------------------------------------------------------
   ; Utilities
@@ -554,6 +560,9 @@
 
         (enforce-unit amount)
 
+        (enforce (contains target-chain VALID_CHAIN_IDS)
+          "target chain is not a valid chainweb chain id")
+
         ;; step 1 - debit delete-account on current chain
         (debit sender amount)
         (emit-event (TRANSFER sender "" amount))
@@ -573,8 +582,12 @@
         { "receiver" := receiver
         , "receiver-guard" := receiver-guard
         , "amount" := amount
+        , "source-chain" := source-chain
         }
+
         (emit-event (TRANSFER "" receiver amount))
+        (emit-event (TRANSFER_XCHAIN_RECD "" receiver amount source-chain))
+
         ;; step 2 - credit create account on target chain
         (with-capability (CREDIT receiver)
           (credit receiver receiver-guard amount))

@@ -16,7 +16,7 @@ This README contains a complete walkthrough for [manually formatting and sending
 
 ### Deploy the faucet contract
 
-Before you make requests to the faucet contract it must be deployed. There are request files for [funding the faucet account](./send/fund-faucet-account.yaml) and then using it to [deploy the faucet contract](./send/deploy-faucet-contract.yaml). You could execute these transactions yourself, but there is also a [run-deploy-contract.js](../run-deploy-contract.js) script that will take care of these steps for you.
+Before you make requests to the faucet contract it must be deployed. There are request files for [funding the faucet account](./send/fund-faucet-account.yaml) and then using it to [deploy the faucet contract](./send/deploy-faucet-contract.yaml). You could execute these transactions yourself, but there is also a [run-deploy-contract.js](../run-deploy-contract.js) script that will take care of these steps for you. (If you're using the Nix shell, you can run `faucet-deploy` to deploy the contract.)
 
 With the faucet contract deployed, you can now execute any request in the `local` or `send` directories.
 
@@ -24,49 +24,49 @@ With the faucet contract deployed, you can now execute any request in the `local
 
 You can use the [run-request.js](../run-request.js) script to execute any request in the `local` or `send` directories. Local requests will return a result immediately, but the exec requests in the `send` directory take between 30 and 90 seconds to complete since they must be mined into a block (blocks are mined every 30 seconds).
 
+> The ../run-request.js script is aliased to faucet-request in the Nix shell. I use that command throughout the guide. If you aren't using Nix, run `../run-request.js` with the same arguments.
+
 To see all available transactions and keys:
 
-```console
-./run-request.js
-./run-request.js --local # to only see local requests
-./run-request.js --send # to only see exec requests
+```sh
+faucet-request
+
+# To see only local requests
+faucet-request --local
+
+# To see only exec requests
+faucet-request --send
 ```
 
 To execute a 'send' transaction, use the `--send` argument to provide the name of the request and the `--signers` flag to list the keys for any required signers. For example, to fund the faucet account:
 
-```console
-./run-request.js --send fund-faucet-account --signers sender00
+```sh
+faucet-request --send fund-faucet-account --signers sender00
 ```
 
 If you write a request file that needs multiple signers you can comma-separate them, e.g. `--signers sender00,goliath-faucet`.
 
 To execute a 'local' transaction, use the `--local` argument to provide the name of the request. For example, to look up the account details for the faucet account (this will fail if the faucet has not yet been funded):
 
-```console
-./run-request.js --local faucet-details
+```sh
+faucet-request --local faucet-details
 ```
 
 By default the script will only output the `result` field of the response. To see the entire raw response the Chainweb node returns, include the `--raw` flag:
 
-```console
-./run-request.js --raw --local faucet-details
+```sh
+faucet-request --raw --local faucet-details
 ```
 
 If you only want to get the formatted JSON payload for a request and would like to send it yourself (for example, you want to load it into `postman`), then you can pass the `--format-only` flag in addition to the other arguments.
 
-```console
-./run-request.js --format-only --local faucet-details
+```sh
+faucet-request --format-only --local faucet-details
 ```
 
 This will print the formatted JSON to the console, which you can copy and paste into the tool of your choosing. Please note that the JSON payload will expire after a while when the `creationTime` gets too old and you'll need to run this command again.
 
-### Run the integration test
-
-Finally, you can use the [run-integration-test.js](../run-integration-test.js) script to run the full integration test. This test mirrors the [faucet.repl](../faucet.repl) file, and I encourage you to open them side-by-side and compare them!
-
-The integration test will fund the faucet and deploy the contract if necessary. Then, it will return all funds from the user account to the faucet account. Finally, it will execute various functions from the faucet contract and ensure they succeed when they're supposed to and fail when they're not supposed to.
-
-I encourage you to extend the faucet contract yourself, adding your own request files and tweaking the integration test accordingly.
+I encourage you to extend the faucet contract yourself, adding your own request files and tweaking the repl file accordingly.
 
 ## Directory Structure
 
@@ -121,7 +121,7 @@ You can format a request file into a JSON payload to send to a Chainweb node usi
 
 Let's try to format our `fund-faucet-account.yaml` request:
 
-```console
+```sh
 pact --unsigned yaml/send/fund-faucet-account.yaml
 ```
 
@@ -129,7 +129,7 @@ If you run this yourself, you'll notice that we received YAML as output instead 
 
 Here's how we would format the request _and_ add the signature we need:
 
-```console
+```sh
 pact --unsigned yaml/send/fund-faucet-account.yaml | pact add-sig api/keys/sender00.yaml
 ```
 

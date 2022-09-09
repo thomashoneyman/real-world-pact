@@ -23,7 +23,7 @@ data:
 # relies on the (coin.transfer) function to send funds from the user account to
 # the faucet account, which means the user account must sign the transaction
 # with the (coin.TRANSFER) capability:
-# https://github.com/kadena-io/chainweb-node/blob/b06b17da1ce22e63852993af26571fa6e0a0a8b0/pact/coin-contract/v4/coin-v4.pact#L77-L81
+# https://github.com/kadena-io/chainweb-node/blob/56e99ae421d2269a657e3bb3780c6d707e5149a0/pact/coin-contract/v5/coin-v5.pact#L80-L84
 #
 # As usual, the faucet will pay the gas, so that account will sign the
 # transaction as well.

@@ -63,7 +63,13 @@ const deployFaucetIfNeeded = async () => {
     if (deployResult.status === "success") {
       console.log(`Deployed! Cost: ${deployResult.gas} gas.`);
     } else {
-      throw new Error(`Failed to deploy contract: ${deployResult.error}`);
+      throw new Error(
+        `Failed to deploy contract: ${JSON.stringify(
+          deployResult.error,
+          null,
+          2
+        )}`
+      );
     }
   } else {
     console.log(

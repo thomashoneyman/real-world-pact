@@ -8,7 +8,7 @@ The Goliath wallet is a TypeScript + React frontend that interacts with Kadena's
 
 Goliath is a fully-functioning frontend; I encourage you to run it yourself, make tweaks, and view the results! If you are using the provided Nix shell, then you can use the following commands to run Goliath:
 
-```console
+```sh
 # Enter the Nix shell
 nix develop
 
@@ -50,7 +50,7 @@ Finally, the transaction details section lists each transaction associated with 
 
 You can use the command below to start the wallet frontend in development mode. Feel free to make changes to the source code – the UI will hot-reload with your changes.
 
-```console
+```sh
 pnpm run dev
 ```
 

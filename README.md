@@ -23,33 +23,33 @@ As a quick demonstration: follow the commands below to start a local simulation 
 
 1. Clone the repository and initialize the `devnet` submodule
 
-   ```console
+   ```sh
    git clone git@github.com:thomashoneyman/real-world-pact
    cd real-world-pact
-   git submodule update --init
    ```
 
 2. Enter the Nix developer shell, which provides all the tools you need except for Docker
 
-   ```console
+   ```sh
+   # Use nix-shell if you do not have a version of Nix that supports Nix flakes.
    nix develop
    ```
 
 3. Start the simulation Chainweb (run `devnet-stop` to stop the simulation)
 
-   ```console
+   ```sh
    devnet-start
    ```
 
 4. Deploy the faucet contract to the simulation Chainweb
 
-   ```console
+   ```sh
    faucet-deploy
    ```
 
 5. Start the Goliath wallet application (Ctrl+C to exit)
 
-   ```console
+   ```sh
    goliath-start
    ```
 
@@ -73,8 +73,8 @@ This application provisions a developer shell using [Nix](https://nixos.org/down
 
 Once installed, enter the developer shell:
 
-```console
-$ nix develop
+```sh
+nix develop
 ```
 
 The only tool not included is Docker, which is omitted because it requires specific system permissions. If you want to use devnet then you must have Docker installed.
