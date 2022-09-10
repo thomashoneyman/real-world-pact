@@ -74,6 +74,7 @@ This application provisions a developer shell using [Nix](https://nixos.org/down
 Once installed, enter the developer shell:
 
 ```sh
+# Use nix-shell if you do not have a version of Nix that supports Nix flakes.
 nix develop
 ```
 

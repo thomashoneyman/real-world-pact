@@ -9,10 +9,22 @@ This faucet smart contract project will teach you the fundamentals of developing
 - Generating keypairs and signing transactions with the Pact CLI
 - Sending transactions and deploying contracts using the Pact CLI and a tool for HTTP requests
 
-The Goliath faucet is a fully-functioning smart contract. I encourage you to deploy it yourself, execute transactions from the `yaml/send` directory, and query the state of the contract and its related accounts using the requests in the `yaml/local` directory. If you are using the provided Nix shell, then you can use the following commands to deploy the contract and run requests against it:
+The contract and its associated repl and request files are all fully-commented to explain how you would write them yourself. You should read through them, beginning with the contract itself.
+
+The Goliath faucet is a fully-functioning smart contract. I encourage you to deploy it, execute transactions from the `yaml/send` directory, and query the state of the contract and its related accounts using the requests in the `yaml/local` directory. If you are using the provided Nix shell, then you can use the following commands to run the faucet.repl file to formally verify and test the contract:
 
 ```sh
-# Enter the Nix shell
+# Enter the Nix shell (use nix-shell if your Nix installation does not support flakes)
+nix develop
+
+# Use Pact to run the repl file
+pact faucet.repl
+```
+
+You can also deploy the contract to a simulation of Chainweb and run requests against the live contract exactly how you would if it were a real contract deployed to mainnet:
+
+```sh
+# Enter the Nix shell (use nix-shell if your Nix installation does not support flakes)
 nix develop
 
 # Start the simulation blockchain (run devnet-stop to stop the simulation)
@@ -95,12 +107,12 @@ If you just want to set up an environment with the faucet contract and some acco
 pact> (load "faucet.setup.repl")
 ----------
 'goliath-faucet' account created:
-  - keyset: 'goliath-faucet-keyset'
+  - keyset: 'free.goliath-faucet-keyset'
   - public key: 'goliath-faucet-public-key'
   - balance: 1000.0 KDA
 
 'user' account created:
-  - keyset: 'user-keyset'
+  - keyset: 'free.user-keyset'
   - public key: 'user-public-key'
   - balance: 0.0 KDA
 ----------

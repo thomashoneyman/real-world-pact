@@ -1,54 +1,201 @@
-; The faucet.setup.repl file sets up the REPL environment by loading in our
-; dependencies (such as the coin contract), initializing accounts like the
-; faucet account and a test user account, and loading our faucet contract. It's
-; a useful base file. Here, we use it to set up our test environment so we can
-; get right to testing.
+; REPL files are a fast way to test our contracts from the terminal. It's a
+; common practice to develop contracts with an associated REPL file. This lets
+; you exercise various functions from the contract, and provides other
+; developers concrete usage examples.
+;
+; This REPL file tests the goliath-faucet contract. Along the way, we'll learn
+; a number of useful REPL-only functions that you can use when writing your
+; own contracts. In the rest of this file, we will:
+;
+; 1. Load the REPL environment from the faucet.setup.repl file
+; 2. Formally verify our contract
+; 3. Execute code from our contract, test the results, and measure the total
+;    gas consumption of various functions.
+;
+; You can execute this file from the command line with:
+;   $ pact faucet.repl
+;
+; Alternately, to execute this file and remain in the REPL so you can interact
+; with the running program, run `pact` from the command line, then:
+;   pact> (load "faucet.repl")
+;
+; This file is written with the expectation you have already read through
+; the associated smart contract. Concepts like namespaces, keysets, interfaces,
+; modules, schemas, tables, constants, functions, and formal verification are
+; explained there.
+;
+; I also recommend reading through the faucet.setup.repl file if you are
+; interested in how the REPL environment was set up and how it differs from the
+; Chainweb environment.
+
+; --------------------
+; 1. Load the REPL environment
+; --------------------
+
+; The REPL environment is not Chainweb, so it doesn't have data that our
+; contract will expect to exist on Chainweb when it is deployed, such as the
+; modules and keysets it depends on. We've implemented a REPL file that creates
+; a suitable environment in the REPL for testing our code. Specifically, it
+; creates the "free" namespace, creates and funds the faucet account, "deploys"
+; the modules our contract depends on (such as the "coin" module), and registers
+; a keyset for a test user account that we can use to request funds from our
+; faucet account.
+;
+; To see exactly how the environment is set up, please read the fully-commented
+; faucet.setup.repl file. For this file, we simply need to load it.
 (load "faucet.setup.repl")
 
+; --------------------
+; 2. Formally verify the contract
+; --------------------
+
+; Pact provides a powerful formal verification system that can prove that
+; invalid states cannot be reached in our contract code. Our functions have some
+; property testing models and our table has some invariants that it would like
+; Pact to verify. We can typecheck our code and run formal verification in the
+; REPL with (verify):
+; https://pact-language.readthedocs.io/en/latest/pact-properties.html
+; https://pact-language.readthedocs.io/en/latest/pact-functions.html#verify
+;
+; Try disabling some of the (enforce) checks in the Pact module to see how the
+; formal verification catches invalid inputs!
 (verify "free.goliath-faucet")
 
-; Now the tests can begin. First we try requesting funds.
+; If you are not using any formal verification in your Pact code, but you would
+; still like Pact to verify that your types are correct, then you can use the
+; (typecheck) function. This isn't necessary in our case, because (verify) will
+; also typecheck the module.
+; https://pact-language.readthedocs.io/en/latest/pact-functions.html#typecheck
+
+; --------------------
+; 3. Execute code from our contract and test the results
+; --------------------
+
+; We've come a long way. We've set up our pseudo-Chainweb environment. We've
+; "deployed" and formally verified our contract. Our test environment is fully
+; set up: our faucet is funded and ready to begin sending funds. We've enabled
+; metrics so we can measure how much gas is consumed by our contract functions.
+; Let's start testing!
+;
+; Here's how our faucet works:
+;
+;  1. Anyone can ask for KDA from the faucet, but the faucet must sign the tx.
+;  2. By default, the faucet will send a maximum of 20 KDA in a single call to
+;     (request-funds) and a maximum of 100 KDA per address.
+;  3. The per-request and per-account limits can be raised by the faucet using
+;     the (set-account-limit) and (set-request-limit) functions.
+;  4. Accounts can return funds to the faucet with (return-funds), which will
+;     credit against their limits.
+;  5. Account limits can be checked at any time with (get-limits)
+;
+; Our tests should verify this behaviour and serve as an example of how to call
+; functions in our contract. If this is your first time seeing the (env-sigs)
+; or (env-data) functions, please read the description in the faucet.setup.repl
+; file and review the documentation:
+; https://pact-language.readthedocs.io/en/stable/pact-functions.html#env-data
+; https://pact-language.readthedocs.io/en/stable/pact-functions.html#env-sigs
+
+; Now the tests can begin! First we try requesting funds. Recall that the
+; (request-funds) function relies on the (coin.TRANSFER) capability because it
+; calls the (coin.transfer-create) function, and therefore we must scope the
+; faucet's signature to this capability as part of the transaction.
+;
+; Below, the goliath faucet keys sign the transaction, and the signature is
+; scoped to the TRANSFER capability. The capability takes three arguments to
+; restrict how much authorization is being granted: the account to transfer
+; from, the account to transfer to, and the maximum amount that can be
+; transferred. If the Pact code in the transaction tries to transfer to a
+; different account or tries to transfer a larger amount, then the capability
+; will not be granted and the transaction will fail. Try it for yourself – see
+; what happens if you comment out the below line.
 (env-sigs [{"key": "goliath-faucet-public-key", "caps": [(coin.TRANSFER "goliath-faucet" "user" 1000.0)]}])
 (begin-tx)
 (free.goliath-faucet.request-funds "user" (describe-keyset "free.user-keyset") 20.0)
+; Great – we've requested funds for the "user" account! It began with no funds
+; at all, so let's let's verify this worked by checking that this account now
+; has 20 KDA.
+;
+; We can use the (expect), (expect-that), and (expect-failure) functions to make
+; test assertions in our REPL code:
+; https://pact-language.readthedocs.io/en/latest/pact-functions.html#expect
+; https://pact-language.readthedocs.io/en/latest/pact-functions.html#expect-that
+; https://pact-language.readthedocs.io/en/latest/pact-functions.html#expect-failure
+;
+; The (coin.get-balance) function records how much KDA a particular account
+; has, or fails with an error if the account does not exist. We can use it
+; to verify we did indeed create the user account.
 (expect "User account has been created and has 20 KDA." 20.0 (coin.get-balance "user"))
 (expect "Faucet has spent 20 KDA and has 980 KDA remaining." 980.0 (coin.get-balance "goliath-faucet"))
 (commit-tx)
 (env-sigs [])
 
-; Then we exceed the per-request limit, then adjust it upwards, then succeed.
+; We now know that requesting funds works. What about our restrictions? What
+; happens if you exceed the per-request limit? In the below test, we try to
+; request more funds in a single call than we're allowed to, and then we raise
+; the per-request limit for the user account, and ensure that our previously
+; over-the-limit request succeeds.
+;
+; Recall that the (free.goliath.set-request-limit) function is guarded by the
+; SET_LIMIT capability; we need to scope the faucet's signature to that
+; capability in order for the transaction to succeed.
 (env-sigs [{"key": "goliath-faucet-public-key", "caps": [(coin.TRANSFER "goliath-faucet" "user" 1000.0), (free.goliath-faucet.SET_LIMIT)]}])
 (begin-tx)
+; First, let's verify that exceeding the per-request limit fails, as expected.
 (expect-failure "80.0 would exceed per-request limit." (free.goliath-faucet.request-funds "user" (describe-keyset "free.user-keyset") 80.0))
-
+; Then, let's adjust the per-request limit to be higher than the default 20.0.
+; This time, we'll use (env-gaslog) to measure the gas consumption of the
+; (set-request-limit) function. We can do this because we set up gas metrics in
+; the faucet.setup.repl file.
+; https://pact-language.readthedocs.io/en/stable/pact-functions.html#env-gaslog
+(env-gaslog)
 (free.goliath-faucet.set-request-limit "user" 200.0)
+(env-gaslog)
+; We can measure how much gas a call to (set-request-limit) takes.
+(let (( expected-gas 489 ))
+  (expect (format "Setting request limit costs {} gas" [expected-gas]) expected-gas (env-gas)))
+; And we can verify that the limit was indeed raised by calling (get-limits)
 (expect "User request limit has been raised to 200.0." { "account-limit": 100.0, "request-limit": 200.0, "account-limit-remaining": 80.0 } (free.goliath-faucet.get-limits "user"))
-
+; Now our request for 80.0 KDA should succeed.
 (free.goliath-faucet.request-funds "user" (describe-keyset "free.user-keyset") 80.0)
 (expect "User account has 100.0 KDA." 100.0 (coin.get-balance "user"))
 (commit-tx)
 (env-sigs [])
 
-; Then we exceed the per-account limit, then adjust it upwards, then succeed.
+; Now, let's implement the same test, except this time we'll reach the per-
+; account limit, then raise the limit, then successfully request funds over the
+; prior limit. This time, we'll also record how much a call to (request-funds)
+; costs in terms of gas.
 (env-sigs [{"key": "goliath-faucet-public-key", "caps": [(coin.TRANSFER "goliath-faucet" "user" 1000.0), (free.goliath-faucet.SET_LIMIT)]}])
 (begin-tx)
 (expect-failure "Would exceed per-account limit." (free.goliath-faucet.request-funds "user" (describe-keyset "free.user-keyset") 1.0))
-
 (free.goliath-faucet.set-account-limit "user" 200.0)
 (expect "User account limit has been raised to 200.0." { "account-limit": 200.0, "request-limit": 200.0, "account-limit-remaining": 100.0 } (free.goliath-faucet.get-limits "user"))
-
+(env-gaslog)
 (free.goliath-faucet.request-funds "user" (describe-keyset "free.user-keyset") 100.0)
+(env-gaslog)
+(let (( expected-gas 2638 ))
+  (expect (format "Requesting funds costs {} gas" [expected-gas]) expected-gas (env-gas)))
 (expect "User account has 200.0 KDA." 200.0 (coin.get-balance "user"))
 (commit-tx)
 (env-sigs [])
 
-; Then we exceed the per-account limit again, then return funds, then succeed
+; Finally, let's verify that we can return funds to the faucet and it will
+; credit back to our overall limits.
 (env-sigs [{"key": "user-public-key", "caps": [(coin.TRANSFER "user" "goliath-faucet" 1000.0)]}])
 (begin-tx)
 (expect "User account has reached its account limit." { "account-limit": 200.0, "request-limit": 200.0, "account-limit-remaining": 0.0 } (free.goliath-faucet.get-limits "user"))
-
 (free.goliath-faucet.return-funds "user" 50.0)
 (expect "User account limit is no longer reached." { "account-limit": 200.0, "request-limit": 200.0, "account-limit-remaining": 50.0 } (free.goliath-faucet.get-limits "user"))
-
 (commit-tx)
 (env-sigs [])
+
+; And that's that! Our faucet.repl file formally verifies our contract, performs
+; unit tests, and serves as a concrete demonstration of calling functions from
+; our contract. We've also estimated the gas cost of various functions from the
+; contract. I encourage you to tweak the contract to see how the gas consumption
+; changes.
+;
+; If you haven't yet used the request files in the yaml directory to interact
+; with a deployed version of the contract on a simulation of Chainweb, you
+; should do that next. If you have, then you're ready to move on to the Goliath
+; wallet frontend!
