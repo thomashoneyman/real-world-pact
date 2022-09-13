@@ -16,5 +16,5 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["theme/src", "pact-api-utils", "02-goliath-wallet/src", "03-lending-platform/src"],
+  "include": ["theme", "02-goliath-wallet", "03-lending-platform"]
 }

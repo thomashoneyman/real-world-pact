@@ -13,7 +13,7 @@
 #   verify the guard, and only transfer the funds if it matches.
 #
 # To execute this request:
-# ./run-request --send request-funds --signers goliath-faucet
+# faucet-request --send request-funds --signers goliath-faucet
 
 networkId: "development"
 type: exec

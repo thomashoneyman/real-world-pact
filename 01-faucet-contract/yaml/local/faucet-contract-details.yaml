@@ -3,7 +3,7 @@
 # been deployed to the Chainweb node.
 #
 # To execute this request:
-# ./run-request --local faucet-contract-details
+# faucet-request --local faucet-contract-details
 #
 # If you would like to deploy the faucet smart contract, please see the
 # `yaml/send/deploy-faucet-contract.yaml` request file.

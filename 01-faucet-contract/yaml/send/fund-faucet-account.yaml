@@ -9,11 +9,11 @@
 # on devnet to transfer funds to our faucet address.
 #
 # To execute this request:
-# ./run-request --send fund-faucet-account --signers sender00
+# faucet-request --send fund-faucet-account --signers sender00
 #
 # Alternately, to fund the faucet account and then use it to deploy the faucet
 # smart contract:
-# ./run-deploy-contract.js
+# faucet-deploy
 
 networkId: "development"
 type: exec

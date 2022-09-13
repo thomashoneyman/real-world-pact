@@ -8,4 +8,4 @@ Charkha combines a TypeScript + React frontend using [kadena.js](https://github.
 - Interact with off-chain data (real-world asset prices, for example)
 - Implementing unit tests, integration tests, and formal verification for our contracts
 
-Charkha is still under development.
+Charkha is still under development. Stay tuned!

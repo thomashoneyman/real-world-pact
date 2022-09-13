@@ -2,9 +2,9 @@
 
 The Goliath wallet is a TypeScript + React frontend that interacts with Kadena's Chainweb blockchain. It is a minimal but complete frontend application, intended for developers who have built a React application before but are newcomers to Pact and Chainweb. This project builds on the [smart contract we developed in Project 1](../01/faucet-contract/) and demonstrates how to:
 
-- Use the [pact-lang-api](https://github.com/kadena-io/pact-lang-api) library to deploy contracts, send transactions, read and read transaction results from a Chainweb node.
+- Use the [pact-lang-api](https://github.com/kadena-io/pact-lang-api) library to send transactions to a Chainweb node for execution and read th results.
+- Query our local Chainweb node for information on one chain or across all 20 chains (for example, to retrieve an account's balance on all chains).
 - Write an interface for interacting with the faucet smart contract we developed in Project 1
-- Query our local Chainweb node for information across all 20 chains (for example, to retrieve an account's balance on all chains).
 
 Goliath is a fully-functioning frontend; I encourage you to run it yourself, make tweaks, and view the results! If you are using the provided Nix shell, then you can use the following commands to run Goliath:
 
@@ -48,7 +48,7 @@ Finally, the transaction details section lists each transaction associated with 
 
 ### Development
 
-You can use the command below to start the wallet frontend in development mode. Feel free to make changes to the source code – the UI will hot-reload with your changes.
+You can use the command below to start the wallet frontend in development mode. Feel free to make changes to the source code – the UI will hot-reload with your changes. Remember: this will only work if you are running devnet!
 
 ```sh
 pnpm run dev
@@ -61,11 +61,12 @@ You may wish to open the developer tools with the console and/or network tabs op
 The code specific to our wallet is in the `src` directory:
 
 - `App.tsx` is our application. It initializes data, stores the app state, and assembles our UI from our theme components.
-- `goliath-faucet.ts` contains the TypeScript implementation of our faucet smart contract. You should read this file and the [faucet smart contract it describes](../01-faucet-contract/faucet.pact) side-by-side.
-- `requests.ts` contains various requests that we'll send to Chainweb using the `pact-lang-api` library. It's roughly analogous to the [yaml directory containing request files](../01-faucet-contract/yaml/) from Project 1, so you can see how requests translate between request files and a similar implementation in TypeScript.
+- `pact-utils` is a helper library built on top of `pact-lang-api` that provides TypeScript definitions for `pact-lang-api`, helpers for writing Pact code in JavaScript, a request builder module that makes it easy to build requests for Chainweb, and a collection of React Hooks for integrating requests into your UI. Feel free to use this code in your own projects!
+- `contracts` contains TypeScript implementations of our faucet smart contract and some of the `coin-v5` contract. You should read this file and the [faucet smart contract it describes](../01-faucet-contract/faucet.pact) side-by-side. You can also compare the requests to the [request files](../01-faucet-contract/yaml) from Project 1, so you can see how the same requests translate to the request builder.
+- `components` contains a few Goliath-specific components, such as the modals for setting account limits, requesting funds, and returning funds.
 - `config.ts` contains configuration specific to our application, such as the network ID and chain that our requests will target and the keypairs for various accounts our wallet will control.
+- `accounts.ts` contains the account details (addresses, public and private keys) for accounts used by the wallet. In the real world **never** commit your private keys; these are included for demonstration only.
 
 There is also some code not stored in this directory because it is used both for the wallet and for the [Charkha lending protocol project](../03-charkha-lending/). Specifically:
 
-- [`pact-api-utils`](../pact-api-utils/) contains TypeScript types and some utilities on top of the official [pact-lang-api](https://github.com/kadena-io/pact-lang-api) library. The `pact-lang-api` library is written in JavaScript and is a little too low-level to be easy to use in our project. This code is commented if you'd like to read it.
-- [`theme`](../theme/) contains the various UI components used to build both frontends. These are typical frontend code and have nothing to do with Pact or Chainweb specifically. This code is not commented.
+- [`theme`](../theme) contains the various UI components used to build both frontends. These are typical frontend code and have nothing to do with Pact or Chainweb specifically. This code is not commented.

@@ -43,10 +43,10 @@ declare module "pact-lang-api" {
   }
 
   interface KeyPairCapabilities extends KeyPair {
-    clist?: CapabilitySignature[];
+    clist?: Capability[];
   }
 
-  interface CapabilitySignature {
+  interface Capability {
     name: string;
     args: PactValue[];
   }
@@ -60,17 +60,15 @@ declare module "pact-lang-api" {
     sender: string;
   }
 
-  interface ExecCmd<a> {
-    networkId: string;
+  // The network to target. For devnet, use "development".
+  type NetworkId = "mainnet01" | "testnet" | "development";
+
+  interface ExecCmd {
+    networkId: NetworkId;
     type?: "exec" | "cont";
     keyPairs?: KeyPairCapabilities | KeyPairCapabilities[];
     nonce?: string;
     envData?: { [key: string]: PactValue | KeySet };
-    pactCode: string;
-    meta: TransactionMetadata;
-  }
-
-  interface LocalCmd {
     pactCode: string;
     meta: TransactionMetadata;
   }
@@ -104,11 +102,7 @@ declare module "pact-lang-api" {
     params: string[];
   }
 
-  interface SuccessResult {
-    status: "success";
-    data: PactValue;
-  }
-
+  // The contents of the "result" field when Pact execution failed.
   interface FailureResult {
     status: "failure";
     error: {
@@ -119,9 +113,13 @@ declare module "pact-lang-api" {
     };
   }
 
-  type RequestError = string;
+  // The contents of the "result" field when Pact execution succeeded.
+  interface SuccessResult {
+    status: "success";
+    data: PactValue;
+  }
 
-  interface ExecTransactionResponse {
+  interface ExecResponseImpl {
     continuation: null;
     events: TransactionEvent[] | null;
     gas: number;
@@ -131,24 +129,35 @@ declare module "pact-lang-api" {
     txId: number | null;
   }
 
-  interface FailedExecTransactionResponse extends ExecTransactionResponse {
+  interface FailedExecResponse extends ExecResponseImpl {
     result: FailureResult;
   }
 
-  interface SuccessExecTransactionResponse extends ExecTransactionResponse {
+  interface SuccessExecResponse extends ExecResponseImpl {
     result: SuccessResult;
   }
 
+  type ExecResponse = FailedExecResponse | SuccessExecResponse;
+
   /* The /local endpoint */
-  interface LocalResponse {
+  interface LocalResponseImpl {
     continuation: null;
     gas: number;
-    result: FailureResult | SuccessResult;
     metaData: LocalResponseMetadata;
     logs: string;
     reqKey: string;
     txId: number | null;
   }
+
+  interface FailedLocalResponse extends LocalResponseImpl {
+    result: FailureResult;
+  }
+
+  interface SuccessLocalResponse extends LocalResponseImpl {
+    result: SuccessResult;
+  }
+
+  type LocalResponse = FailedLocalResponse | SuccessLocalResponse;
 
   /* The /send endpoint */
   interface SendResponse {
@@ -157,9 +166,7 @@ declare module "pact-lang-api" {
 
   /* The /poll endpoint */
   type PollResponse = {
-    [requestKey: string]:
-      | FailedExecTransactionResponse
-      | SuccessExecTransactionResponse;
+    [requestKey: string]: ExecResponse;
   };
 
   /*
@@ -176,20 +183,9 @@ declare module "pact-lang-api" {
   const crypto: ICrypto;
 
   interface IFetch {
-    local: (
-      cmd: LocalCmd,
-      apiHost: string
-    ) => Promise<RequestError | LocalResponse>;
-
-    send: (
-      cmd: ExecCmd<any> | ExecCmd<any>[],
-      apiHost: string
-    ) => Promise<RequestError | SendResponse>;
-
-    poll: (
-      cmd: PollCmd,
-      apiHost: string
-    ) => Promise<RequestError | PollResponse>;
+    local: (cmd: ExecCmd, apiHost: string) => Promise<string | LocalResponse>;
+    send: (cmd: ExecCmd | ExecCmd[], apiHost: string) => Promise<string | SendResponse>;
+    poll: (cmd: PollCmd, apiHost: string) => Promise<string | PollResponse>;
   }
 
   const fetch: IFetch;

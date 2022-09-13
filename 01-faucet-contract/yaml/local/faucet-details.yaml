@@ -3,7 +3,7 @@
 # a "row not found: goliath-faucet" error.
 #
 # To execute this request:
-# ./run-request --local faucet-details
+# faucet-request --local faucet-details
 #
 # If you would like to fund the faucet account, please see the
 # `yaml/send/fund-faucet-account.yaml` request file.

@@ -1,5 +1,4 @@
 packages:
   - "02-goliath-wallet"
   - "03-charkha-lending"
-  - "pact-api-utils"
   - "theme"

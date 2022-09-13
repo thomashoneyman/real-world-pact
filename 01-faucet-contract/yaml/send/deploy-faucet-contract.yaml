@@ -2,10 +2,10 @@
 # faucet contract to Chainweb.
 #
 # To execute this request (you must have funded the faucet account):
-# ./run-request --send deploy-faucet-contract --signers goliath-faucet
+# faucet-request --send deploy-faucet-contract --signers goliath-faucet
 #
 # Alternately, to fund the faucet account _and_ deploy the contract:
-# ./run-deploy-contract.js
+# faucet-deploy
 
 networkId: "development"
 type: "exec"
@@ -65,7 +65,7 @@ publicMeta:
   # Instead, I first set the gas limit to 150000 (the maximum) and deploy the
   # contract to our local simulation Chainweb. Then, I recorded the gas
   # consumption that the node reported and round it up.
-  gasLimit: 6000
+  gasLimit: 6500
 
   gasPrice: 0.0000001
   ttl: 600

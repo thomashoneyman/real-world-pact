@@ -3,7 +3,7 @@
 # account, so this transaction must be signed with those keys.
 #
 # To execute this request:
-# ./run-request --send set-user-request-limit --signers goliath-faucet
+# faucet-request --send set-user-request-limit --signers goliath-faucet
 
 networkId: "development"
 type: exec

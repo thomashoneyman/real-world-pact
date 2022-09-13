@@ -8,13 +8,13 @@
 # funds to this account succeeded and the correct amount arrived!
 #
 # You can execute this request:
-# ./run-request.js --local user-account-details
+# faucet-request --local user-account-details
 #
 # This request will only succeed if the user account exists (ie. has received
 # funds). To create this account, deploy the faucet smart contract and then
 # request funds for the user account:
-# ./run-deploy-contract.js
-# ./run-request --send request-funds --signers goliath-faucet
+# faucet-deploy (or ./run-deploy-contract.js if not using Nix)
+# faucet-request --send request-funds --signers goliath-faucet
 #
 # Then you can look up details on the user account.
 

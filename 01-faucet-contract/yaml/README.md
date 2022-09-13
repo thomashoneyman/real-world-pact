@@ -22,7 +22,7 @@ With the faucet contract deployed, you can now execute any request in the `local
 
 ### Execute a single request
 
-You can use the [run-request.js](../run-request.js) script to execute any request in the `local` or `send` directories. Local requests will return a result immediately, but the exec requests in the `send` directory take between 30 and 90 seconds to complete since they must be mined into a block (blocks are mined every 30 seconds).
+You can use the `faucet-request` command (aliased in the Nix shell to the [run-request.js](../run-request.js) script) to execute any request in the `local` or `send` directories. Local requests will return a result immediately, but the exec requests in the `send` directory take between 30 and 90 seconds to complete since they must be mined into a block (blocks are mined every 30 seconds).
 
 > The ../run-request.js script is aliased to faucet-request in the Nix shell. I use that command throughout the guide. If you aren't using Nix, run `../run-request.js` with the same arguments.
 

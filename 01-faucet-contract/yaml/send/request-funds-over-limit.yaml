@@ -3,7 +3,7 @@
 # must first use the 'set-user-request-limit' request file to update the limit.
 #
 # To execute this request:
-# ./run-request.js --send request-funds-over-limit --signers goliath-faucet
+# faucet-request --send request-funds-over-limit --signers goliath-faucet
 #
 # This request is uncommented. For details on (request-funds), please see the
 # companion file:

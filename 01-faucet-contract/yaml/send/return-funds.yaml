@@ -2,7 +2,7 @@
 # contract. We'll return funds from the test-user account.
 #
 # To execute this request:
-# ./run-request.js --send return-funds --signers test-user,goliath-faucet
+# faucet-request --send return-funds --signers test-user,goliath-faucet
 
 networkId: "development"
 type: exec

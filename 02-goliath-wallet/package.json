@@ -7,7 +7,6 @@
     "build": "tsc && vite build"
   },
   "dependencies": {
-    "@real-world-pact/pact-api-utils": "workspace:*",
     "@real-world-pact/theme": "workspace:*",
     "formik": "^2.2.9",
     "pact-lang-api": "^4.3.5",

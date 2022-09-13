@@ -12,7 +12,6 @@ importers:
     specifiers:
       '@esbuild-plugins/node-globals-polyfill': ^0.1.1
       '@esbuild-plugins/node-modules-polyfill': ^0.1.4
-      '@real-world-pact/pact-api-utils': workspace:*
       '@real-world-pact/theme': workspace:*
       '@types/react': ^18.0.0
       '@types/react-dom': ^18.0.0
@@ -26,7 +25,6 @@ importers:
       typescript: ^4.6.3
       vite: ^2.9.9
     dependencies:
-      '@real-world-pact/pact-api-utils': link:../pact-api-utils
       '@real-world-pact/theme': link:../theme
       formik: 2.2.9_react@18.2.0
       pact-lang-api: 4.3.5
@@ -42,19 +40,6 @@ importers:
       esbuild: 0.15.1
       typescript: 4.7.4
       vite: 2.9.9
-
-  pact-api-utils:
-    specifiers:
-      '@types/react': ^18.0.0
-      pact-lang-api: ^4.3.5
-      react: ^18.0.0
-      typescript: ^4.6.3
-    dependencies:
-      pact-lang-api: 4.3.5
-      react: 18.2.0
-    devDependencies:
-      '@types/react': 18.0.17
-      typescript: 4.7.4
 
   theme:
     specifiers:
