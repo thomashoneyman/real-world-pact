@@ -217,7 +217,7 @@ export const returnFunds: PactRequest<ReturnFundsArgs, string> = buildRequest(HO
     const keyPairs = [
       {
         ...accountKeys,
-        clist: [{ name: "coin.TRANSFER", args: [account, amount, FAUCET_ACCOUNT] }],
+        clist: [{ name: "coin.TRANSFER", args: [account, FAUCET_ACCOUNT, amount] }],
       },
       {
         ...faucetAccount.keys,
