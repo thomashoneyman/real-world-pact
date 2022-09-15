@@ -139,7 +139,7 @@ export type RequestResult<input, result> =
   | ExecError<input>
   | Success<input, result>;
 
-// The possible results of sending a request for execution
+// The possible statuses of sending a request for execution
 export type RequestStatus<input, result> = Pending<input> | RequestResult<input, result>;
 
 /* 3.  EXECUTING REQUESTS

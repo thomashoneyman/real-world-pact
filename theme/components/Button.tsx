@@ -8,6 +8,7 @@ export const Button = styled("button", {
   borderWidth: "0.125rem",
   borderStyle: "solid",
   fontSize: "$sm",
+  minWidth: "6rem",
 
   "&:hover": {
     cursor: "pointer",
@@ -26,13 +27,26 @@ export const Button = styled("button", {
           backgroundColor: "$crimson10",
           borderColor: "$crimson10",
         },
+        "&:disabled": {
+          cursor: "unset",
+          color: "$blackA10",
+          backgroundColor: "$blackA4",
+          borderColor: "$blackA5",
+        },
       },
+
       secondary: {
         backgroundColor: "$mauve2",
         borderColor: "$mauve2",
         "&:hover": {
           backgroundColor: "$mauve3",
           borderColor: "$mauve3",
+        },
+        "&:disabled": {
+          cursor: "unset",
+          color: "$blackA10",
+          backgroundColor: "$blackA4",
+          borderColor: "$blackA5",
         },
       },
     },
@@ -69,4 +83,23 @@ export const Button = styled("button", {
       },
     },
   ],
+});
+
+export const IconButton = styled("button", {
+  all: "unset",
+  fontFamily: "inherit",
+  borderRadius: "100%",
+  height: 25,
+  width: 25,
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  color: "crimson11",
+  position: "absolute",
+  top: 10,
+  right: 10,
+  cursor: "pointer",
+
+  "&:hover": { backgroundColor: "$crimson4" },
+  "&:focus": { boxShadow: "0 0 0 2px $crimson7" },
 });

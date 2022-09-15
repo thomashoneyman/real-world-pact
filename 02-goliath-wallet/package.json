@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@real-world-pact/theme": "workspace:*",
+    "@radix-ui/react-icons": "^1.1.1",
     "formik": "^2.2.9",
     "pact-lang-api": "^4.3.5",
     "react": "^18.0.0",

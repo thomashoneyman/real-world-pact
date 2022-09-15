@@ -11,7 +11,6 @@ import React, { useEffect } from "react";
 
 import { GlobalStyles } from "@real-world-pact/theme/components/GlobalStyles";
 import { Navbar } from "@real-world-pact/theme/components/Navbar";
-import { AdminModal, ReceiveModal, SendModal } from "./components/Modal";
 import { AccountOverview } from "./components/AccountOverview";
 import { Transactions } from "./components/Transactions";
 
@@ -20,10 +19,12 @@ import * as coin from "./contracts/coin-v5";
 import * as faucet from "./contracts/goliath-faucet";
 
 import { useRequest, useRequestAllChains, useRequestGroup } from "./pact-utils/usePactRequest";
-import { RequestStatus, SUCCESS } from "./pact-utils/request-builder";
+import { SUCCESS } from "./pact-utils/request-builder";
 import { userAccount, userKeySet } from "./accounts";
-import { DEFAULT_CHAIN } from "./config";
 import { Box, Container, Flex } from "@real-world-pact/theme/components/Container";
+import { AdminModal } from "./components/AdminModal";
+import { RequestFundsModal } from "./components/RequestFundsModal";
+import { ReturnFundsModal } from "./components/ReturnFundsModal";
 
 const App = () => {
   // We'll begin by setting up the requests we will make to our Chainweb node.
@@ -53,20 +54,24 @@ const App = () => {
     (a, b) => b.request.meta.creationTime - a.request.meta.creationTime
   );
 
+  // After a successful transfer we'll want to refresh the user's balances and
+  // remaining account limits.
+  const refreshUserData = async () => {
+    await runDetails({ address: userAccount.address });
+    await runGetLimits({ address: userAccount.address });
+  };
+
   // We will always request funds and return funds on behalf of the user account
   // so we can specialize our two functions to make them easier to use. We'll
-  // also include a callback that will make a new call to runDetails to refresh
-  // the balances if the transfer was successful.
+  // also refresh the user data after a successful transfer.
   const userRequestFunds = (amount: Pact.PactDecimal) => {
-    const address = userAccount.address;
-    const input = { targetAddress: address, targetAddressKeySet: userKeySet, amount };
-    return runRequestFunds(input, ({ status }) => status === SUCCESS && runDetails({ address }));
+    const input = { targetAddress: userAccount.address, targetAddressKeySet: userKeySet, amount };
+    return runRequestFunds(input, ({ status }) => status === SUCCESS && refreshUserData());
   };
 
   const userReturnFunds = (amount: Pact.PactDecimal) => {
-    const address = userAccount.address;
-    const input = { account: address, accountKeys: userAccount.keys, amount };
-    return runReturnFunds(input, ({ status }) => status === SUCCESS && runDetails({ address }));
+    const input = { account: userAccount.address, accountKeys: userAccount.keys, amount };
+    return runReturnFunds(input, ({ status }) => status === SUCCESS && refreshUserData());
   };
 
   // All right! Our requests are all set up and tidy; we can now easy make
@@ -90,20 +95,28 @@ const App = () => {
       <Box css={{ padding: "0 $1" }}>
         <Navbar>
           <Flex css={{ alignItems: "center" }}>
-            <AdminModal limits={limits} css={{ marginRight: "$3" }} />
-            <ReceiveModal
-              limits={limits}
-              css={{ marginRight: "$2" }}
-              onSubmit={async (amount) => {
-                await userRequestFunds({ decimal: amount.toString() });
+            <AdminModal
+              css={{ marginRight: "$3" }}
+              onSuccess={async () => {
+                await runGetLimits({ address: userAccount.address });
               }}
             />
-            <SendModal />
+            <RequestFundsModal
+              css={{ marginRight: "$2" }}
+              onSubmit={async (amount: Pact.PactDecimal) => {
+                await userRequestFunds(amount);
+              }}
+            />
+            <ReturnFundsModal
+              onSubmit={async (amount: Pact.PactDecimal) => {
+                await userReturnFunds(amount);
+              }}
+            />
           </Flex>
         </Navbar>
         <Container size="md">
-          <AccountOverview kAccount={userAccount.address} balances={details} />
-          <Transactions transactions={transactionStatuses} />
+          <AccountOverview balances={details} />
+          <Transactions limits={limits} transactions={transactionStatuses} />
         </Container>
       </Box>
     </GlobalStyles>

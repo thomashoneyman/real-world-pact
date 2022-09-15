@@ -44,3 +44,34 @@ export const formatPactCode = (code: PactCode): string => {
 
   return `(${code.cmd} ${code.args.map(format).join(" ")})`;
 };
+
+// We'll validate that the provided input is parseable into a Pact decimal.
+export const parsePactDecimal = (value: string): string | Pact.PactDecimal => {
+  const split = value.split(".");
+  const numbers = new RegExp("[0-9]+$");
+  if (split.length === 1) {
+    const parsed = parseFloat(split[0]);
+    if (!numbers.test(split[0])) {
+      return "Can only contain digits and a decimal point.";
+    } else if (isNaN(parsed) || parsed < 0) {
+      return "Invalid number.";
+    } else {
+      return { decimal: `${split[0]}.0` };
+    }
+  } else if (split.length === 2) {
+    if (!numbers.test(split[0]) || !numbers.test(split[1])) {
+      return "Can only contain digits and a decimal point.";
+    }
+    const parsedFirst = parseFloat(split[0]);
+    const parsedSecond = parseFloat(split[1]);
+    if (isNaN(parsedFirst) || parsedFirst < 0) {
+      return "Invalid number before the decimal place.";
+    } else if (isNaN(parsedSecond) || parsedSecond < 0) {
+      return "Invalid number after the decimal place.";
+    } else {
+      return { decimal: `${parsedFirst.toString()}.${parsedSecond.toString()}` };
+    }
+  } else {
+    return "Invalid number (more than one decimal point).";
+  }
+};

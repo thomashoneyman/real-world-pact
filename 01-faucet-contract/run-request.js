@@ -177,9 +177,7 @@ const runRequest = async (args) => {
         );
       }
     }
-  } catch (err) {
-    console.log(err.message);
-  }
+  } catch (err) {}
 };
 
 const main = async () => {

@@ -24,8 +24,8 @@ import { creationTime, defaultLocalCmd, coercePactValue } from "./utils";
 
 // Corresponds with constants defined in the 'goliath-faucet smart contract.
 export const FAUCET_ACCOUNT = "goliath-faucet";
-export const DEFAULT_REQUEST_LIMIT = { decimal: "20.0" };
-export const DEFAULT_ACCOUNT_LIMIT = { decimal: "100.0" };
+export const DEFAULT_REQUEST_LIMIT = 20.0;
+export const DEFAULT_ACCOUNT_LIMIT = 100.0;
 
 // Our first function is the (request-funds) function from the contract. These
 // are the arguments it takes, which ought to be configurable in our app:

@@ -1,4 +1,4 @@
-import { blackA, whiteA, mauve, crimson } from "@radix-ui/colors";
+import { blackA, whiteA, mauve, crimson, green, red } from "@radix-ui/colors";
 import { createStitches } from "@stitches/react";
 
 const spaceSizeScale = {
@@ -37,6 +37,8 @@ export const { css, styled, keyframes } = createStitches({
     colors: {
       ...crimson,
       ...mauve,
+      ...green,
+      ...red,
       ...whiteA,
       ...blackA,
     },

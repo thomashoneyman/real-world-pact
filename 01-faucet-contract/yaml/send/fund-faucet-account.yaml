@@ -97,6 +97,6 @@ publicMeta:
   # This is a reasonable limit for a transfer-create operation. You can measure
   # calculate this for yourself by calling 'transfer-create' in a REPL file and
   # using the (env-gas) functions to measure gas consumption.
-  gasLimit: 600
+  gasLimit: 2000
   gasPrice: 0.0000001
   ttl: 600

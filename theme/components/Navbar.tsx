@@ -8,11 +8,7 @@ const StyledLogo = styled("div", {
 
 const Logo = () => (
   <StyledLogo>
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 367 90"
-      className="iconLeft"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 367 90" className="iconLeft">
       <g
         id="c08561b5-da53-4b0a-b174-194c0704c502"
         fill="#1a1523"

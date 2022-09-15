@@ -1,6 +1,14 @@
+/* ACCOUNT OVERVIEW
+
+The account overview section uses the (coin.details) request to display balances
+for the user's account across all chains.
+
+*/
+
 import { Box, Flex, Grid } from "@real-world-pact/theme/components/Container";
 import { Spinner } from "@real-world-pact/theme/components/Spinner";
 import { Header, Text } from "@real-world-pact/theme/components/Text";
+import { userAccount } from "../accounts";
 import * as coin from "../contracts/coin-v5";
 import {
   EXEC_ERROR,
@@ -11,11 +19,10 @@ import {
 } from "../pact-utils/request-builder";
 
 export interface AccountOverviewProps {
-  kAccount: string;
   balances: RequestStatus<coin.DetailsArgs, coin.DetailsResponse>[];
 }
 
-export const AccountOverview = ({ kAccount, balances }: AccountOverviewProps) => {
+export const AccountOverview = ({ balances }: AccountOverviewProps) => {
   const description = `
     Your account is comprised of the public key from the public/private key pair
     generated for you by the wallet, with a k: prefix. This is called a k:account.
@@ -44,17 +51,16 @@ export const AccountOverview = ({ kAccount, balances }: AccountOverviewProps) =>
           </Text>
         </Box>
       </Flex>
-      <AccountTable kAccount={kAccount} balances={balances} />
+      <AccountTable balances={balances} />
     </Box>
   );
 };
 
 interface AccountTableProps {
-  kAccount: string;
   balances: RequestStatus<coin.DetailsArgs, coin.DetailsResponse>[];
 }
 
-const AccountTable = ({ kAccount, balances }: AccountTableProps) => {
+const AccountTable = ({ balances }: AccountTableProps) => {
   // CSS grid lays items out in a left-to-right basis, but we want chains
   // ordered top-to-bottom.
   const lowerChains = balances.slice(0, 10);
@@ -92,7 +98,7 @@ const AccountTable = ({ kAccount, balances }: AccountTableProps) => {
         overflowX: "auto",
       }}
     >
-      <Text as="pre">{kAccount}</Text>
+      <Text as="pre">{userAccount.address}</Text>
     </Flex>
   );
 
@@ -185,6 +191,7 @@ const AccountTable = ({ kAccount, balances }: AccountTableProps) => {
 const trimDecimal = (n: number): number => {
   return Number(n.toFixed(6));
 };
+
 const sumBalances = (balances: RequestStatus<any, coin.DetailsResponse>[]) =>
   trimDecimal(
     balances

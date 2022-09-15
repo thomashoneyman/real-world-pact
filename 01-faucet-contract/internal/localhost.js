@@ -29,8 +29,18 @@ exports.post = ({ path, body }) => {
             "Received connection timeout. You may need to restart devnet or try this request again."
           );
         } else {
-          const parsed = JSON.parse(result);
-          resolve(parsed);
+          if (result.includes("Validation failed for hash")) {
+            console.log(result);
+            reject(result);
+          } else {
+            try {
+              const parsed = JSON.parse(result);
+              resolve(parsed);
+            } catch (err) {
+              console.log(`Failed to parse JSON response: ${err}`);
+              reject(err);
+            }
+          }
         }
       });
     });

@@ -18,6 +18,21 @@ export const Spinner = styled("span", {
   borderBottomColor: "transparent",
   borderLeftColor: "transparent",
   animation: `${spin} 0.45s linear infinite`,
-  height: "$3",
-  width: "$3",
+
+  variants: {
+    size: {
+      small: {
+        height: "$3",
+        width: "$3",
+      },
+      medium: {
+        height: "$5",
+        width: "$5",
+      },
+    },
+  },
+
+  defaultVariants: {
+    size: "small",
+  },
 });
