@@ -64,7 +64,6 @@ This repository is broken into several directories. You can look at the README.m
 - `02-goliath-wallet`: Contains the implementation for the Goliath wallet (beginner friendly, TypeScript + React code)
 - `03-charkha-lending`: Contains the implementation for the Charkha lending protocol (intermediate, full application)
 - `devnet`: Contains a checkout of Kadena's [devnet](https://github.com/kadena-io/devnet) as a Git submodule. This isn't our code! You don't really need to look at it.
-- `pact-api-utils`: Contains types and helper functions for using the [pact-lang-api](https://github.com/kadena-io/pact-lang-api) library. This may be removed in the future if functions are upstreamed.
 - `theme`: Contains the TypeScript for common UI components used in our application. You don't need to look at this, as it's nothing to do with Pact or Chainweb and solely so our apps look good.
 
 ## Necessary Tools
