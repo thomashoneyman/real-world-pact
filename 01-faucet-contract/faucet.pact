@@ -34,7 +34,7 @@
 ;   endpoint for evaluation.
 ;
 ; A typical Pact smart contract executes some top-level setup code by defining
-; one or more keysets and entering a namspaces. Then, it defines a module and/or
+; one or more keysets and entering a namespaces. Then, it defines a module and/or
 ; interface that other modules can reference. Finally, it executes more top-level code to
 ; initialize data required by the module, such as creating new tables. Each of
 ; these steps introduces critical concepts for Pact development.
