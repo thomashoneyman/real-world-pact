@@ -52,7 +52,7 @@
 ;
 ; Modules, interfaces, and keysets in Pact must have unique names within a
 ; particular 'namespace'. On a private blockchain you can define your own
-; amespace or use the "root" namespace (ie. no namespace at all). On a public
+; namespace or use the "root" namespace (ie. no namespace at all). On a public
 ; blockchain the root namespace is reserved for built-in contracts (like the
 ; `coin` contract, which we'll see later), and on Chainweb specifically you can
 ; only define a new namespace with the approval of the Kadena team.
