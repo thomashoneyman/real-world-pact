@@ -28,3 +28,6 @@ dist-ssr
 
 # Pact
 .pact-history
+
+# Hidden
+**/*.env

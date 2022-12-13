@@ -1,4 +1,4 @@
 packages:
   - "02-goliath-wallet"
-  - "03-charkha-lending"
+  - "03-charkha-lending/app"
   - "theme"

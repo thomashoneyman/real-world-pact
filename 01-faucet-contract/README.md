@@ -2,7 +2,7 @@
 
 This directory contains the Goliath faucet contract. A "faucet" is a smart contract that distributes funds to users for testing purposes (so they don't have to purchase the coin via an exchange). They are often used on test networks like Kadena's testnet (there is a [testnet faucet](https://faucet.testnet.chainweb.com), by the way). The contract in this directory is our own faucet that we will deploy to our local development blockchain. Then, we will use this faucet in our next project: the Goliath wallet.
 
-This faucet smart contract project will teach you the fundamentals of developing with Pact. Specifically, you'll learn about:
+The faucet smart contract project teaches you the fundamentals of developing with Pact. You don't need any tools except for `pact`, the `z3` prover, and `node`. There are no libraries used in this project. Everything Pact-related you learn in this project you can take directly to your next one! Specifically, you'll learn about:
 
 - Pact language features such as keysets, namespaces, modules, interfaces, guards, schemas, tables, governance, and initializing contracts.
 - Testing and iterating on contracts with Pact REPL files, including REPL-only functions for measuring gas consumption, formally verifying contracts, and more.

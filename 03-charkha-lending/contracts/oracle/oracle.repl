@@ -1,0 +1,4 @@
+(begin-tx)
+(load "../_dependencies/bootstrap.pact")
+(load "./oracle.pact")
+(commit-tx)
