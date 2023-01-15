@@ -1,5 +1,5 @@
 {
-  "name": "@real-world-pact/goliath",
+  "name": "@real-world-pact/charkha",
   "private": true,
   "version": "0.0.0",
   "scripts": {
@@ -8,10 +8,6 @@
   },
   "dependencies": {
     "@real-world-pact/theme": "workspace:*",
-    "@real-world-pact/utils": "workspace:*",
-    "@radix-ui/react-icons": "^1.1.1",
-    "formik": "^2.2.9",
-    "pact-lang-api": "^4.3.5",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
   },

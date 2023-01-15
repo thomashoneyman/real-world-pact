@@ -1,0 +1,31 @@
+; All Pact modules must exist within a namespace on Chainweb, except for basic
+; contracts provided by Kadena. There are two namespaces that anyone can use on
+; Chainweb: the "free" namespace and the "user" namespace. Other namespaces can
+; be created with Kadena's sign-off, but for our contracts we'll assume we don't
+; have the ability to create namespaces.
+;
+; The "free" and "user" namespaces exist on Chainweb, but they don't exist in
+; the REPL environment. If we want to load Pact modules that we have written in
+; the "free" namespace into the REPL, then we need to ensure that namespace
+; exists in the REPL. We can do that with (define-namespace):
+; https://pact-language.readthedocs.io/en/stable/pact-functions.html#define-namespace
+;
+; Defining a namespace requires that we provide two guards. The first guard is
+; the user who will manage the namespace. It must be satisfied in order to
+; deploy code to the given namespace. The second guard is the blockchain admin,
+; and it must be satisfied in order to create the new namespace.
+;
+; In practice, you only need to care about any of this if the Kadena team grants
+; you a namespace of your own. In the REPL environment we will simply create
+; these namespaces using mock guards.
+(begin-tx)
+(module test-ns GOVERNANCE
+  (defcap GOVERNANCE () true)
+  (defconst NAMESPACE_GUARD (create-user-guard (succeed)))
+  (defun succeed () true)
+)
+
+(define-namespace "free" test-ns.NAMESPACE_GUARD test-ns.NAMESPACE_GUARD)
+(define-namespace "user" test-ns.NAMESPACE_GUARD test-ns.NAMESPACE_GUARD)
+(commit-tx)
+(print "Loaded 'free' and 'user' namespaces.")

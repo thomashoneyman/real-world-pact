@@ -1,0 +1,38 @@
+; The REPL environment allows us to execute Pact code and inspect the results.
+; We can use it to simulate how our contract will behave once deployed to
+; Chainweb. However: we aren't actually using Chainweb. That means there
+; technically are no nodes, no transactions, no keysets, no existing contracts,
+; and so on. Therefore we must set up our REPL environment so that it includes
+; data that our contract would expect to exist.
+;
+; This REPL file initializes all the data we would expect to exist on Chainweb
+; at the time we deploy our contracts. See each loaded REPL file for an
+; explanation of why and how that data is being initialized.
+;
+; You can execute this file from the command line with:
+;   $ pact init.repl
+;
+; Alternately, to execute this file and remain in the REPL so you can interact
+; with the running program, run `pact` in the terminal and then:
+;   pact> (load "init.repl")
+
+; We initialize the "free" and "user" namespaces, the only two which we can use
+; to deploy our contracts.
+(load "init-namespaces.repl")
+
+; We inititialize foundational Kadena contracts we expect to be present on-chain
+; such as the 'coin' contract.
+(load "init-contracts.repl")
+
+; We create and fund three accounts (sender00, sender01, sender02). These aren't
+; present on Chainweb, but they are present on our local simulation blockchain,
+; devnet, so test code that refers to these accounts will work in both
+; environments. We can use these accounts to create and fund other accounts, or
+; as basic test accounts.
+;
+; This relies on the coin contract so it must be loaded after 'init-contracts'.
+(load "init-accounts.repl")
+
+; The gas model allows us to track gas consumption during our REPL session. We
+; load it last because we don't want our general initialization to count.
+(load "init-gasmodel.repl")

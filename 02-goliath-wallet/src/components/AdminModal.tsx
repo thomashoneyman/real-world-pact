@@ -14,9 +14,14 @@ import { Formik } from "formik";
 import { ReactNode } from "react";
 import { userAccount } from "../accounts";
 import * as faucet from "../contracts/goliath-faucet";
-import { parsePactDecimal } from "../pact-utils/pact-code";
-import { EXEC_ERROR, PENDING, RequestStatus, REQUEST_ERROR } from "../pact-utils/request-builder";
-import { useRequest } from "../pact-utils/usePactRequest";
+import { parsePactDecimal } from "@real-world-pact/utils/pact-code";
+import {
+  EXEC_ERROR,
+  PENDING,
+  RequestStatus,
+  REQUEST_ERROR,
+} from "@real-world-pact/utils/request-builder";
+import { useRequest } from "@real-world-pact/utils/usePactRequest";
 
 interface AdminModalProps {
   onSuccess: () => Promise<void>;

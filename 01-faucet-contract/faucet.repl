@@ -3,13 +3,14 @@
 ; you exercise various functions from the contract, and provides other
 ; developers concrete usage examples.
 ;
-; This REPL file tests the goliath-faucet contract. Along the way, we'll learn
+; This REPL file tests the goliath-faucet module. Along the way, we'll learn
 ; a number of useful REPL-only functions that you can use when writing your
 ; own contracts. In the rest of this file, we will:
 ;
-; 1. Load the REPL environment from the faucet.setup.repl file
-; 2. Formally verify our contract
-; 3. Execute code from our contract, test the results, and measure the total
+; 1. Load a REPL environment from the ../pact-repl-utils/init.repl file
+; 2. Deploy the faucet contract
+; 3. Formally verify our contract
+; 4. Execute code from our contract, test the results, and measure the total
 ;    gas consumption of various functions.
 ;
 ; You can execute this file from the command line with:
@@ -24,10 +25,14 @@
 ; modules, schemas, tables, constants, functions, and formal verification are
 ; explained there.
 ;
-; I also recommend reading through the faucet.setup.repl file if you are
-; interested in how the REPL environment was set up and how it differs from the
-; Chainweb environment.
-
+; One last thing: we are going to wrap each logical step in our REPL session in
+; (begin-tx) and (commit-tx). This mimics executing a transaction on chain. It
+; also allows us to run a few steps and then undo them without committing via
+; the (rollback-tx) function.
+; https://pact-language.readthedocs.io/en/latest/pact-functions.html#begin-tx
+; https://pact-language.readthedocs.io/en/latest/pact-functions.html#commit-tx
+; https://pact-language.readthedocs.io/en/latest/pact-functions.html#rollback-tx
+;
 ; --------------------
 ; 1. Load the REPL environment
 ; --------------------
@@ -36,14 +41,60 @@
 ; contract will expect to exist on Chainweb when it is deployed, such as the
 ; modules and keysets it depends on. We've implemented a REPL file that creates
 ; a suitable environment in the REPL for testing our code. Specifically, it
-; creates the "free" namespace, creates and funds the faucet account, "deploys"
-; the modules our contract depends on (such as the "coin" module), and registers
-; a keyset for a test user account that we can use to request funds from our
-; faucet account.
+; creates and enters the "free" namespace, creates and funds several test
+; accounts, and loads the modules our contract depends on (such as the "coin"
+; module).
+(load "../pact-repl-utils/init.repl")
+
+; --------------------
+; 2. Create the test environment
+; --------------------
+
+; We are now in an environment similar to Chainweb. Next, let's mimic the
+; deployment process we will take in the real world. We need to create and fund
+; the admin faucet account and use it to deploy the faucet contract.
+
+; Accounts can be created on Chainweb using the (coin.create-account) function
+; or by transferring funds to the account with (coin.transfer-create). Since we
+; loaded the 'init.repl' file, we have access to a 'sender00' account that has
+; funds they can transfer to create the faucet admin account.
 ;
-; To see exactly how the environment is set up, please read the fully-commented
-; faucet.setup.repl file. For this file, we simply need to load it.
-(load "faucet.setup.repl")
+; In the real world, you might create a k:account, then purchase KDA on an
+; exchange and have the exchange transfer the funds to your address. You can
+; then use your account to deploy contracts.
+;
+; Recall that the (coin.transfer-create) function relies on the (coin.TRANSFER)
+; capability, and therefore we must scope the "sender00" signature to this
+; capability as part of the transaction. We can add a signature to the current
+; transaction with the REPL-only (env-sigs) function:
+; https://pact-language.readthedocs.io/en/stable/pact-functions.html#env-sigs
+(env-sigs [ { "key": test-keys.SENDER00, "caps": [ (coin.TRANSFER "sender00" "goliath-faucet" 1000.0) ] } ])
+(env-data { "goliath-faucet-keyset": { "keys": [ "goliath-faucet-public-key" ], "pred": "keys-all" } })
+(begin-tx)
+(coin.transfer-create "sender00" "goliath-faucet" (read-keyset "goliath-faucet-keyset") 1000.0)
+(commit-tx)
+(env-data {})
+(env-sigs [])
+
+; Recall that our contract expects to read an "init" boolean from transaction
+; data so it knows whether it needs to initialize data or not. It also reads
+; the "goliath-faucet-keyset" field to know what keyset to register to governy
+; the contract. We can use the (env-data) REPL-only function to associate
+; transaction data:
+; https://pact-language.readthedocs.io/en/stable/pact-functions.html#env-data
+;
+; Our contract also includes a safety check that ensures that the faucet keys
+; were used to deploy the contract. We therefore must use (env-sigs) again to
+; sign the deployment.
+(env-data { "init": true, "goliath-faucet-keyset": { "keys": [ "goliath-faucet-public-key" ], "pred": "keys-all" } })
+(env-sigs [ { "key": "goliath-faucet-public-key", "caps": [] } ])
+(begin-tx)
+; And now we "deploy" our contract, which will also register our keyset at the
+; name "free.goliath-faucet-keyset".
+(load "./faucet.pact")
+(commit-tx)
+(env-sigs [])
+(env-data {})
 
 ; --------------------
 ; 2. Formally verify the contract
@@ -89,16 +140,21 @@
 ;  5. Account limits can be checked at any time with (get-limits)
 ;
 ; Our tests should verify this behaviour and serve as an example of how to call
-; functions in our contract. If this is your first time seeing the (env-sigs)
-; or (env-data) functions, please read the description in the faucet.setup.repl
-; file and review the documentation:
-; https://pact-language.readthedocs.io/en/stable/pact-functions.html#env-data
-; https://pact-language.readthedocs.io/en/stable/pact-functions.html#env-sigs
+; functions in our contract.
 
-; Now the tests can begin! First we try requesting funds. Recall that the
-; (request-funds) function relies on the (coin.TRANSFER) capability because it
-; calls the (coin.transfer-create) function, and therefore we must scope the
-; faucet's signature to this capability as part of the transaction.
+; We'll quickly register a keyset for our test user for ease of use in our tests.
+; We'll then use this user account to request and return funds.
+(env-data { "user-keyset": { "keys": [ "user-public-key" ], "pred": "keys-all" } })
+(begin-tx)
+(namespace "free")
+(define-keyset "free.user-keyset" (read-keyset "user-keyset"))
+(commit-tx)
+(env-data {})
+
+; First we try requesting funds. Recall that the (request-funds) function relies
+; on the (coin.TRANSFER) capability because it calls the (coin.transfer-create)
+; function, and therefore we must scope the faucet's signature to this capability
+; as part of the transaction.
 ;
 ; Below, the goliath faucet keys sign the transaction, and the signature is
 ; scoped to the TRANSFER capability. The capability takes three arguments to
@@ -108,8 +164,9 @@
 ; different account or tries to transfer a larger amount, then the capability
 ; will not be granted and the transaction will fail. Try it for yourself – see
 ; what happens if you comment out the below line.
-(env-sigs [{"key": "goliath-faucet-public-key", "caps": [(coin.TRANSFER "goliath-faucet" "user" 1000.0)]}])
+(env-sigs [ { "key": "goliath-faucet-public-key", "caps": [ (coin.TRANSFER "goliath-faucet" "user" 1000.0) ] } ])
 (begin-tx)
+
 (free.goliath-faucet.request-funds "user" (describe-keyset "free.user-keyset") 20.0)
 ; Great – we've requested funds for the "user" account! It began with no funds
 ; at all, so let's let's verify this worked by checking that this account now
@@ -138,7 +195,7 @@
 ; Recall that the (free.goliath.set-request-limit) function is guarded by the
 ; SET_LIMIT capability; we need to scope the faucet's signature to that
 ; capability in order for the transaction to succeed.
-(env-sigs [{"key": "goliath-faucet-public-key", "caps": [(coin.TRANSFER "goliath-faucet" "user" 1000.0), (free.goliath-faucet.SET_LIMIT)]}])
+(env-sigs [ { "key": "goliath-faucet-public-key", "caps": [ (coin.TRANSFER "goliath-faucet" "user" 1000.0), (free.goliath-faucet.SET_LIMIT) ] } ])
 (begin-tx)
 ; First, let's verify that exceeding the per-request limit fails, as expected.
 (expect-failure "80.0 would exceed per-request limit." (free.goliath-faucet.request-funds "user" (describe-keyset "free.user-keyset") 80.0))
@@ -165,7 +222,7 @@
 ; account limit, then raise the limit, then successfully request funds over the
 ; prior limit. This time, we'll also record how much a call to (request-funds)
 ; costs in terms of gas.
-(env-sigs [{"key": "goliath-faucet-public-key", "caps": [(coin.TRANSFER "goliath-faucet" "user" 1000.0), (free.goliath-faucet.SET_LIMIT)]}])
+(env-sigs [ { "key": "goliath-faucet-public-key", "caps": [ (coin.TRANSFER "goliath-faucet" "user" 1000.0), (free.goliath-faucet.SET_LIMIT) ] } ])
 (begin-tx)
 (expect-failure "Would exceed per-account limit." (free.goliath-faucet.request-funds "user" (describe-keyset "free.user-keyset") 1.0))
 (free.goliath-faucet.set-account-limit "user" 200.0)
@@ -181,7 +238,7 @@
 
 ; Finally, let's verify that we can return funds to the faucet and it will
 ; credit back to our overall limits.
-(env-sigs [{"key": "user-public-key", "caps": [(coin.TRANSFER "user" "goliath-faucet" 1000.0)]}])
+(env-sigs [ { "key": "user-public-key", "caps": [ (coin.TRANSFER "user" "goliath-faucet" 1000.0) ] } ])
 (begin-tx)
 (expect "User account has reached its account limit." { "account-limit": 200.0, "request-limit": 200.0, "account-limit-remaining": 0.0 } (free.goliath-faucet.get-limits "user"))
 (free.goliath-faucet.return-funds "user" 50.0)
@@ -195,7 +252,6 @@
 ; contract. I encourage you to tweak the contract to see how the gas consumption
 ; changes.
 ;
-; If you haven't yet used the request files in the yaml directory to interact
-; with a deployed version of the contract on a simulation of Chainweb, you
-; should do that next. If you have, then you're ready to move on to the Goliath
-; wallet frontend!
+; If you haven't yet used the request files to interact with a deployed version
+; of the contract on a simulation of Chainweb, you should do that next. If you
+; have, then you're ready to move on to the Goliath wallet frontend!

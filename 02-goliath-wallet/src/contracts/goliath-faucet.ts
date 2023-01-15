@@ -17,9 +17,9 @@ If you still feel stuck, please open an issue!
 
 import Pact, { KeyPair, KeyPairCapabilities, PactDecimal } from "pact-lang-api";
 import { faucetAccount } from "../accounts";
-import { formatPactCode } from "../pact-utils/pact-code";
+import { formatPactCode } from "@real-world-pact/utils/pact-code";
 import { DEFAULT_CHAIN, GAS_PRICE, HOST_NAME, NETWORK_ID, TTL } from "../config";
-import { buildRequest, PactRequest } from "../pact-utils/request-builder";
+import { buildRequest, PactRequest } from "@real-world-pact/utils/request-builder";
 import { creationTime, defaultLocalCmd, coercePactValue } from "./utils";
 
 // Corresponds with constants defined in the 'goliath-faucet smart contract.

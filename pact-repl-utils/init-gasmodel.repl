@@ -1,0 +1,31 @@
+; One of the most important concepts when building a dapp on a blockchain like
+; Chainweb is gas: computations on chain cost gas, which is paid for using KDA.
+; This cost is either paid by users of the dapp or on the user's behalf by the
+; dapp itself. Either way, if you create a dapp, you need to be able to estimate
+; the cost of running your contracts.
+;
+; The Pact REPL  provides a handy way to measure gas consumption in a contract
+; via the (env-gas*) family of functions.
+; https://pact-language.readthedocs.io/en/latest/pact-functions.html#env-gas
+;
+;   * (env-gasmodel) lets you specify how to store record of gas consumption,
+;     which you have to set up before taking any measurements.
+;   * (env-gaslog) lets you measure gas consumption over a specific block.
+;   * (env-gas) lets you read the current gas count if provided no arguments,
+;     and lets you manually set the gas count if provided an integer (such as 0
+;     to reset the counter to 0).
+;   * (env-gaslimit) lets you set a limit to the units of gas that can be
+;     consumed in the REPL session. It will throw an error if exceeded. The
+;     maximum gas that can be consumed in a single transaction is 150000. That
+;     can be useful limit to set when you want to measure a single .pact file
+;     and see how much gas it would cost to execute the entire thing in one
+;     transaction on Chainweb.
+;
+; Note that gas consumption depends in part on the size of the Pact code sent
+; to Chainweb, whether you are using transaction data for the arguments or
+; inlining the arguments into the Pact code, and so on. It's always a good idea
+; to treat gas measurements as estimates and round them up by at least 1% when
+; submitting requests to Chainweb.
+(env-gasmodel "table")
+(env-gaslimit 150000)
+(print "Initialized gas model 'table' with default limit '150_000'. Change limit with (env-gaslimit :int).")

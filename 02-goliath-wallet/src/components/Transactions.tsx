@@ -24,7 +24,7 @@ import {
   REQUEST_ERROR,
   Status,
   SUCCESS,
-} from "../pact-utils/request-builder";
+} from "@real-world-pact/utils/request-builder";
 
 import { faucetAccount } from "../accounts";
 

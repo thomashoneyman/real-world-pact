@@ -73,8 +73,18 @@
 ; KEYSETS
 ; ----------
 
-; Now that we are inside the "free" namespace, we can begin defining keysets for
-; use in our module.
+; Our smart contract will be governed by a keyset named "goliath-faucet-keyset",
+; within the "free" namespace. This means the contract can only be upgraded in
+; a transaction that was signed by the private keys that satisfy the keyset
+; that "free.goliath-faucet-keyset" refers to.
+;
+; It's absolutely critical that we register this keyset before we deploy the
+; contract. If we forget, then someone else can come along and register the
+; "free.goliath-faucet-keyset" name with their own keyset, and then they
+; control our contract!
+;
+; In this step we will ensure we've registered this keyset. But before we go
+; on: what, exactly, is a keyset?
 ;
 ; Public-key authorization is widely used in smart contracts to ensure that only
 ; the holders of specific keys can take certain actions (such as transferring
@@ -84,36 +94,37 @@
 ; Pact is handled via "guards" or "capabilities" (we'll learn about both later),
 ; and a keyset is a specific kind of guard.
 ;
-; So what, concretely, is a keyset? A keyset pairs a set of public keys with a
-; predicate function. In JSON form it looks like this:
+; A keyset pairs a set of public keys with a predicate function. In JSON form it
+; looks like this:
 ;
-;   { "keys": [ "abc123"], "pred": "keys-all" }
+;   { "keys": [ "abc123" ], "pred": "keys-all" }
 ;
 ; Pact will check the predicate function against the set of keys when the keyset
 ; is used as a guard. If the predicate fails then access is denied. There are
 ; a few built-in predicate functions, such as the "keys-all" function above;
-; this predicate means means that all keys in the set must have signed the
-; transaction. You can also write your own predicate functions (for example,
-; to authorize access according to a vote).
+; this predicate means means that the transaction must include private key
+; signatures for every public key in the set. You can also write your own
+; predicate functions (for example, to authorize access according to a vote).
 ; https://pact-language.readthedocs.io/en/latest/pact-reference.html#keysets-and-authorization
 ;
-; Keysets are defined via the (define-keyset) function. This function takes a
-; name and a keyset as arguments. When evaluated, Pact will either register the
+; Keysets are simple data, but you will typically register a unique name for
+; keysets you are using in your contracts. To "register" a keyset is to store
+; it on the blockchain with a unique name, called a "keyset reference", via the
+; (define-keyset) function. When evaluated, Pact will either register the
 ; keyset at the given name on Chainweb or, if the name is already registered,
-; then it will "rotate" (ie. update) the keyset to the new value.
+; it will "rotate" (ie. update) the keyset at that name to the provided value.
 ; https://pact-language.readthedocs.io/en/stable/pact-functions.html#define-keyset
 ;
-; When registering a keyset in a smart contract it's a common practice to send
-; the keyset in the deployment transaction data instead of hardcoding it into
-; the contract. That's because keyset references can be rotated (ie. upgraded);
-; once rotated, the keyset name won't refer to the value written in the contract
-; anymore. If you ever want to see the current value of a keyset reference, you
+; If you ever want to see the current value of a keyset reference, you
 ; can look it up by name by sending this code to a Chainweb node:
 ;
 ;    (describe-keyset "free.my-keyset")
 ;
-; Let's proceed with defining the "free.goliath-faucet-keyset" using the keyset
-; provided via transaction data. You can parse data from the transaction using
+; Let's proceed with registering the "free.goliath-faucet-keyset". How do we
+; know what keyset to register?
+;
+; It's common practice to provide the keyset that we'd like to register as part
+; of the transaction data. You can parse data from the transaction using
 ; the (read-*) family of functions:
 ; https://pact-language.readthedocs.io/en/stable/pact-functions.html#read-msg
 ; https://pact-language.readthedocs.io/en/stable/pact-functions.html#read-keyset
@@ -123,48 +134,44 @@
 ;
 ; Our deployment transaction will be sent with two pieces of data:
 ;
-; * 'upgrade': a boolean indicating whether we intend this as a deployment or as
+; * 'init': a boolean indicating whether we intend this as a deployment or as
 ;   an upgrade to the already-deployed module; if we are upgrading then we can
 ;   skip the keyset definition and initialization steps.
-; * 'goliath-faucet-contract': a keyset that should be registered as the
+; * 'goliath-faucet-keyset': a keyset that should be registered as the
 ;   "free.goliath-faucet-keyset" keyset on-chain.
 ;
 ; Below, we read the Goliath faucet keyset from the transaction data and
-; register it, but only if we are deploying (not upgrading) this contract. Once
-; the keyset is registered, our Pact module can refer to it when guarding
-; sensitive information. To see how to provide a keyset in transaction data
-; please refer to the faucet.repl file and the deploy-faucet-contract.yaml file.
-(if (read-msg "upgrade")
-
-  ; If reading the 'upgrade' field yields 'true', then this isn't our initial
-  ; deployment and therefore we should skip registering the keyset.
-  "Upgrading contract"
-
-  ; Otherwise, this is our initial deployment, so we should register the keyset.
-  ; Just one more thing before we proceed: we should verify our keyset. There
-  ; are multiple reasons to do this.
-  ;
-  ; First, what if we have a typo in the keyset sent in the transaction data?
-  ; The typo keyset will be registered and we'll be unable to access anything
-  ; guarded by it!
-  ;
-  ; Second, you don't have to define a keyset inside your smart contract. You
-  ; may wish to reuse the same keyset reference in multiple contracts, and so
-  ; you simply reuse the keyset reference in your contract. This can be
-  ; dangerous, however. If you deploy a contract referring to a keyset but you
-  ; forgot to register that keyset, then someone else can register the keyset
-  ; with their keys and gain access to your guarded data.
-  ;
-  ; To prevent these risks it's a best practice to enforce a keyset guard on the
-  ; transaction that deploys the contract. This guard should ensure that any
-  ; keysets passed to the contract were also used to sign the transaction that
-  ; deploys the contract. If the enforcement fails, the deployment is aborted,
-  ; and you can fix the keyset and try again.
-  ; https://pact-language.readthedocs.io/en/stable/pact-functions.html#keyset-ref-guard
-  [ (enforce-keyset (read-keyset "goliath-faucet-keyset"))
-    (define-keyset "free.goliath-faucet-keyset" (read-keyset "goliath-faucet-keyset"))
-  ]
-)
+; register it. If the keyset reference doesn't exist then it will be created and
+; our Pact module can refer to it when guarding sensitive information. If the
+; reference already exists, then Pact will use the transaction signatures to
+; determine whether the keyset at that reference is satisfied; if so, then it
+; will overwrite it.
+;
+; To see how to provide a keyset in transaction data please refer to the
+; faucet.repl file and the deploy-faucet-contract.yaml file.
+;
+; There's just one last thing to do before we register our keyset: verify it!
+; There are multiple reasons to do this.
+;
+; First, what if we have a typo in the keyset we sent in the transaction data?
+; The incorrect keyset will be registered and we'll be unable to access anything
+; guarded by it!
+;
+; Second, you don't have to define a keyset inside your smart contract. You may
+; wish to reuse the same keyset reference in multiple contracts, and so you
+; simply reuse the keyset reference in your contract. This can be dangerous,
+; however. If you deploy a contract referring to a keyset but you forgot to
+; register that keyset, then someone else can register the keyset with their
+; keys and gain access to your guarded data.
+;
+; To prevent these risks it's a best practice to always enforce a keyset guard
+; on the transaction that deploys the contract. This guard should ensure that
+; any keysets passed to the contract were also used to sign the transaction that
+; deploys the contract. If the enforcement fails, the deployment is aborted,
+; and you can fix the keyset and try again.
+; https://pact-language.readthedocs.io/en/stable/pact-functions.html#keyset-ref-guard
+(enforce-keyset (read-keyset "goliath-faucet-keyset"))
+(define-keyset "free.goliath-faucet-keyset" (read-keyset "goliath-faucet-keyset"))
 
 ; ----------
 ; INTERFACES & MODULES
@@ -694,10 +701,10 @@
 ; having to re-create the table.
 ;
 ; Speaking of: it's a common practice to implement the initialization step as an
-; 'if' statement that differentiates between an initial deployment and an
-; upgrade. As with our keyset definition at the beginning of the contract, this
-; can be done by sending an "upgrade" field with a boolean value as part of the
+; if statement that differentiates between an initial deployment and an upgrade.
+; As with our keyset definition at the beginning of the contract, this can be
+; done by sending an "init" field with a boolean value as part of the
 ; transaction data
-(if (read-msg "upgrade")
-  "Upgrade complete"
-  (create-table free.goliath-faucet.accounts))
+(if (read-msg "init")
+  (create-table free.goliath-faucet.accounts)
+  "Upgrade complete")

@@ -1,6 +1,6 @@
 import * as Pact from "pact-lang-api";
 import { DEFAULT_CHAIN, GAS_PRICE, NETWORK_ID, TTL } from "../config";
-import { formatPactCode, PactCode } from "../pact-utils/pact-code";
+import { formatPactCode, PactCode } from "@real-world-pact/utils/pact-code";
 
 // A helper function to generate a new creation time when building a
 // new transaction.

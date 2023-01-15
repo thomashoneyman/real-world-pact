@@ -11,6 +11,7 @@ importers:
       '@esbuild-plugins/node-modules-polyfill': ^0.1.4
       '@radix-ui/react-icons': ^1.1.1
       '@real-world-pact/theme': workspace:*
+      '@real-world-pact/utils': workspace:*
       '@types/react': ^18.0.0
       '@types/react-dom': ^18.0.0
       '@vitejs/plugin-react': ^1.3.0
@@ -25,6 +26,7 @@ importers:
     dependencies:
       '@radix-ui/react-icons': 1.1.1_react@18.2.0
       '@real-world-pact/theme': link:../theme
+      '@real-world-pact/utils': link:../pact-api-utils
       formik: 2.2.9_react@18.2.0
       pact-lang-api: 4.3.5
       react: 18.2.0
@@ -39,6 +41,17 @@ importers:
       esbuild: 0.15.1
       typescript: 4.7.4
       vite: 2.9.9
+
+  pact-api-utils:
+    specifiers:
+      '@types/react': ^18.0.0
+      pact-lang-api: ^4.3.5
+      react: ^18.0.0
+    dependencies:
+      pact-lang-api: 4.3.5
+      react: 18.2.0
+    devDependencies:
+      '@types/react': 18.0.17
 
   theme:
     specifiers:

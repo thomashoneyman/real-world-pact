@@ -16,7 +16,7 @@ import {
   RequestStatus,
   REQUEST_ERROR,
   SUCCESS,
-} from "../pact-utils/request-builder";
+} from "@real-world-pact/utils/request-builder";
 
 export interface AccountOverviewProps {
   balances: RequestStatus<coin.DetailsArgs, coin.DetailsResponse>[];

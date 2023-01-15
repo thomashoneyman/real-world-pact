@@ -1,3 +1,9 @@
+; The coin-v5 contract implements two interfaces: fungible-v2 and
+; fungible-xchain-v1. To verify the contract implements these interfaces
+; correctly, we need to be able to load their contents. This is a copy of the
+; fungible-xchain-v1 interface deployed to Chainweb.
+;
+; https://github.com/kadena-io/chainweb-node/blob/master/pact/coin-contract/v4/fungible-xchain-v1.pact
 (interface fungible-xchain-v1
 
   " This interface offers a standard capability for cross-chain \

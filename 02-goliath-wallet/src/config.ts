@@ -17,7 +17,7 @@ are targeting!
 */
 
 import { NetworkId } from "pact-lang-api";
-import { HostName } from "./pact-utils/request-builder";
+import { HostName } from "@real-world-pact/utils/request-builder";
 
 // Which network to target. For production code targeting the main Kadena
 // network, use "mainnet01".

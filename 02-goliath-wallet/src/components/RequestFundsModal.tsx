@@ -17,7 +17,7 @@ import * as Pact from "pact-lang-api";
 
 import { Formik } from "formik";
 import { ReactNode } from "react";
-import { parsePactDecimal } from "../pact-utils/pact-code";
+import { parsePactDecimal } from "@real-world-pact/utils/pact-code";
 
 export interface RequestFundsModalProps {
   onSubmit: (amount: Pact.PactDecimal) => any;

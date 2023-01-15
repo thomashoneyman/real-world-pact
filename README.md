@@ -4,18 +4,26 @@ Real World Pact is a short guide and collection of example projects that demonst
 
 :warning: The projects in this repository are still under development! The Goliath faucet contract and wallet are largely complete, but the core concepts guide and Charkha lending protocol are unfinished.
 
-1. [**Faucet Contract**](./01-faucet-contract) (Complete)
+## Included Projects
+
+1. [**Goliath Faucet Contract**](./01-faucet-contract) (Complete)
    The faucet contract demonstrates how to write a smart contract with Pact, use the REPL to iterate on and test your code, and use the devnet test blockchain to deploy and interact with your smart contract. You'll learn the core concepts of Pact, such as modules, capabilities, property tests, tables and schemas, dependency management, and deploying your code.
 
-2. [**Goliath Wallet**](./02-goliath-wallet) (Complete)
+2. [**Goliath Wallet UI**](./02-goliath-wallet) (Complete)
    The Goliath wallet demonstrates how to build a frontend application in TypeScript + React and use the [pact-lang-api](https://github.com/kadena-io/pact-lang-api) library to interact with Chainweb. You'll learn how to generate accounts, transfer and receive KDA, interact with contracts on-chain from your frontend, and more. Goliath is named after the Goliath bird-eating spider.
 
-3. **Charkha Lending** (Upcoming)
-   The Charkha lending platform is an advanced project that demonstrates building a real-world application on Pact and Chainweb. You'll write a lending protocol in a smart contract and a frontend that allows user accounts to access the protocol. You'll learn advanced Pact and Chainweb concepts such as pacts, smart contract performance, governance, and functional programming patterns, as well as some real-world DeFi concepts. Charkha is named for the common spinning wheels used to spin silk.
+3. **[Charkha Lending Protocol](./03-charkha-lending)** (Upcoming)
+   The Charkha lending protocol is an advanced project that demonstrates building a real-world application on Pact and Chainweb. You'll see how to implement a white paper describing a lending protocol as a set of smart contracts. You'll also connect a full frontend to the protocol. You'll learn a mixture of Pact, Chainweb, and DeFi concepts, such as smart contract performance, governance, and minimizing gas fees. Charkha is named for the common spinning wheels used to spin silk.
 
-All three projects expect that you have first read the **Core Concepts**, a short crash-course on building applications with Pact. The projects contain plenty of tests and the frontends are developed with a theme included in this repository; I've made as little use of external libraries as possible so that this code is easy to extend and modify yourself.
+All three projects expect that you have first read the **Core Concepts**, a short crash-course on building applications with Pact. There are also two directories containing utility code which you should review:
 
-## Running the Applications
+1. **[Pact REPL Utils](./pact-repl-utils)**
+   The Pact REPL simulates contract operations on a Pact-supporting blockchain such as Chainweb. However, the REPL has no knowledge of the namespaces, guards, and contracts that have been deployed to Chainweb. The REPL utilities help you set up your REPL to mimic the Chainweb environment you will be deploying to -- such as making dependencies like the `coin-v5` contract available.
+
+2. **[Pact API Utils](./pact-api-utils)**
+   The [pact-lang-api](https://github.com/kadena-io/pact-lang-api) library provides basic building blocks for interacting with the Pact endpoint on a Chainweb node. However, it's too low-level for use in a serious application, so I've implemented a layer on top of it we'll use to build and send requests in our TypeScript & React applications. Feel free to use it in your own projects!
+
+## Running the Apps
 
 Each project is fully-functioning – I encourage you to run each one! All the tools you need to run this project are included via a Nix developer shell except for Docker, which you'll need to install yourself if you want to use devnet. Each project has a README describing how to use it.
 

@@ -1,0 +1,11 @@
+{
+  "name": "@real-world-pact/utils",
+  "private": true,
+  "dependencies": {
+    "pact-lang-api": "^4.3.5",
+    "react": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0"
+  }
+}

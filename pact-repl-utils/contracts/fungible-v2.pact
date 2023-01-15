@@ -1,9 +1,9 @@
-;; The coin-v5 contract implements two interfaces: fungible-v2 and
-;; fungible-xchain-v1. To verify the contract implements these interfaces
-;; correctly, we need to be able to load their contents. This is a copy of the
-;; fungible-v2 interface deployed to Chainweb.
-;;
-;; https://github.com/kadena-io/chainweb-node/blob/master/pact/coin-contract/v2/fungible-v2.pact
+; The coin-v5 contract implements two interfaces: fungible-v2 and
+; fungible-xchain-v1. To verify the contract implements these interfaces
+; correctly, we need to be able to load their contents. This is a copy of the
+; fungible-v2 interface deployed to Chainweb.
+;
+; https://github.com/kadena-io/chainweb-node/blob/master/pact/coin-contract/v2/fungible-v2.pact
 (interface fungible-v2
 
   " Standard for fungible coins and tokens as specified in KIP-0002. "

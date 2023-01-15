@@ -18,8 +18,12 @@ import * as Pact from "pact-lang-api";
 import * as coin from "./contracts/coin-v5";
 import * as faucet from "./contracts/goliath-faucet";
 
-import { useRequest, useRequestAllChains, useRequestGroup } from "./pact-utils/usePactRequest";
-import { SUCCESS } from "./pact-utils/request-builder";
+import {
+  useRequest,
+  useRequestAllChains,
+  useRequestGroup,
+} from "@real-world-pact/utils/usePactRequest";
+import { SUCCESS } from "@real-world-pact/utils/request-builder";
 import { userAccount, userKeySet } from "./accounts";
 import { Box, Container, Flex } from "@real-world-pact/theme/components/Container";
 import { AdminModal } from "./components/AdminModal";

@@ -1,0 +1,95 @@
+; A Kadena account pairs an address (such as "k:12345" or "alice") with a keyset
+; (a guard that determines what keys control the account).
+;
+; Accounts can be created on Chainweb using the (coin.create-account) function,
+; or by transferring funds to the account with (coin.transfer-create). Since we
+; don't have any accounts that could transfer funds, we'll rely on the former
+; in this file.
+;
+; That said, in the the real world plenty of accounts exist that can transfer us
+; funds. We might purchase KDA on an exchange and tell the exchange to transfer
+; funds to our KDA address on Chainweb. On our local test blockchain, devnet,
+; there are a set of accounts automatically created and funded for us:
+; https://github.com/kadena-io/chainweb-node/blob/8c32fcfff85c4e5b61a9554f0180ca6c90840e42/pact/genesis/devnet/keys.yaml
+; https://github.com/kadena-io/chainweb-node/blob/8c32fcfff85c4e5b61a9554f0180ca6c90840e42/pact/genesis/devnet/grants0.yaml
+;
+; In our REPL sessions we will mimic devnet by creating the same accounts we
+; expect to see there. That way our REPL test code is also usable in the devnet
+; test environment.
+
+; First, let's define the public and secret keys for each account, copied from
+; the 'keys.yaml' file linked above.
+(begin-tx)
+(module test-keys GOVERNANCE
+  (defcap GOVERNANCE () true)
+  (defconst SENDER00 "368820f80c324bbc7c2b0610688a7da43e39f91d118732671cd9c7500ff43cca")
+  (defconst SENDER01 "6be2f485a7af75fedb4b7f153a903f7e6000ca4aa501179c91a2450b777bd2a7")
+  (defconst SENDER02 "3a9dd532d73dace195dbb64d1dba6572fb783d0fdd324685e32fbda2f89f99a6")
+)
+(commit-tx)
+
+; Next, let's register the keysets that guard each account so that we can refer
+; to them when creating the accounts, signing transactions, and more.
+;
+; Keysets are defined via the (define-keyset) function. This function takes a
+; name and a keyset as arguments. When evaluated, Pact will either register the
+; keyset at the given name on Chainweb or, if the name is already registered,
+; then it will "rotate" (ie. update) the keyset to the new value.
+; https://pact-language.readthedocs.io/en/stable/pact-functions.html#define-keyset
+(env-data { "sender00" : [ test-keys.SENDER00 ], "sender01": [ test-keys.SENDER01 ], "sender02": [ test-keys.SENDER02 ] })
+(begin-tx)
+(namespace "free")
+(define-keyset "free.sender00-keyset" (read-keyset "sender00"))
+(define-keyset "free.sender01-keyset" (read-keyset "sender01"))
+(define-keyset "free.sender02-keyset" (read-keyset "sender02"))
+(commit-tx)
+
+(print "Registered 'sender00-keyset', 'sender01-keyset', and 'sender02-keyset' keysets.")
+(env-data {})
+
+; Next, we'll use these keysets to create our accounts. This requires that we
+; have access to the 'coin' contract, which manages the KDA token; that must
+; have been loaded into the REPL before this file executes.
+;
+; Accounts can be created on Chainweb using the (coin.create-account) function,
+; or by transferring funds to the account with (coin.transfer-create). In our
+; case we don't have any funds to transfer, so we'll use (coin.create-account)
+(begin-tx)
+(coin.create-account "sender00" (describe-keyset "free.sender00-keyset"))
+(coin.create-account "sender01" (describe-keyset "free.sender01-keyset"))
+(coin.create-account "sender02" (describe-keyset "free.sender02-keyset"))
+(commit-tx)
+(print "Created 'sender00', 'sender01', and 'sender02' accounts guarded by their respective keysets.")
+
+; Finally, we need to ensure these accounts have some funds. On Chainweb, you
+; can get funds from one of two places: someone transfers you KDA, or you mine
+; the KDA yourself. We don't have access to either source of funding in the
+; REPL, but we can simulate mining KDA by referring again to the coin contract.
+;
+; The coin contract includes a (coinbase) function that is used to reward miners
+; by minting KDA and distributing it to them when they mine a block. We can't
+; call this function on Chainweb because it is protected by the COINBASE
+; capability:
+; https://github.com/kadena-io/chainweb-node/blob/4dc69750eeffbf6eb2ce901b3d951534cc98e9be/pact/coin-contract/coin.pact#L324
+;
+; A function protected by a call to (require-capability) cannot be called from
+; outside the module, because capabilities can only be granted within the module
+; that defined the capability. However, in the REPL environment we have access
+; to a special function to magically grant ourselves a capability:
+; https://pact-language.readthedocs.io/en/latest/pact-functions.html#test-capability
+;
+; Let's use it to give ourselves the COINBASE capability.
+(begin-tx)
+(test-capability (coin.COINBASE))
+
+; Finally, it's time to fund our accounts.
+(coin.coinbase "sender00" (describe-keyset "free.sender00-keyset") 1000.0)
+(coin.coinbase "sender01" (describe-keyset "free.sender01-keyset") 1000.0)
+(coin.coinbase "sender02" (describe-keyset "free.sender02-keyset") 1000.0)
+(commit-tx)
+(print "Funded sender* accounts each with 1000.0 KDA.")
+
+; Voila! We can now transfer funds from the three sender accounts to create
+; and fund other accounts, or use these accounts as basic test accounts. Code
+; that refers to sender00, sender01, and sender02 will also be usable when
+; testing on devnet, as the accounts are also present there.

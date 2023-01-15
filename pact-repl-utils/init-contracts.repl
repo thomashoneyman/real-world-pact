@@ -1,0 +1,28 @@
+; Our Pact modules sometimes rely on other modules that have been deployed to
+; Chainweb. For example, the "coin" contract manages the KDA token, and we can
+; use it to transfer KDA, create accounts, and more. This contract exists on
+; Chainweb, but it doesn't exist in the REPL.
+;
+; If we want to be able to test contracts that depend on contracts deployed to
+; Chainweb, then we need to load those dependencies into the REPL, too. To
+; "deploy" a contract in the repl, use the (load) function:
+; https://pact-language.readthedocs.io/en/latest/pact-functions.html#load
+;
+; The (load) function takes a filepath. For that reason, we've saved copies of
+; several foundational contracts we might rely on in the 'contracts' directory.
+; We can load these contracts into the REPL one-by-one.
+(begin-tx)
+(load "./contracts/fungible-v2.pact")
+(load "./contracts/fungible-xchain-v1.pact")
+(load "./contracts/coin-v5.pact")
+
+; If a module contains tables and they are not initialized as part of the
+; smart contract, then they will need to be created on deployment. The 'coin'
+; contract is one example.
+;
+; The coin-v5 contract defines two tables (you can find them by looking for
+; calls to the (deftable) function in the contract).
+(create-table coin.coin-table)
+(create-table coin.allocation-table)
+(commit-tx)
+(print "Loaded essential Kadena contracts.")

@@ -14,7 +14,7 @@ https://github.com/kadena-io/chainweb-node/blob/master/pact/coin-contract/v5/coi
 
 import Pact from "pact-lang-api";
 import { HOST_NAME } from "../config";
-import { buildRequest, PactRequest } from "../pact-utils/request-builder";
+import { buildRequest, PactRequest } from "@real-world-pact/utils/request-builder";
 import { defaultLocalCmd, coercePactValue } from "./utils";
 
 // The address to look up details about.
