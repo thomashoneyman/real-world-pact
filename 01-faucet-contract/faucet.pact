@@ -4,7 +4,7 @@
 ; must be signed by the faucet account, so in practice only software that has
 ; access to the faucet account keys can request funds on behalf of its users,
 ; and that means the Goliath wallet software — or you, since I've committed the
-; faucet account keys to the yaml/keys directory.
+; faucet account keys to the request/keys directory.
 ;
 ; We'll implement these features in idiomatic Pact:
 ;

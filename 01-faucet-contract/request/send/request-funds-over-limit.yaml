@@ -7,7 +7,7 @@
 #
 # This request is uncommented. For details on (request-funds), please see the
 # companion file:
-# ./yaml/send/request-funds.yaml
+# ./request/send/request-funds.yaml
 
 networkId: "development"
 type: exec

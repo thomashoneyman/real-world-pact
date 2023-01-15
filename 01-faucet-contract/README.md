@@ -11,7 +11,7 @@ The faucet smart contract project teaches you the fundamentals of developing wit
 
 The contract and its associated repl and request files are all fully-commented to explain how you would write them yourself. You should read through them, beginning with the contract itself.
 
-The Goliath faucet is a fully-functioning smart contract. I encourage you to deploy it, execute transactions from the `yaml/send` directory, and query the state of the contract and its related accounts using the requests in the `yaml/local` directory. If you are using the provided Nix shell, then you can use the following commands to run the faucet.repl file to formally verify and test the contract:
+The Goliath faucet is a fully-functioning smart contract. I encourage you to deploy it, execute transactions from the `request/send` directory, and query the state of the contract and its related accounts using the requests in the `request/local` directory. If you are using the provided Nix shell, then you can use the following commands to run the faucet.repl file to formally verify and test the contract:
 
 ```sh
 # Enter the Nix shell (use nix-shell if your Nix installation does not support flakes)
@@ -35,7 +35,7 @@ devnet-start
 faucet-deploy
 
 # Send transactions and query information about the contract. For more details,
-# see the yaml/README.md instructions. (This command aliases to run-request.js;
+# see the request/README.md instructions. (This command aliases to run-request.js;
 # run that script if you aren't using Nix.)
 faucet-request
 
@@ -73,12 +73,12 @@ This directory demonstrates a typical structure for a smart contract. It consist
 
 There are also two directories (well, three, but `internal` is just helper code for scripts):
 
-- `yaml` contains request files that can be used with the Pact CLI and a tool for HTTP requests to interact with Chainweb directly. It also includes several keypairs we'll use for testing (such as the keypair for the Goliath faucet account). Please see the [README in the `yaml` directory](./yaml/) for a thorough walkthrough -- this is an important topic!
-- `root` contains a few foundational contracts developed by Kadena that our contract depends on. While these contracts will exist on Chainweb when we deploy our contract, we need to version them in our project so our REPL file can use them.
+- `request` contains request files that can be used with the Pact CLI and a tool for HTTP requests to interact with Chainweb directly. It also includes several keypairs we'll use for testing (such as the keypair for the Goliath faucet account). Please see the [README in the `request` directory](./request/) for a thorough walkthrough -- this is an important topic!
+- `keys` contains the public and secret key for various accounts we will use in our tests. The `sender00` keys are taken [from the chainweb-node repo](https://github.com/kadena-io/chainweb-node/blob/master/pact/genesis/devnet/keys.yaml) and control an account included in our local devnet automatically, which has funds we can use to fund our faucet account. The `goliath-faucet` keys control the faucet account, and I generated them with the Pact CLI. The `test-user` keys are another pair of generated keys, and they control an test account we'll use to request funds from the faucet.
 
 Finally, there are some scripts that you can use to deploy the contract and interact with it on devnet (our development Chainweb node):
 
-- `run-request.js` allows you to run any request from the `yaml` directory and review the result. Feel free to add more request files and this script will pick them up automatically! If you're in a Nix shell, this can be run from anywhere in the repository with `faucet-request`.
+- `run-request.js` allows you to run any request from the `request` directory and review the result. Feel free to add more request files and this script will pick them up automatically! If you're in a Nix shell, this can be run from anywhere in the repository with `faucet-request`.
 - `run-deploy-contract.js` chains together several calls to `run-request.js` to create the faucet account and deploy the faucet contract. The contract must be deployed before any of its functions can be called. If you're in a Nix shell, this is aliased to `faucet-deploy`.
 
 ## Usage
@@ -99,23 +99,6 @@ Alternately, you can run `pact` to enter an interactive repl. Then, load the `fa
 
 ```
 pact> (load "faucet.repl")
-```
-
-If you just want to set up an environment with the faucet contract and some accounts (but no tests), then you can use the setup file:
-
-```
-pact> (load "faucet.setup.repl")
-----------
-'goliath-faucet' account created:
-  - keyset: 'free.goliath-faucet-keyset'
-  - public key: 'goliath-faucet-public-key'
-  - balance: 1000.0 KDA
-
-'user' account created:
-  - keyset: 'free.user-keyset'
-  - public key: 'user-public-key'
-  - balance: 0.0 KDA
-----------
 ```
 
 For example, now that we're set up, we can interactively request funds for the user account:
@@ -141,7 +124,7 @@ pact> (verify "free.goliath-faucet")
 
 The second way to interact with the faucet contract is to deploy it to [devnet](https://github.com/kadena-io/devnet) and then make requests to devnet. We _could_ use a client library like [pact-lang-api](https://github.com/kadena-io/pact-lang-api) to make these requests, but for this project we're sticking with vanilla Pact. For that reason, we'll use Pact's [request formatter](https://pact-language.readthedocs.io/en/stable/pact-reference.html#api-request-formatter) to turn `request.yaml` files into valid JSON that can be sent to our Chainweb node.
 
-To learn more about how to use `request.yaml` files, including a full walkthrough of building and sending a request of your own, please refer to the [README in the `yaml` directory](./yaml).
+To learn more about how to use `request.yaml` files, including a full walkthrough of building and sending a request of your own, please refer to the [README in the `request` directory](./request).
 
 There's a little utility included in this project to help you make these requests. If you're in the Nix shell, you can send requests to your local devnet node with `faucet-request`. For example, here's a full session interacting with the contract:
 

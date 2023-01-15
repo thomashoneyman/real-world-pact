@@ -40,7 +40,7 @@ export interface RequestFundsArgs {
 // the ExecCmd we create here; if you'd like more details on why we chose the
 // values in these fields, please see the request-funds.yaml file in the faucet
 // contract project:
-// 01-faucet-contract/yaml/send/request-funds.yaml
+// 01-faucet-contract/request/send/request-funds.yaml
 export const requestFunds: PactRequest<RequestFundsArgs, string> = buildRequest(HOST_NAME, {
   type: "send",
   // This will automatically parse to our result type (string, in this case).
@@ -96,7 +96,7 @@ export interface GetLimitsResponse {
 
 // Fetch the current limits for the given address, if it has used the faucet
 // before. See also:
-// 01-faucet-contract/yaml/local/user-limits.yaml
+// 01-faucet-contract/request/local/user-limits.yaml
 export const getLimits: PactRequest<GetLimitsArgs, GetLimitsResponse> = buildRequest(HOST_NAME, {
   type: "local",
   parse: (response) => coercePactValue(response),
@@ -117,7 +117,7 @@ export interface SetRequestLimitArgs {
 }
 
 // Set the per-request limit for an account. See also:
-// 01-faucet-contract/yaml/send/set-user-request-limit.yaml
+// 01-faucet-contract/request/send/set-user-request-limit.yaml
 export const setRequestLimit: PactRequest<SetRequestLimitArgs, string> = buildRequest(HOST_NAME, {
   type: "send",
   parse: (response) => response as string,
@@ -154,7 +154,7 @@ export interface SetAccountLimitArgs {
 }
 
 // Set the per-account limit for an account. See also:
-// 01-faucet-contract/yaml/send/set-user-account-limit.yaml
+// 01-faucet-contract/request/send/set-user-account-limit.yaml
 export const setAccountLimit: PactRequest<SetAccountLimitArgs, string> = buildRequest(HOST_NAME, {
   type: "send",
   parse: (response) => response as string,
@@ -201,7 +201,7 @@ export type ReturnFundsArgs = {
 
 // Return funds from the user account to the faucet, crediting against their
 // account limits. See also:
-// 01-faucet-contract/yaml/send/return-funds.yaml
+// 01-faucet-contract/request/send/return-funds.yaml
 export const returnFunds: PactRequest<ReturnFundsArgs, string> = buildRequest(HOST_NAME, {
   type: "send",
   parse: (response) => response as string,

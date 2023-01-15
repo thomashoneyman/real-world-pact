@@ -8,8 +8,7 @@ the resulting JSON payload to Chainweb for execution. If the request is a 'send'
 request, then it will poll Chainweb until the transaction has been mined and a
 result produced.
 
-For usage information, please see the README in the yaml directory:
-https://github.com/thomashoneyman/kadena-academy/tree/trh/more-work/01-faucet-contract/yaml#execute-a-single-request
+For usage information, please see the README in the request directory:
 
 */
 
@@ -32,15 +31,15 @@ const CHAIN = "0";
 const apiPath = (endpoint) =>
   `/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN}/pact/api/v1/${endpoint}`;
 
-// All of the request files are kept in the `yaml` directory of our Pact
+// All of the request files are kept in the `request` directory of our Pact
 // project. We can freely add and remove request files without adjusting this
 // script file.
-const yamlDir = path.join(__dirname, "yaml");
+const requestDir = path.join(__dirname, "request");
 
 // This helper function calls out to the Pact CLI to format a local command. For
 // more details, see the manual request formatting walkthrough in the README.
 const formatLocalRequest = async (request) => {
-  const requestPath = path.join(yamlDir, "local", request.concat(".yaml"));
+  const requestPath = path.join(requestDir, "local", request.concat(".yaml"));
   const command = `pact --apireq ${requestPath} --local`;
   const { stdout, stderr } = await exec(command);
   if (stderr) console.error(`Error formatting local request: ${stderr}`);
@@ -50,9 +49,9 @@ const formatLocalRequest = async (request) => {
 // This helper function calls out to the Pact CLI to format an exec command. For
 // more details, see the manual request formatting walkthrough in the README.
 const formatExecRequest = async (request, signers) => {
-  const requestPath = path.join(yamlDir, "send", request.concat(".yaml"));
+  const requestPath = path.join(requestDir, "send", request.concat(".yaml"));
   const command = `pact --unsigned ${requestPath}`;
-  const getKey = (key) => path.join(yamlDir, "keys", key.concat(".yaml"));
+  const getKey = (key) => path.join("keys", key.concat(".yaml"));
   const sigs = signers.map((k) => `| pact add-sig ${getKey(k)}`).join(" ");
   const { stdout, stderr } = await exec(`${command} ${sigs}`);
   if (stderr) console.error(`Error formatting exec request: ${stderr}`);

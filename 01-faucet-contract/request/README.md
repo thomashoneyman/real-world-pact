@@ -1,10 +1,10 @@
-# Faucet YAML Files
+# Faucet Request Files
 
 The Pact CLI can [format request files](https://pact-language.readthedocs.io/en/stable/pact-reference.html#api-request-formatter) like the ones in this directory into JSON payloads. You can then make a POST request with the JSON to a Chainweb node for execution. Request files make it possible to execute arbitrary Pact code with nothing but a yaml file, `pact`, and a tool for HTTP requests such as `curl`; they're a flexible, wonderful tool for executing snippets of Pact code in a real-world environment.
 
-When developing your own smart contracts you will mostly use a REPL file like `faucet.repl` to iterate on your Pact code and test your contract. However, it's also valuable to deploy your contract to a Chainweb node and then execute transactions on that node. Doing so simulates how your contract will behave when deployed to a real-world network like mainnet. Accordingly, it's common to have a `yaml` directory containing request files. For example, here's [the Marmalade yaml directory](https://github.com/kadena-io/marmalade/tree/fe6b786063ba2082c56a1ff917dbaf14cf6f61be/pact/yaml).
+When developing your own smart contracts you will mostly use a REPL file like `faucet.repl` to iterate on your Pact code and test your contract. However, it's also valuable to deploy your contract to a Chainweb node and then execute transactions on that node. Doing so simulates how your contract will behave when deployed to a real-world network like mainnet. Accordingly, it's common to have a directory containing request files. For example, here's [the Marmalade yaml directory](https://github.com/kadena-io/marmalade/tree/fe6b786063ba2082c56a1ff917dbaf14cf6f61be/pact/yaml).
 
-Our `yaml` directory contains all the requests needed to create the faucet account, deploy the faucet contract, and then exercise each function in the contract.
+Our `request` directory contains all the requests needed to create the faucet account, deploy the faucet contract, and then exercise each function in the contract.
 
 ## Usage
 
@@ -70,9 +70,8 @@ I encourage you to extend the faucet contract yourself, adding your own request 
 
 ## Directory Structure
 
-Here's the structure of our yaml directory:
+Here's the structure of our request directory:
 
-- The `keys` directory contains the public and secret key for various accounts we will use in our tests. The `sender00` keys are taken [from the chainweb-node repo](https://github.com/kadena-io/chainweb-node/blob/master/pact/genesis/devnet/keys.yaml) and control an account included in our local devnet automatically, which has funds we can use to fund our faucet account. The `goliath-faucet` keys control the faucet account, and I generated them with the Pact CLI. The `test-user` keys are another pair of generated keys, and they control an test account we'll use to request funds from the faucet.
 - The `local` directory contains request files intended for the [/local endpoint](https://api.chainweb.com/openapi/pact.html#tag/endpoint-local/paths/~1local/post). The /local endpoint is for Pact code that does not write to the blockchain, and therefore doesn't need to be mined into a block and can be executed solely on your local Chainweb node. We'll use local execution to look up information about accounts and modules and verify that our transactions have indeed changed the state of the blockchain.
 - The `send` directory contains request files intended for the [/send endpoint](https://api.chainweb.com/openapi/pact.html#tag/endpoint-send/paths/~1send/post). The /send endpoint is for Pact code that executes a transaction on Chainweb and therefore must be mined into a block. We'll use this endpoint to create the faucet account, deploy the faucet contract, and call the contract to transfer funds.
 
@@ -103,7 +102,7 @@ To format a local request, call the `pact` CLI using these arguments:
 Here's an example of formatting the `faucet-details` request that fetches details on the goliath-faucet account:
 
 ```
-$ pact --local --apireq yaml/local/faucet-details.yaml
+$ pact --local --apireq request/local/faucet-details.yaml
 { "hash":"R9bx4sw7_UhCWyf6AwCsjfSFkFTxRDON7TKgrP2YnUk", ... }
 ```
 
@@ -122,15 +121,15 @@ You can format a request file into a JSON payload to send to a Chainweb node usi
 Let's try to format our `fund-faucet-account.yaml` request:
 
 ```sh
-pact --unsigned yaml/send/fund-faucet-account.yaml
+pact --unsigned request/send/fund-faucet-account.yaml
 ```
 
-If you run this yourself, you'll notice that we received YAML as output instead of JSON. That's because our request requires a signature from the `sender00` account keys but we haven't provided it. You can add a new signature to a transaction using `pact add-sig [KEY_FILE]`. The faucet keypair is stored in the `yaml/keys/goliath-faucet.yaml` file — but remember, you should never commit your secret key in a real-world repository!
+If you run this yourself, you'll notice that we received YAML as output instead of JSON. That's because our request requires a signature from the `sender00` account keys but we haven't provided it. You can add a new signature to a transaction using `pact add-sig [KEY_FILE]`. The faucet keypair is stored in the `request/keys/goliath-faucet.yaml` file — but remember, you should never commit your secret key in a real-world repository!
 
 Here's how we would format the request _and_ add the signature we need:
 
 ```sh
-pact --unsigned yaml/send/fund-faucet-account.yaml | pact add-sig api/keys/sender00.yaml
+pact --unsigned request/send/fund-faucet-account.yaml | pact add-sig api/keys/sender00.yaml
 ```
 
 ### 3. Sending Requests
@@ -163,7 +162,7 @@ Let's first try sending a local request, continuing with our `faucet-details` ex
 ```sh
 # Format the request. You can inspect the formatted command to verify it is JSON
 # as expected (it will be YAML if something went wrong).
-payload=$(pact --local --apireq yaml/local/faucet-details.yaml)
+payload=$(pact --local --apireq request/local/faucet-details.yaml)
 echo $payload
 
 # Then, send it to the `local` endpoint:
@@ -187,7 +186,7 @@ Let's go ahead and fund the faucet account — if it already exists it will rece
 # keys. We can once again print the formatted command to verify it is JSON as
 # expected. If you sign with the wrong keys (or the wrong number of keys) you'll
 # see an error and a YAML result.
-payload=$(pact --unsigned yaml/send/fund-faucet-account.yaml | pact add-sig yaml/keys/sender00.yaml)
+payload=$(pact --unsigned request/send/fund-faucet-account.yaml | pact add-sig request/keys/sender00.yaml)
 echo $payload
 
 # Then, we post the payload to the /send Pact API endpoint on the Chainweb node.
@@ -235,7 +234,7 @@ This request may time out after 60 seconds if your transaction doesn't get mined
 Let's verify the transaction behaved the way we would expect by re-running our request to check the faucet account details:
 
 ```sh
-payload=$(pact --local --apireq yaml/local/faucet-details.yaml)
+payload=$(pact --local --apireq request/local/faucet-details.yaml)
 curl -H 'Content-Type: application/json' -X POST --data "$payload" http://localhost:8080/chainweb/0.0/development/chain/0/pact/api/v1/local
 ```
 

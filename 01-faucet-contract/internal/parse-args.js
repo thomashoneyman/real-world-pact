@@ -7,7 +7,6 @@ ignore it, too.
 
 const fs = require("node:fs/promises");
 const path = require("node:path");
-const process = require("node:process");
 
 // Parse the command-line arguments. Available options:
 //
@@ -26,15 +25,17 @@ exports.parseArgs = async (argv) => {
   const trimExtension = (entries) =>
     entries.map((path) => path.substring(0, path.length - 5));
 
-  const keysDir = await fs.readdir(path.join(__dirname, "..", "yaml", "keys"));
+  const keysDir = await fs.readdir(path.join(__dirname, "..", "keys"));
   const keys = trimExtension(keysDir);
 
   const localDir = await fs.readdir(
-    path.join(__dirname, "..", "yaml", "local")
+    path.join(__dirname, "..", "request", "local")
   );
   const local = trimExtension(localDir);
 
-  const sendDir = await fs.readdir(path.join(__dirname, "..", "yaml", "send"));
+  const sendDir = await fs.readdir(
+    path.join(__dirname, "..", "request", "send")
+  );
   const send = trimExtension(sendDir);
 
   const availableLocal = `Available --local requests:${[""]

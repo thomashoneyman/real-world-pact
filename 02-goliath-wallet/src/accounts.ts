@@ -20,7 +20,7 @@ export interface ChainwebAccount {
 // The faucet account owns the faucet contract and is able to upgrade it. It is
 // also the account that we'll use to pay gas fees and transfer funds to users.
 //
-// See also 01-faucet-contract/yaml/keys/goliath-faucet.yaml for the actual key
+// See also 01-faucet-contract/request/keys/goliath-faucet.yaml for the actual key
 // file that we generated with the Pact CLI.
 export const faucetAccount: ChainwebAccount = {
   address: "goliath-faucet",

@@ -6,7 +6,7 @@
 # faucet-request --local faucet-contract-details
 #
 # If you would like to deploy the faucet smart contract, please see the
-# `yaml/send/deploy-faucet-contract.yaml` request file.
+# `request/send/deploy-faucet-contract.yaml` request file.
 
 code: (describe-module "free.goliath-faucet")
 publicMeta:
