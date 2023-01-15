@@ -5,6 +5,6 @@
 # this file because this is a demo project.
 #
 # These keys were generated via the Pact v4.3.1 CLI:
-#     pact --genkey > api/keys/goliath-faucet.yaml
+#     pact --genkey > keys/goliath-faucet.yaml
 public: 550fdb22682e109b207a19b6b0ee0d069007d9a3eccedcb2eb7809f4f56b5ecf
 secret: 2a9d9112e96e8a299091e067879c50d1cbefbd9c7fff78e2623d7e3f0cd2bf45

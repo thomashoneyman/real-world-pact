@@ -124,12 +124,12 @@ Let's try to format our `fund-faucet-account.yaml` request:
 pact --unsigned request/send/fund-faucet-account.yaml
 ```
 
-If you run this yourself, you'll notice that we received YAML as output instead of JSON. That's because our request requires a signature from the `sender00` account keys but we haven't provided it. You can add a new signature to a transaction using `pact add-sig [KEY_FILE]`. The faucet keypair is stored in the `request/keys/goliath-faucet.yaml` file — but remember, you should never commit your secret key in a real-world repository!
+If you run this yourself, you'll notice that we received YAML as output instead of JSON. That's because our request requires a signature from the `sender00` account keys but we haven't provided it. You can add a new signature to a transaction using `pact add-sig [KEY_FILE]`. The faucet keypair is stored in the `keys/goliath-faucet.yaml` file — but remember, you should never commit your secret key in a real-world repository!
 
 Here's how we would format the request _and_ add the signature we need:
 
 ```sh
-pact --unsigned request/send/fund-faucet-account.yaml | pact add-sig api/keys/sender00.yaml
+pact --unsigned request/send/fund-faucet-account.yaml | pact add-sig keys/sender00.yaml
 ```
 
 ### 3. Sending Requests
@@ -186,7 +186,7 @@ Let's go ahead and fund the faucet account — if it already exists it will rece
 # keys. We can once again print the formatted command to verify it is JSON as
 # expected. If you sign with the wrong keys (or the wrong number of keys) you'll
 # see an error and a YAML result.
-payload=$(pact --unsigned request/send/fund-faucet-account.yaml | pact add-sig request/keys/sender00.yaml)
+payload=$(pact --unsigned request/send/fund-faucet-account.yaml | pact add-sig keys/sender00.yaml)
 echo $payload
 
 # Then, we post the payload to the /send Pact API endpoint on the Chainweb node.
