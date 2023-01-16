@@ -34,6 +34,7 @@ As a quick demonstration: follow the commands below to start a local simulation 
    ```sh
    git clone git@github.com:thomashoneyman/real-world-pact
    cd real-world-pact
+   git submodule update --init
    ```
 
 2. Enter the Nix developer shell, which provides all the tools you need except for Docker

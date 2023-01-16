@@ -66,6 +66,6 @@ publicMeta:
   sender: "goliath-faucet"
   # In the faucet.repl file we calculated the gas consumption for a call to the
   # (request-funds) function. We've rounded that number up for our gas limit.
-  gasLimit: 900
+  gasLimit: 950
   gasPrice: 0.0000001
   ttl: 600

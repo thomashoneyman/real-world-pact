@@ -6,22 +6,24 @@ isn't Pact-specific code here except for the requests made to set the limits.
 
 */
 
-import * as Pact from "pact-lang-api";
+import { ReactNode } from "react";
+import { Formik } from "formik";
+
 import { Fieldset, Input, Label } from "@real-world-pact/theme/components/Form";
 import * as FormModal from "@real-world-pact/theme/components/Modal/FormModal";
 import { Link, Text } from "@real-world-pact/theme/components/Text";
-import { Formik } from "formik";
-import { ReactNode } from "react";
-import { userAccount } from "../accounts";
-import * as faucet from "../contracts/goliath-faucet";
+
 import { parsePactDecimal } from "@real-world-pact/utils/pact-code";
 import {
   EXEC_ERROR,
   PENDING,
   RequestStatus,
   REQUEST_ERROR,
-} from "@real-world-pact/utils/request-builder";
-import { useRequest } from "@real-world-pact/utils/usePactRequest";
+} from "@real-world-pact/utils/pact-request";
+
+import { userAccount } from "../accounts";
+import * as faucet from "../contracts/goliath-faucet";
+import { usePactRequest } from "../pact-api";
 
 interface AdminModalProps {
   onSuccess: () => Promise<void>;
@@ -32,8 +34,8 @@ interface AdminModalProps {
 // for the user account. Most of this code is typical React code, so I've left
 // out the comments. However, you can see another use of 'useRequest' below.
 export const AdminModal = ({ onSuccess, ...props }: AdminModalProps) => {
-  const [setRequestLimit, runSetRequestLimit] = useRequest(faucet.setRequestLimit);
-  const [setAccountLimit, runSetAccountLimit] = useRequest(faucet.setAccountLimit);
+  const [setRequestLimit, runSetRequestLimit] = usePactRequest(faucet.setRequestLimit);
+  const [setAccountLimit, runSetAccountLimit] = usePactRequest(faucet.setAccountLimit);
 
   const validateLimit = (value: string, min: number): null | string => {
     const parsed = parsePactDecimal(value);
@@ -136,9 +138,7 @@ export const AdminModal = ({ onSuccess, ...props }: AdminModalProps) => {
 
 // Convert a Pact request status into a Modal request status. A convenience
 // function to help unify errors in the modal and excit on success.
-const toModalRequestStatus = (
-  request: null | RequestStatus<any, any>
-): FormModal.ModalRequestStatus => {
+const toModalRequestStatus = (request: null | RequestStatus<any>): FormModal.ModalRequestStatus => {
   if (!request) return { status: "NOT_SENT" };
   if (request.status === PENDING) return { status: "PENDING" };
   if (request.status === REQUEST_ERROR) return { status: "ERROR", message: request.message };

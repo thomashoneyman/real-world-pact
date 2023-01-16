@@ -8,7 +8,7 @@ lists out the current per-request and per-account limits for the user.
 */
 
 import * as Pact from "pact-lang-api";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { DetailsModal } from "@real-world-pact/theme/components/Modal/DetailsModal";
 import { Box, Flex, Grid } from "@real-world-pact/theme/components/Container";
 import { Header, Link, Text } from "@real-world-pact/theme/components/Text";
@@ -22,16 +22,21 @@ import {
   RequestResult,
   RequestStatus,
   REQUEST_ERROR,
-  Status,
+  SendRequest,
   SUCCESS,
-} from "@real-world-pact/utils/request-builder";
+} from "@real-world-pact/utils/pact-request";
+import { pactAPI } from "../pact-api";
 
-import { faucetAccount } from "../accounts";
+export interface Transaction {
+  request: RequestStatus<any>;
+  amount: Pact.PactDecimal;
+  from: string;
+  to: string;
+}
 
-// The 'Transactions' component is a container
 export interface TransactionsProps {
-  limits: null | RequestStatus<faucet.GetLimitsArgs, faucet.GetLimitsResponse>;
-  transactions: RequestStatus<faucet.RequestFundsArgs | faucet.ReturnFundsArgs, string>[];
+  limits: null | RequestStatus<faucet.GetLimitsResponse>;
+  transactions: Transaction[];
 }
 
 export const Transactions = ({ limits, transactions }: TransactionsProps) => {
@@ -105,7 +110,7 @@ export const Transactions = ({ limits, transactions }: TransactionsProps) => {
 };
 
 interface TransactionProps {
-  transaction: RequestStatus<faucet.RequestFundsArgs | faucet.ReturnFundsArgs, string>;
+  transaction: Transaction;
 }
 
 const Transaction = ({ transaction }: TransactionProps) => {
@@ -118,10 +123,8 @@ const Transaction = ({ transaction }: TransactionProps) => {
     </Box>
   );
 
-  const row = transactionToRow(transaction);
-
   const status: ReactNode = (() => {
-    switch (row.status) {
+    switch (transaction.request.status) {
       case PENDING:
         return <Spinner />;
       case REQUEST_ERROR:
@@ -144,63 +147,57 @@ const Transaction = ({ transaction }: TransactionProps) => {
       }}
     >
       <Labeled label="Status">{status}</Labeled>
-      <Labeled label="Amount">{truncateDecimal(row.amount.decimal)}</Labeled>
-      <Labeled label="From">{truncateString(row.from)}</Labeled>
-      <Labeled label="To">{truncateString(row.to)}</Labeled>
-      <Labeled label="Details">{row.details}</Labeled>
+      <Labeled label="Amount">{truncateDecimal(transaction.amount.decimal)}</Labeled>
+      <Labeled label="From">{truncateString(transaction.from)}</Labeled>
+      <Labeled label="To">{truncateString(transaction.to)}</Labeled>
+      <Labeled label="Details">
+        <TransactionDetails transaction={transaction} />
+      </Labeled>
     </Grid>
   );
 };
 
-interface TransactionRow {
-  status: Status;
-  amount: Pact.PactDecimal;
-  from: string;
-  to: string;
-  details: ReactNode;
-}
-
-const transactionToRow = (
-  transaction: RequestStatus<faucet.RequestFundsArgs | faucet.ReturnFundsArgs, string>
-): TransactionRow => {
-  const isRequestFunds = (tx: any): tx is RequestStatus<faucet.RequestFundsArgs, string> =>
-    !tx.input.accountKeys;
-
-  const isReturnFunds = (tx: any): tx is RequestStatus<faucet.ReturnFundsArgs, string> =>
-    tx.input.accountKeys;
-
-  const transactionResult =
-    transaction.status === PENDING ? <Spinner /> : <TransactionDetails transaction={transaction} />;
-
-  if (isReturnFunds(transaction)) {
-    return {
-      status: transaction.status,
-      details: transactionResult,
-      from: transaction.input.account,
-      to: faucetAccount.address,
-      amount: transaction.input.amount,
-    };
-  } else if (isRequestFunds(transaction)) {
-    return {
-      status: transaction.status,
-      details: transactionResult,
-      from: faucetAccount.address,
-      to: transaction.input.targetAddress,
-      amount: transaction.input.amount,
-    };
-  } else {
-    throw new Error("Unexpected transaction.");
-  }
-};
-
 interface TransactionDetailsProps {
-  transaction: RequestResult<faucet.RequestFundsArgs | faucet.ReturnFundsArgs, string>;
+  transaction: Transaction;
 }
 
 const TransactionDetails = ({ transaction }: TransactionDetailsProps) => {
   const Label = ({ children }: { children: ReactNode }) => (
     <Text css={{ fontSize: "$xs", color: "$crimson11" }}>{children}</Text>
   );
+
+  const response: ReactNode = (() => {
+    switch (transaction.request.status) {
+      case PENDING:
+        return (
+          <Box>
+            <Label>Response Contents</Label>
+            <Spinner />
+          </Box>
+        );
+      case REQUEST_ERROR:
+        return (
+          <Box>
+            <Label>Error Contents</Label>
+            <Text>{transaction.request.message}</Text>
+          </Box>
+        );
+      case EXEC_ERROR:
+        return (
+          <Box>
+            <Label>Error Contents</Label>
+            <Text>{JSON.stringify(transaction.request.response.result.error)}</Text>
+          </Box>
+        );
+      case SUCCESS:
+        return (
+          <Box>
+            <Label>Success Contents</Label>
+            <Text>{JSON.stringify(transaction.request.parsed)}</Text>
+          </Box>
+        );
+    }
+  })();
 
   return (
     <DetailsModal
@@ -211,48 +208,29 @@ const TransactionDetails = ({ transaction }: TransactionDetailsProps) => {
     >
       <Box>
         <Label>Status</Label>
-        <Text>{transaction.status}</Text>
+        <Text>{transaction.request.status}</Text>
         <br />
-        {transaction.status === REQUEST_ERROR && (
-          <Box>
-            <Label>Error Contents</Label>
-            <Text>{transaction.message}</Text>
-            <br />
-          </Box>
-        )}
-        {transaction.status === EXEC_ERROR && (
-          <Box>
-            <Label>Error Contents</Label>
-            <Text>{JSON.stringify(transaction.response.result.error)}</Text>
-            <br />
-          </Box>
-        )}
-        {transaction.status === SUCCESS && (
-          <Box>
-            <Label>Success Contents</Label>
-            <Text>{JSON.stringify(transaction.parsed)}</Text>
-            <br />
-          </Box>
-        )}
+        {response}
+        <br />
         <Label>Pact Code</Label>
-        <Text>{transaction.request.pactCode}</Text>
+        <Text>{transaction.request.request.pactCode}</Text>
         <br />
-        {transaction.request.envData && (
+        {transaction.request.request.envData && (
           <Box>
             <Label>Env Data</Label>
-            <Text>{JSON.stringify(transaction.request.envData)}</Text>
+            <Text>{JSON.stringify(transaction.request.request.envData)}</Text>
             <br />
           </Box>
         )}
-        {transaction.request.keyPairs && (
+        {transaction.request.request.keyPairs && (
           <Box>
             <Label>Key Pairs</Label>
-            <Text>{JSON.stringify(transaction.request.keyPairs, undefined, 2)}</Text>
+            <Text>{JSON.stringify(transaction.request.request.keyPairs, undefined, 2)}</Text>
             <br />
           </Box>
         )}
         <Label>Metadata</Label>
-        <Text>{JSON.stringify(transaction.request.meta)}</Text>
+        <Text>{JSON.stringify(transaction.request.request.meta)}</Text>
       </Box>
     </DetailsModal>
   );
@@ -272,4 +250,60 @@ const truncateString = (str: string) => {
   } else {
     return str;
   }
+};
+
+// A Hook that lets you submit requests representing transactions that should
+// be displayed in the UI and will record their statuses (most recent listed first)
+export const useTransactions = (): [
+  Transaction[],
+  <a>(
+    req: SendRequest<a>,
+    amount: Pact.PactDecimal,
+    from: string,
+    to: string
+  ) => Promise<RequestResult<a>>
+] => {
+  const [txs, setTxs] = useState<Transaction[]>([]);
+
+  const newTransaction = function <a>(
+    req: SendRequest<a>,
+    amount: Pact.PactDecimal,
+    from: string,
+    to: string
+  ): Promise<RequestResult<a>> {
+    // Local requests return quickly, but transactions take a while to be mined.
+    // It's possible that several transactions are initiated before the prior
+    // transactions complete, so we need to track the position of a particular
+    // request in the closure.
+    let id: number;
+
+    const handleStatusChange = (newStatus: RequestStatus<any>) => {
+      switch (newStatus.status) {
+        // When we receive a PENDING status, that means the request has been
+        // initiated and we should insert it at the beginning of the array.
+        case PENDING:
+          setTxs((oldTxs) => {
+            const copy = Array.from(oldTxs);
+            id = copy.length;
+            copy.push({ amount, from, to, request: newStatus });
+            return copy;
+          });
+          break;
+
+        // Otherwise, we've received a non-pending status and we should update the
+        // array at the index we previously stored.
+        default:
+          setTxs((oldTxs) => {
+            const copy = Array.from(oldTxs);
+            copy[id] = { amount, from, to, request: newStatus };
+            return copy;
+          });
+          break;
+      }
+    };
+
+    return pactAPI.sendWithCallback(req, handleStatusChange);
+  };
+
+  return [Array.from(txs).reverse(), newTransaction];
 };

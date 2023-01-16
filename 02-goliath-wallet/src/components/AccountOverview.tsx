@@ -16,10 +16,10 @@ import {
   RequestStatus,
   REQUEST_ERROR,
   SUCCESS,
-} from "@real-world-pact/utils/request-builder";
+} from "@real-world-pact/utils/pact-request";
 
 export interface AccountOverviewProps {
-  balances: RequestStatus<coin.DetailsArgs, coin.DetailsResponse>[];
+  balances: RequestStatus<coin.DetailsResponse>[];
 }
 
 export const AccountOverview = ({ balances }: AccountOverviewProps) => {
@@ -57,7 +57,7 @@ export const AccountOverview = ({ balances }: AccountOverviewProps) => {
 };
 
 interface AccountTableProps {
-  balances: RequestStatus<coin.DetailsArgs, coin.DetailsResponse>[];
+  balances: RequestStatus<coin.DetailsResponse>[];
 }
 
 const AccountTable = ({ balances }: AccountTableProps) => {
@@ -104,7 +104,7 @@ const AccountTable = ({ balances }: AccountTableProps) => {
 
   type TableRowArgs = {
     chain: number;
-    balance: null | RequestStatus<coin.DetailsArgs, coin.DetailsResponse>;
+    balance: null | RequestStatus<coin.DetailsResponse>;
   };
 
   const TableRow = ({ chain, balance }: TableRowArgs) => {
@@ -192,11 +192,9 @@ const trimDecimal = (n: number): number => {
   return Number(n.toFixed(6));
 };
 
-const sumBalances = (balances: RequestStatus<any, coin.DetailsResponse>[]) =>
+const sumBalances = (balances: RequestStatus<coin.DetailsResponse>[]) =>
   trimDecimal(
     balances
-      .flatMap((req: RequestStatus<any, coin.DetailsResponse>) => {
-        return req.status === SUCCESS ? [req.parsed.balance] : [];
-      })
+      .flatMap((req) => (req.status === SUCCESS ? [req.parsed.balance] : []))
       .reduce((sum, current) => sum + current, 0.0)
   );

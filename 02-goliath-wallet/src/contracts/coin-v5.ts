@@ -13,14 +13,12 @@ https://github.com/kadena-io/chainweb-node/blob/master/pact/coin-contract/v5/coi
 */
 
 import Pact from "pact-lang-api";
-import { HOST_NAME } from "../config";
-import { buildRequest, PactRequest } from "@real-world-pact/utils/request-builder";
-import { defaultLocalCmd, coercePactValue } from "./utils";
+import { coercePactValue, LocalRequest } from "@real-world-pact/utils/pact-request";
 
 // The address to look up details about.
-export type DetailsArgs = {
+export interface DetailsArgs {
   address: string;
-};
+}
 
 // The type of a successful call to the (coin.details) function.
 export interface DetailsResponse {
@@ -31,11 +29,7 @@ export interface DetailsResponse {
 
 // Look up the details for the given address using (coin.details)
 // https://github.com/kadena-io/chainweb-node/blob/56e99ae421d2269a657e3bb3780c6d707e5149a0/pact/coin-contract/v5/coin-v5.pact#L304
-export const details: PactRequest<DetailsArgs, DetailsResponse> = buildRequest(HOST_NAME, {
-  type: "local",
-  parse: (response) => coercePactValue(response),
-  build: ({ address }, chainId): Pact.ExecCmd => {
-    const code = { cmd: "coin.details", args: [address] };
-    return defaultLocalCmd(code, undefined, chainId);
-  },
+export const details = (args: DetailsArgs): LocalRequest<DetailsResponse> => ({
+  code: { cmd: "coin.details", args: [args.address] },
+  transformResponse: coercePactValue,
 });

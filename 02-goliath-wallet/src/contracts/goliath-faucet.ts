@@ -15,12 +15,9 @@ recommend that you:
 If you still feel stuck, please open an issue!
 */
 
-import Pact, { KeyPair, KeyPairCapabilities, PactDecimal } from "pact-lang-api";
+import Pact, { KeyPair, PactDecimal } from "pact-lang-api";
 import { faucetAccount } from "../accounts";
-import { formatPactCode } from "@real-world-pact/utils/pact-code";
-import { DEFAULT_CHAIN, GAS_PRICE, HOST_NAME, NETWORK_ID, TTL } from "../config";
-import { buildRequest, PactRequest } from "@real-world-pact/utils/request-builder";
-import { creationTime, defaultLocalCmd, coercePactValue } from "./utils";
+import { coercePactValue, LocalRequest, SendRequest } from "@real-world-pact/utils/pact-request";
 
 // Corresponds with constants defined in the 'goliath-faucet smart contract.
 export const FAUCET_ACCOUNT = "goliath-faucet";
@@ -41,42 +38,33 @@ export interface RequestFundsArgs {
 // values in these fields, please see the request-funds.yaml file in the faucet
 // contract project:
 // 01-faucet-contract/request/send/request-funds.yaml
-export const requestFunds: PactRequest<RequestFundsArgs, string> = buildRequest(HOST_NAME, {
-  type: "send",
-  // This will automatically parse to our result type (string, in this case).
-  parse: (response) => response as string,
-  build: ({ targetAddress, targetAddressKeySet, amount }, chainId): Pact.ExecCmd => {
-    // The code to be executed on the Chainweb node
-    const code = {
-      cmd: "free.goliath-faucet.request-funds",
-      args: [targetAddress, { cmd: "read-keyset", args: ["target-keyset"] }, amount],
-    };
+export const requestFunds = (args: RequestFundsArgs): SendRequest<string> => ({
+  // The account responsible for paying gas
+  sender: faucetAccount.address,
 
-    // The transaction data to include with the transaction
-    const envData = { "target-keyset": targetAddressKeySet };
+  // The maximum amount of gas this transaction can consume before it is cancelled
+  gasLimit: 2500,
 
-    // The keys that should be used to sign the transaction, along with the caps
-    // to scope their signature to
-    const keyPairs: Pact.KeyPairCapabilities = {
-      ...faucetAccount.keys,
-      clist: [
-        { name: "coin.TRANSFER", args: [FAUCET_ACCOUNT, targetAddress, amount] },
-        { name: "coin.GAS", args: [] },
-      ],
-    };
-
-    // The public metadata to associate with the transaction.
-    const meta: Pact.TransactionMetadata = {
-      creationTime: creationTime(),
-      gasPrice: GAS_PRICE,
-      ttl: TTL,
-      chainId: chainId ?? DEFAULT_CHAIN,
-      gasLimit: 2500,
-      sender: faucetAccount.address,
-    };
-
-    return { networkId: NETWORK_ID, pactCode: formatPactCode(code), envData, keyPairs, meta };
+  // The code to be executed on the Chainweb node
+  code: {
+    cmd: "free.goliath-faucet.request-funds",
+    args: [args.targetAddress, { cmd: "read-keyset", args: ["target-keyset"] }, args.amount],
   },
+
+  // The transaction data to include with the transaction
+  data: { "target-keyset": args.targetAddressKeySet },
+
+  // The keys that should be used to sign the transaction, along with the caps
+  // to scope their signature to
+  signers: {
+    ...faucetAccount.keys,
+    clist: [
+      { name: "coin.TRANSFER", args: [FAUCET_ACCOUNT, args.targetAddress, args.amount] },
+      { name: "coin.GAS", args: [] },
+    ],
+  },
+
+  transformResponse: (response: Pact.PactValue) => response as string,
 });
 
 // Now, we'll implement the (get-limits) function, which lets you look up the
@@ -97,16 +85,9 @@ export interface GetLimitsResponse {
 // Fetch the current limits for the given address, if it has used the faucet
 // before. See also:
 // 01-faucet-contract/request/local/user-limits.yaml
-export const getLimits: PactRequest<GetLimitsArgs, GetLimitsResponse> = buildRequest(HOST_NAME, {
-  type: "local",
-  parse: (response) => coercePactValue(response),
-  build: ({ address }, chainId): Pact.ExecCmd => {
-    const code = {
-      cmd: "free.goliath-faucet.get-limits",
-      args: [address],
-    };
-    return defaultLocalCmd(code, undefined, chainId);
-  },
+export const getLimits = (args: GetLimitsArgs): LocalRequest<GetLimitsResponse> => ({
+  code: { cmd: "free.goliath-faucet.get-limits", args: [args.address] },
+  transformResponse: coercePactValue,
 });
 
 // Next, we have the (set-request-limit) and (set-account-limit) functions.
@@ -118,34 +99,18 @@ export interface SetRequestLimitArgs {
 
 // Set the per-request limit for an account. See also:
 // 01-faucet-contract/request/send/set-user-request-limit.yaml
-export const setRequestLimit: PactRequest<SetRequestLimitArgs, string> = buildRequest(HOST_NAME, {
-  type: "send",
-  parse: (response) => response as string,
-  build: ({ account, amount }, chainId) => {
-    const code = {
-      cmd: "free.goliath-faucet.set-request-limit",
-      args: [account, amount],
-    };
-
-    const keyPairs: KeyPairCapabilities = {
-      ...faucetAccount.keys,
-      clist: [
-        { name: "free.goliath-faucet.SET_LIMIT", args: [] },
-        { name: "coin.GAS", args: [] },
-      ],
-    };
-
-    const meta: Pact.TransactionMetadata = {
-      creationTime: creationTime(),
-      gasPrice: GAS_PRICE,
-      ttl: TTL,
-      chainId: chainId ?? DEFAULT_CHAIN,
-      gasLimit: 500,
-      sender: faucetAccount.address,
-    };
-
-    return { networkId: NETWORK_ID, pactCode: formatPactCode(code), keyPairs, meta };
+export const setRequestLimit = (args: SetRequestLimitArgs): SendRequest<string> => ({
+  sender: faucetAccount.address,
+  gasLimit: 500,
+  code: { cmd: "free.goliath-faucet.set-request-limit", args: [args.account, args.amount] },
+  signers: {
+    ...faucetAccount.keys,
+    clist: [
+      { name: "free.goliath-faucet.SET_LIMIT", args: [] },
+      { name: "coin.GAS", args: [] },
+    ],
   },
+  transformResponse: (response: Pact.PactValue) => response as string,
 });
 
 export interface SetAccountLimitArgs {
@@ -155,41 +120,25 @@ export interface SetAccountLimitArgs {
 
 // Set the per-account limit for an account. See also:
 // 01-faucet-contract/request/send/set-user-account-limit.yaml
-export const setAccountLimit: PactRequest<SetAccountLimitArgs, string> = buildRequest(HOST_NAME, {
-  type: "send",
-  parse: (response) => response as string,
-  build: ({ account, amount }, chainId) => {
-    const code = {
-      cmd: "free.goliath-faucet.set-account-limit",
-      args: [account, amount],
-    };
-
-    const keyPairs: KeyPairCapabilities = {
-      ...faucetAccount.keys,
-      clist: [
-        { name: "free.goliath-faucet.SET_LIMIT", args: [] },
-        { name: "coin.GAS", args: [] },
-      ],
-    };
-
-    const meta: Pact.TransactionMetadata = {
-      creationTime: creationTime(),
-      gasPrice: GAS_PRICE,
-      ttl: TTL,
-      chainId: chainId ?? DEFAULT_CHAIN,
-      gasLimit: 500,
-      sender: faucetAccount.address,
-    };
-
-    return { networkId: NETWORK_ID, pactCode: formatPactCode(code), keyPairs, meta };
+export const setAccountLimit = (args: SetAccountLimitArgs): SendRequest<string> => ({
+  sender: faucetAccount.address,
+  gasLimit: 500,
+  code: { cmd: "free.goliath-faucet.set-account-limit", args: [args.account, args.amount] },
+  signers: {
+    ...faucetAccount.keys,
+    clist: [
+      { name: "free.goliath-faucet.SET_LIMIT", args: [] },
+      { name: "coin.GAS", args: [] },
+    ],
   },
+  transformResponse: (response: Pact.PactValue) => response as string,
 });
 
 // Finally, we'll implement bindings to the (return-funds) function from the
 // faucet. This lets users send funds back to the faucet, crediting against
 // their account limits.
 
-export type ReturnFundsArgs = {
+export interface ReturnFundsArgs {
   account: string;
   // Since the user needs to sign the transaction to transfer funds back to the
   // faucet, we need access to their signature. In our application we have their
@@ -197,43 +146,27 @@ export type ReturnFundsArgs = {
   // wallet to sign.
   accountKeys: KeyPair;
   amount: PactDecimal;
-};
+}
 
 // Return funds from the user account to the faucet, crediting against their
 // account limits. See also:
 // 01-faucet-contract/request/send/return-funds.yaml
-export const returnFunds: PactRequest<ReturnFundsArgs, string> = buildRequest(HOST_NAME, {
-  type: "send",
-  parse: (response) => response as string,
-  build: ({ account, accountKeys, amount }, chainId) => {
-    const code = {
-      cmd: "free.goliath-faucet.return-funds",
-      args: [account, amount],
-    };
-
-    // This is our only transaction that uses multiple signers. The user must sign
-    // the transaction to authorize transferring their funds, and the faucet must
-    // sign the transaction to authorize paying for gas.
-    const keyPairs = [
-      {
-        ...accountKeys,
-        clist: [{ name: "coin.TRANSFER", args: [account, FAUCET_ACCOUNT, amount] }],
-      },
-      {
-        ...faucetAccount.keys,
-        clist: [{ name: "coin.GAS", args: [] }],
-      },
-    ];
-
-    const meta: Pact.TransactionMetadata = {
-      creationTime: creationTime(),
-      gasPrice: GAS_PRICE,
-      ttl: TTL,
-      chainId: chainId ?? DEFAULT_CHAIN,
-      gasLimit: 2500,
-      sender: faucetAccount.address,
-    };
-
-    return { networkId: NETWORK_ID, pactCode: formatPactCode(code), keyPairs, meta };
-  },
+export const returnFunds = (args: ReturnFundsArgs): SendRequest<string> => ({
+  sender: faucetAccount.address,
+  gasLimit: 2500,
+  code: { cmd: "free.goliath-faucet.return-funds", args: [args.account, args.amount] },
+  // This is our only transaction that uses multiple signers. The user must sign
+  // the transaction to authorize transferring their funds, and the faucet must
+  // sign the transaction to authorize paying for gas.
+  signers: [
+    {
+      ...args.accountKeys,
+      clist: [{ name: "coin.TRANSFER", args: [args.account, FAUCET_ACCOUNT, args.amount] }],
+    },
+    {
+      ...faucetAccount.keys,
+      clist: [{ name: "coin.GAS", args: [] }],
+    },
+  ],
+  transformResponse: (response: Pact.PactValue) => response as string,
 });
