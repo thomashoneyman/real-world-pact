@@ -607,7 +607,7 @@
     ; capability, please refer to the faucet.repl file or the
     ; set-user-request-limit.yaml request file.
     (with-capability (SET_LIMIT)
-      ; We used (with-read-default) before because we wanted to provide a
+      ; We used (with-default-read) before because we wanted to provide a
       ; fallback value in case the account had never requested funds before.
       ; This function is different: it should not be possible to update the
       ; limits for an account that hasn't yet requested anything. (with-read)

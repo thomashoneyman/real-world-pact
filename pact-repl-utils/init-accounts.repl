@@ -44,7 +44,7 @@
 (define-keyset "free.sender02-keyset" (read-keyset "sender02"))
 (commit-tx)
 
-(print "Registered 'sender00-keyset', 'sender01-keyset', and 'sender02-keyset' keysets.")
+(print "Registered keysets 'sender00-keyset', 'sender01-keyset', and 'sender02-keyset'.")
 (env-data {})
 
 ; Next, we'll use these keysets to create our accounts. This requires that we
@@ -59,7 +59,7 @@
 (coin.create-account "sender01" (describe-keyset "free.sender01-keyset"))
 (coin.create-account "sender02" (describe-keyset "free.sender02-keyset"))
 (commit-tx)
-(print "Created 'sender00', 'sender01', and 'sender02' accounts guarded by their respective keysets.")
+(print "Created accounts 'sender00', 'sender01', and 'sender02'.")
 
 ; Finally, we need to ensure these accounts have some funds. On Chainweb, you
 ; can get funds from one of two places: someone transfers you KDA, or you mine
@@ -83,11 +83,11 @@
 (test-capability (coin.COINBASE))
 
 ; Finally, it's time to fund our accounts.
-(coin.coinbase "sender00" (describe-keyset "free.sender00-keyset") 1000.0)
-(coin.coinbase "sender01" (describe-keyset "free.sender01-keyset") 1000.0)
-(coin.coinbase "sender02" (describe-keyset "free.sender02-keyset") 1000.0)
+(coin.coinbase "sender00" (describe-keyset "free.sender00-keyset") 100000.0)
+(coin.coinbase "sender01" (describe-keyset "free.sender01-keyset") 100000.0)
+(coin.coinbase "sender02" (describe-keyset "free.sender02-keyset") 100000.0)
 (commit-tx)
-(print "Funded sender* accounts each with 1000.0 KDA.")
+(print "Funded sender* accounts each with 100,000.0 KDA.")
 
 ; Voila! We can now transfer funds from the three sender accounts to create
 ; and fund other accounts, or use these accounts as basic test accounts. Code

@@ -1,0 +1,582 @@
+; This file tests the Charkha lending protocol, not including the price oracle
+; and KETH token. I've opted for a single large test file instead of many
+; independent tests because the contracts are intertwined; a function in the
+; charkha-controller-iface contract (charkha) may rely on a function in a market
+; contract and vice-versa, so in testing one contract we are often testing both.
+(load "setup.repl")
+(env-data {})
+(env-sigs [])
+
+; We'll start by verifying each of the contracts. Note that modrefs are not
+; supported by analysis, so you will see "can't translate an empty body" in
+; the log output.
+(print "Verifying contracts...")
+
+(verify "free.cwKDA")
+(print "Verified cwKDA contract.")
+
+(verify "free.charkha-governance")
+(print "Verified governance contract.")
+
+(verify "free.charkha-controller")
+(print "Verified controller contract.")
+
+; ----------
+; ORACLE INITIALIZATION
+
+; At the time we deploy our price oracle it has no information about the markets
+; we support. Let's feed it some data: today (January 29, 2023)'s prices for
+; ETH, COMP, and KDA (for our KETH, CHRK, and KDA markets).
+(begin-tx)
+(env-sigs [ { "key": "charkha-admin-key", "caps": [ (free.charkha-oracle.ADMIN) ] } ])
+
+(env-gas 0)
+(free.charkha-oracle.register-asset "KDA" 1.35)
+(print (format "(charkha-oracle.register-asset) gas cost: {}" [(env-gas)]))
+
+(free.charkha-oracle.register-asset "CHRK" 56.59)
+(free.charkha-oracle.register-asset "KETH" 1614.61)
+(env-sigs [])
+(commit-tx)
+
+; ----------
+; USER ACCOUNTS
+
+; Before we begin interacting with the protocol we should allocate some funds
+; to our user accounts. Recall that our 'init.repl' file from 'pact-repl-utils'
+; gives us access to 'sender00', 'sender01', and 'sender02' accounts, each of
+; which have 100,000 KDA. We can also supply these accounts with some KETH as if
+; they had used our "bridge".
+(begin-tx)
+(env-sigs [ { "key": "charkha-admin-key", "caps": [ (free.KETH.MINT "sender00" 10.0) (free.KETH.MINT "sender01" 20.0) ] } ])
+(free.KETH.mint "sender00" (describe-keyset "free.sender00-keyset") 10.0)
+(free.KETH.mint "sender01" (describe-keyset "free.sender01-keyset") 20.0)
+; We can verify that our KETH token indeed works as a typical fungible token:
+(env-sigs [ { "key": test-keys.SENDER01, "caps": [ (free.KETH.TRANSFER "sender01" "sender02" 10.0) ] } ])
+(free.KETH.transfer-create "sender01" "sender02" (describe-keyset "free.sender02-keyset") 10.0)
+(expect "sender02 has 10.0 KETH" 10.0 (free.KETH.get-balance "sender02"))
+(env-sigs [])
+(commit-tx)
+
+; ----------
+; MARKET INITIALIZATION
+
+; At the time we deploy Charkha there are no markets and therefore the protocol
+; does nothing. We can verify that by letting a few blocks pass and then
+; checking on the total supply of the CHRK rewards token, which should be zero.
+;
+; As we begin to use functions from the modules we've written, we'll print out
+; their gas costs. This is a good habit: you can be shocked at the gas
+; consumption of seemingly-innocent calls like (length (keys my-table))!
+(begin-tx)
+(env-chain-data { "block-height": 3 })
+
+; First we'll accrue CHRK over the last few blocks:
+(env-gas 0)
+(free.CHRK.accrue)
+(print (format "(CHRK.accrue) gas cost: {}" [(env-gas)]))
+
+; We've accrued rewards over the last 3 blocks, but since there are no markets,
+; we should see zero total supply.
+(env-gas 0)
+(expect "There are no supported markets." 0 (free.charkha-controller.get-market-count))
+(print (format "(charkha-controller.get-market-count) gas cost: {}" [(env-gas)]))
+
+(env-gas 0)
+(expect "No CHRK should have accrued." 0 (free.CHRK.get-total-supply))
+(print (format "(CHRK.get-total-supply) gas cost: {}" [(env-gas)]))
+
+; We also can't interact with the protocol, such as by supplying, borrowing, or
+; submitting a proposal.
+(expect-failure "Cannot supply funds with no markets." (free.charkha-controller.supply "sender00" "KDA" 1000.0))
+(expect-failure "Cannot borrow funds with no markets." (free.charkha-controller.borrow "sender00" "KETH" 1.0))
+(expect-failure "Cannot submit proposal with no markets." (free.charkha-governance.submit-proposal "sender00" "Change KDA multiplier to 0.5" "KDA" "multiplier" 0.5))
+
+; Let's get the protocol started by registering a new KDA market associated with
+; the cwKDA contract. This demonstrates that we can register markets for any
+; token that supports the fungible-v2 interface, so long as we also implement a
+; market interface for it. We can support any fungible-v2 token on Chainweb.
+(env-sigs [ { "key": "charkha-admin-key", "caps": [ (free.charkha-controller.ADMIN) ] } ])
+(env-gas 0)
+(free.charkha-controller.register-market "KDA" coin free.cwKDA)
+(print (format "(charkha-controller.register-market) gas cost: {}" [(env-gas)]))
+
+; Now, if a block progresses, we should see CHRK accrue.
+(env-chain-data { "block-height": 6 })
+(free.CHRK.accrue)
+(expect "1 CHRK per market (1) per block." 3 (free.CHRK.get-total-supply))
+
+; We can go ahead and register our other markets, too, so we have KDA, KETH, and
+; CHRK markets.
+(free.charkha-controller.register-market "KETH" free.KETH free.cwKETH)
+(free.charkha-controller.register-market "CHRK" free.CHRK free.cwCHRK)
+
+; Now the CHRK accrual rate moves to 3 per block to reflect our three markets.
+(env-chain-data { "block-height": 7 })
+(free.CHRK.accrue)
+(expect "1 CHRK per market (3) per block." 6 (free.CHRK.get-total-supply))
+(env-sigs [])
+(commit-tx)
+
+; ----------
+; LENDING & BORROWING
+
+; Whew! We now have a few potential Charkha users with holdings of KDA and KETH.
+; We have a usable price oracle and three markets: KDA, KETH, and CHRK. The
+; Charkha lending protocol is open for business.
+(begin-tx)
+
+; Let's kick things off by having sender00 supply some KDA as collateral. The
+; (supply) function transfers funds from the sender to the protocol, so it's
+; necessary the sender signs the TRANSFER capability for the token they are
+; supplying.
+(env-sigs [ { "key": test-keys.SENDER00, "caps": [ (coin.TRANSFER "sender00" "charkha" 10000.0) ] } ])
+
+; With this capability signed they can supply funds to the protocol.
+(env-gas 0)
+(free.charkha-controller.supply "sender00" "KDA" 10000.0)
+(print (format "(charkha-controller.supply) gas cost: {}" [(env-gas)]))
+
+; The (supply) function is internally tricky, because we want any user to be
+; able to supply funds to the protocol without any admin interaction. But when
+; a user supplies funds we need to credit them the equivalent amount of protocol
+; tokens (like cwKDA for a KDA supply). It takes some back-and-forth
+; communication between the controlling contract and the individual market
+; contract to properly transfer funds to the protocol and credit protocol tokens
+; to the user with zero admin interaction. Let's verify everything looks OK.
+
+; First, we definitely expect that the 'sender00' account has sent 10000 KDA and
+; therefore the protocol has a total supply of 10000 KDA in that market.
+(expect "sender00 has sent 10000 KDA" 90000.0 (coin.get-balance "sender00"))
+(env-gas 0) (free.charkha-controller.get-market "KDA") (print (format "(charkha-controller.get-market) gas cost: {}" [(env-gas)]))
+(expect "protocol has 10000 KDA supply" 10000.0 (at 'total-supply (free.charkha-controller.get-market "KDA")))
+
+; We should also expect that the 'sender00' has a (10,000 / 50) or 200 cwKDA
+; balance, since exchange rates for a market begin at 50:1.
+(env-gas 0)
+(expect "exchange rate began at 50:1" 50.0 (free.charkha-controller.get-exchange-rate "KDA"))
+(print (format "(charkha-controller.get-exchange-rate) gas cost: {}" [(env-gas)]))
+
+(env-gas 0)
+(expect "sender00 has 200 cwKDA" 200.0 (free.cwKDA.get-balance "sender00"))
+(print (format "(charkha-controller.get-balance) gas cost: {}" [(env-gas)]))
+
+; We should also expect that sender00, with 200 cwKDA, has an 8000 KDA borrowing
+; capacity, as markets begin with an 80% collateral ratio (you can borrow up to
+; 80% of what you lend).
+(env-gas 0)
+(expect "markets factors are correct" { "base-rate": 0.025, "collateral-ratio": 0.8, "reserve-factor": 0.01, "multiplier": 0.2 } (free.charkha-governance.get-market-factors "KDA"))
+(print (format "(charkha-governance.get-market-factors) gas cost: {}" [(env-gas)]))
+
+; We can see their total capacity denominated in the currency of our choice
+(env-gas 0)
+(expect "sender00 has 8000 KDA borrowing capacity" 8000.0 (free.charkha-controller.borrowing-capacity "sender00" "KDA"))
+(print (format "(charkha-controller.borrowing-capacity) gas cost: {}" [(env-gas)]))
+
+; Or we can use the -usd function to see their total capacity in USD
+(env-gas 0)
+(expect "sender00 has $10,800 borrowing capacity" 10800.0 (free.charkha-controller.borrowing-capacity-usd "sender00"))
+(print (format "(charkha-controller.borrowing-capacity-usd) gas cost: {}" [(env-gas)]))
+
+; We can, in the same block, have sender01 supply KETH, participating in a
+; different market altogether. We'll have them supply all of their KETH (10).
+(env-sigs [ { "key": test-keys.SENDER01, "caps": [ (free.KETH.TRANSFER "sender01" "charkha" 10.0) ] } ])
+(free.charkha-controller.supply "sender01" "KETH" 10.0)
+(expect "sender01 has sent 10 KETH" 0.0 (free.KETH.get-balance "sender01"))
+(expect "protocol has 10 KETH supply" 10.0 (at 'total-supply (free.charkha-controller.get-market "KETH")))
+(expect "sender01 has 0.2 cwKDA" 0.2 (free.cwKETH.get-balance "sender01"))
+(expect "sender01 has $12,916 borrowing capacity" 12916.88 (free.charkha-controller.borrowing-capacity-usd "sender01"))
+(env-sigs [])
+
+; Finally, let's set up the same situation seen in the Charkha white paper
+; examples for the KDA market in which a lender has supplied 10,000 KDA and
+; a borrower has taken out a 6,000 KDA loan.
+;
+; Notice how we don't need the protocol to sign off on supplying or borrowing
+; funds — there is no admin participation in the lending market, even though
+; the admin account is used to transfer KDA to you! This is because of our work
+; in the contract to create a module-owned account, where transfers can only be
+; done by the module itself — not even an admin with the contract keys.
+(env-gas 0)
+(free.charkha-controller.borrow "sender01" (describe-keyset "free.sender01-keyset") "KDA" 6000.0)
+(print (format "(charkha-controller.borrow) gas cost: {}" [(env-gas)]))
+
+; Notably, we can't borrow above our capacity or from a market that has no
+; supply, even if our borrowing capacity would allow it.
+(expect-failure "Not enough borrowing capacity" (free.charkha-controller.borrow "sender01" (describe-keyset "free.sender01-keyset") "CHRK" 10000.0))
+(expect-failure "Not enough market capacity" (free.charkha-controller.borrow "sender01" (describe-keyset "free.sender01-keyset") "CHRK" 10.0))
+
+(commit-tx)
+
+; ----------
+; INTEREST & EXCHANGE RATES
+
+; We have our first lenders: sender00 has lent 10,000 KDA and sender01 has lent
+; 10 KETH to the protocol, both in the same block. Before every protocol
+; interaction the protocol syncs, updating interest rates, exchange rates,
+; supply and borrow totals, and so on. In this section of the tests we'll
+; see how interest rates and exchange rates change over time and how that
+; represents interest earned or owed.
+;
+; The protocol only syncs a market when it has borrowers, and only on the first
+; protocol interaction in a block. Therefore, even though we have a borrower in
+; the KDA market, there has not yet been any effect on interest rates because
+; the first interaction was to supply funds. In our next interaction we'll take
+; out another loan that matches the Charkha white paper examples and we'll see
+; how that affects market rates.
+;
+; NOTE: The numbers in this section won't exactly match the white paper examples
+; because there we were rounding for readability. Here you'll see the full
+; decimal output.
+(begin-tx)
+
+; First we'll move to a new block. The protocol only compounds once per block,
+; so any actions we take in the same block will have no effect.
+(env-chain-data { "block-height": 8 })
+
+; Next, we'll verify the state of the KDA market prior to the borrow. Remember:
+; when a protocol interaction happens, the protocol compounds interest since the
+; last update — not including the pending transaction. We can therefore expect
+; to see our interest rates reflect the KDA market with a 10,000 KDA supply and
+; 6,000 KDA borrow (its initial state). Before we begin proving our rates are
+; correct, let's make sure all of the factors that go into an interest rate
+; are what we expect.
+(expect "Initial KDA market factors are their expected values." true
+  (bind (free.charkha-governance.get-market-factors "KDA")
+    { "base-rate" := base-rate
+    , "multiplier" := multiplier
+    , "reserve-factor" := reserve-factor
+    }
+    (and (= base-rate 0.025) (and (= multiplier 0.2) (= reserve-factor 0.01)))))
+
+(expect "Initial KDA market state is as expected." true
+  (bind (free.charkha-controller.get-market "KDA")
+    { "total-supply" := total-supply
+    , "total-borrows" := total-borrows
+    , "total-reserves" := total-reserves
+    }
+    (and (= total-supply 10000.0) (and (= total-borrows 6000.0) (= total-reserves 0.0)))))
+
+; With this market, we can expect that the market utilization is 60%. Utilization
+; is calculated as (Borrows / (Cash + Borrows)) or (Borrows / Supply)
+(expect "Initial KDA market utilization is 60%" 0.6 (free.charkha-controller.get-utilization "KDA"))
+
+; We can therefore expect the borrow interest rate to be 14.5% over the prior
+; period. Borrow interest rates are calculated as (BaseRate + Utilization * Multiplier).
+(expect "Initial KDA borrow interest rate is 14.5%" 0.145 (free.charkha-controller.get-borrow-interest-rate "KDA"))
+
+; And we can expect the supply interest rate to be 8.6%. It's calculated from
+; the borrow interest rate as (BorrowInterestRate * Utilization * (1 - ReserveFactor))
+(expect "Initial KDA supply interest rate is 8.6%" 0.08613 (free.charkha-controller.get-supply-interest-rate "KDA"))
+
+; Finally, we know that the interest rate index begins at 1 and the exchange
+; rate begins at 50:1.
+(expect "Initial KDA interest rate index is 1" 1.0 (free.charkha-controller.get-interest-rate-index "KDA"))
+(expect "Initial KDA exchange rate is 50:1" 50.0 (free.charkha-controller.get-exchange-rate "KDA"))
+
+; Great! We know everything we need in order to verify the change in the KDA
+; market that should occur when sender01 expands their loan by an additional
+; 3000 KDA, as seen in the Charkha white paper examples. Let's do it:
+(free.charkha-controller.borrow "sender01" (describe-keyset "free.sender01-keyset") "KDA" 3000.0)
+
+; The protocol should have synced. Interest should compound over the last single
+; block; since there are about 1,051,920 blocks per year on a Chainweb chain we
+; should see our borrow interest rate compounded against the 1/1051920 share of
+; the year we've just seen. To compound the interest rate index we use the
+; formula (PriorIndex + BorrowInterestRate * APRShare). In our case, that's
+; (1 + 0.145 * (1/1051920)).
+(expect "New interest rate index for KDA is correct." 1.000000137843 (free.charkha-controller.get-interest-rate-index "KDA"))
+
+; This interest rate index reflects the borrower interest over the prior period,
+; so we should see our total borrows changed accordingly. Note that the interest
+; accrued on the 6000 KDA borrows, but we see ~9000 KDA in the total borrows
+; because we then added another 3000 KDA.
+(expect "New total borrows for KDA is correct" 9000.000827058000 (at 'total-borrows (free.charkha-controller.get-market "KDA")))
+
+; We can verify that our platform reserves have accrued a small portion of the
+; borrower interest. Reserves are calculated as:
+; PrevReserves + PrevBorrows * (BorrowInterestRate * APRShare * ReserveFactor)
+(expect "New total reserves for KDA is correct" 0.000008270590 (at 'total-reserves (free.charkha-controller.get-market "KDA")))
+
+; The supply doesn't change. Supplier interest accrues in the form of the
+; exchange rate on their cTokens; the actual supplied funds cannot change unless
+; more of the underlying asset is provided.
+(expect "New total supply for KDA is unchanged" 10000.0 (at 'total-supply (free.charkha-controller.get-market "KDA")))
+
+; Finally, our new exchange rate should also reflect the compounded interest. If
+; our supplier were to withdraw their KDA now, they would have earned about
+; 0.0008 KDA in their 30-second loan.
+(expect "New exchange rate for KDA is correct" 50.000004093942 (free.charkha-controller.get-exchange-rate "KDA"))
+
+; We can also verify that the state of the market has changed. With the new
+; borrow total for KDA we should see a 90% utilization, which will raise the
+; borrower interest rate to 20.5% and the supplier interest rate to 18.3%.
+(expect "New KDA market utilization is 90%" 0.900000082705 (free.charkha-controller.get-utilization "KDA"))
+(expect "New KDA borrow interest rate is 20.5%" 0.205000016541 (free.charkha-controller.get-borrow-interest-rate "KDA"))
+(expect "New KDA supply interest rate is 18.3%" 0.182655031523 (free.charkha-controller.get-supply-interest-rate "KDA"))
+
+(commit-tx)
+
+; ----------
+; CLAIMING REWARDS
+
+; We now have lenders and borrowers participating in the Charkha protocol,
+; earning and owing interest. Charkha participants earn CHRK proportional to
+; their participation in the overall market, and then they can use their CHRK
+; holdings to change the behavior of the protocol (for example, by lowering
+; rates in the markets they participate in most often).
+;
+; In this section of the tests we will verify that users have accrued rewards
+; proportional to their participation in the market and allow them to claim
+; their CHRK.
+
+(begin-tx)
+; Let's begin by verifying the market participation of our senders. At this
+; point sender01 is supplying 10 KETH and borrowing 9000 KDA and sender00 is
+; supplying 10000 KDA. We should expect that sender01 has about 2/3 of the
+; overall market participation. Their market participation will determine how
+; much they receive in CHRK rewards.
+;
+; Note: when we look up their market participation we will see the up-to-date
+; borrow amount for the user. But the rewards share for the market won't update
+; again until the next interaction, and so it is still rewarding CHRK assuming
+; markets of about 16000 KDA vs. 10 KETH. That means the KDA market is rewarding
+; at a slightly higher rate than KETH and not the significantly higher rate we
+; might otherwise expect.
+(expect "KDA reward share is 57%" 0.572244562421 (at 'reward-share (free.charkha-controller.get-market "KDA")))
+(expect "KETH reward share is 43%" 0.427755437578 (at 'reward-share (free.charkha-controller.get-market "KETH")))
+
+(env-gas 0)
+(expect "sender00 has about 1/3 market participation" 0.301181360192 (free.charkha-controller.market-participation "sender00"))
+(print (format "(charkha-controller.market-participation) gas cost: {}" [(env-gas)]))
+
+(expect "sender01 has about 2/3 market participation" 0.698818639557 (free.charkha-controller.market-participation "sender01"))
+(expect "The senders together have 100% market participation" 1.0 (round (+ (free.charkha-controller.market-participation "sender00") (free.charkha-controller.market-participation "sender01")) 5))
+
+; With this market participation, when we accrue and claim rewards for these
+; accounts over the last block, we should see that of the 3 CHRK accrued about
+; 2/3 of it should go to sender01.
+(free.CHRK.accrue)
+(env-gas 0)
+(free.CHRK.claim-create "sender00" (describe-keyset "free.sender00-keyset"))
+(print (format "(CHRK.claim-create) gas cost: {}" [(env-gas)]))
+(free.CHRK.claim-create "sender01" (describe-keyset "free.sender01-keyset"))
+
+; Indeed, after claiming their rewards, we can see that sender00 received just
+; under 1 CHRK and sender01 received just over 2 CHRK.
+(expect "sender00 claimed ~1 CHRK" 0.903544080576 (free.CHRK.get-balance "sender00"))
+(expect "sender01 claimed ~2 CHRK" 2.096455918671 (free.CHRK.get-balance "sender01"))
+(commit-tx)
+
+; ----------
+; GOVERNANCE & COMMUNITY PROPOSALS
+
+; Our protocol is well under way! However, the community has decided that KETH
+; is a riskier asset than is represented by its market factors. In this step
+; we'll test the community governance process by submitting and voting on
+; proposals to change the protocol. Only CHRK holders can create or vote on
+; proposals.
+
+(begin-tx)
+
+; The community governance process is limited to submitting a proposal, voting
+; on proposals, and closing voting (which will either apply the change or have
+; no effect, depending on whether the vote passed.) Votes can be closed after a
+; specified vote interval which we've hardcoded to 2 minutes for testing's sake
+; (something like 7 days would be more realistic in the real world). For that
+; reason we should set a specific block time before continuing:
+(env-chain-data { "block-time": (time "2023-06-01T00:00:00Z") })
+
+; Both sender00 and sender01 have CHRK, which makes them eligible to submit
+; proposals and vote. We can verify that only CHRK holders can submit proposals
+; by having sender02 attempt to submit a vote:
+(expect-failure "sender02 has no CHRK and cannot submit proposals"
+  (free.charkha-governance.submit-proposal "sender02" "Raise KDA base rate to 5%" "KDA" "base-rate" 0.05))
+
+; However, sender00 can submit a proposal to change the KDA base rate.
+(env-sigs [ { "key": test-keys.SENDER00, "caps": [ (free.charkha-governance.VOTE "sender00") ] }])
+(env-gas 0)
+(free.charkha-governance.submit-proposal "sender00" "Raise KDA base rate to 5%" "KDA" "base-rate" 0.05)
+(print (format "(charkha-governance.submit-proposal) gas cost: {}" [(env-gas)]))
+
+; Proposals begin at 1 and increment from there, so we can refer to our newly-
+; created proposal as CP-1. sender00 automatically votes for the proposal, which
+; we can see by looking up the vote count:
+(expect "sender00 voted for the proposal" true
+  (contains "sender00" (at 'for (free.charkha-governance.get-proposal "CP-1"))))
+
+; Let's now have sender01 vote against the proposal, essentially trying to keep
+; the borrow interest rate down.
+(env-sigs [ { "key": test-keys.SENDER01, "caps": [ (free.charkha-governance.VOTE "sender01") ] }])
+(env-gas 0)
+(free.charkha-governance.vote "sender01" "CP-1" false)
+(print (format "(charkha-governance.vote) gas cost: {}" [(env-gas)]))
+
+(expect "sender01 voted against the proposal" true
+  (contains "sender01" (at 'against (free.charkha-governance.get-proposal "CP-1"))))
+
+; Let's now close and tally the vote. We have to leave the vote open for at
+; least 2 minutes, so closing it right now will fail:
+(expect-failure "Cannot close the vote until the vote window expires"
+  (free.charkha-governance.close-proposal "CP-1"))
+
+; Let's advance the clock past 2 minutes so we can complete the proposal.
+(env-chain-data { "block-time": (time "2023-06-01T00:02:01Z") })
+(expect "Vote can be closed. The proposal failed because sender02 has more votes."
+  "Proposal failed."
+  (free.charkha-governance.close-proposal "CP-1"))
+
+; Let's try again. This time we won't have sende01 vote against the proposal,
+; so it should pass. We'll set the KETH base rate this time.
+(env-sigs [ { "key": test-keys.SENDER00, "caps": [ (free.charkha-governance.VOTE "sender00") ] }])
+(free.charkha-governance.submit-proposal "sender00" "Raise KETH base rate to 20%" "KETH" "base-rate" 0.2)
+(env-chain-data { "block-time": (time "2023-06-01T00:04:02Z") })
+(env-gas 0)
+(expect "Vote can be closed. The proposal passes because there are only 'for' votes."
+  "Proposal passed."
+  (free.charkha-governance.close-proposal "CP-2"))
+(print (format "(charkha-governance.close-proposal) gas cost: {}" [(env-gas)]))
+
+; We should expect that the market factors for the KETH market have now changed
+; due to the community vote.
+(expect "KETH market now has a 20% base rate." 0.2 (at 'base-rate (free.charkha-governance.get-market-factors "KETH")))
+
+; Voila! Community governance at work!
+(commit-tx)
+
+; ----------
+; LIQUIDATION
+
+; The major risk a lender faces is that their borrower will not repay their
+; loan. Charkha and all major DeFi lending protocols today use over-collateralized
+; loans, which means that a borrower must provide more collateral than they
+; borrow (we represent this with the collateral ratio). This gives some room for
+; the value of their collateral to decline a bit without dropping to a level
+; where it cannot be used to cover their debts.
+;
+; However, it is still possible that a user becomes under-collateralized, e.g.
+; that the value of their collateral is not sufficient to cover their debts, or
+; at least not sufficient to keep them above the required collateral ratio. When
+; this happens, Charkha and major lending protocols allow other users to
+; repay the user's loan and claim their collateral in exchange, usually at a
+; discount. For example, if KDA is $1, you might be able to pay a user's loan
+; and acquire their KDA collateral at $0.90 each.
+;
+; In this section we'll test the liquidation capabilities of the Charkha
+; protocol.
+(begin-tx)
+
+; To begin with, neither of our senders are eligible for liquidation. They each
+; have sufficient collateral to cover their debts.
+(expect "sender00 has sufficient collateral" 10800.000884291472 (free.charkha-controller.borrowing-capacity-usd "sender00"))
+(expect "sender01 has sufficient collateral" 766.88 (free.charkha-controller.borrowing-capacity-usd "sender01"))
+
+; However, we can see that sender01 has just $766 left in their borrowing
+; capacity. Their collateral is largely in KETH — what happens when the value
+; of KETH drops 15% (a not-uncommon scenario in crypto markets)
+(env-sigs [ { "key": "charkha-admin-key", "caps": [ (free.charkha-oracle.ADMIN) ] } ])
+(free.charkha-oracle.set-price "KETH" 1400.0)
+
+; ...and then another protocol interaction occurs? This time, sender02 will
+; enter the KDA market, and the sky-high interest rates will compound on
+; sender01's balance.
+(env-chain-data { "block-height": 10 })
+(env-sigs [ { "key": test-keys.SENDER02, "caps": [ (coin.TRANSFER "sender02" "charkha" 1000.0) ] } ])
+(free.charkha-controller.supply "sender02" "KDA" 1000.0)
+
+; All of a sudden sender01 no longer has sufficient collateral to cover their
+; debts. A liquidator can step in to protect the protocol from bad debts.
+(expect "sender01 has insufficient collateral" -950.0064104129 (free.charkha-controller.borrowing-capacity-usd "sender01"))
+
+; When this occurs a liquidator can find how much they can liquidate the account
+; for in a given market. In general, an account can be liquidated for its
+; exceeded capacity plus an additional 25%. That works out to about $1187, which
+; at $1400 per KETH works out to about 0.85 KETH.
+(env-gas 0)
+(expect "sender01 can be liquidated in the KETH market" 0.805809008832625 (free.charkha-controller.liquidation-eligible "sender01" "KETH"))
+(print (format "(charkha-controller.liquidation-eligible) gas cost: {}" [(env-gas)]))
+
+; We can go ahead — at first, sender02 has no cwKETH:
+(expect-failure "sender02 has no cwKETH" (free.cwKETH.get-balance "sender02"))
+
+(env-sigs [ { "key": test-keys.SENDER02, "caps": [ (free.KETH.TRANSFER "sender02" "charkha" 0.82) ] } ])
+(expect-failure "sender01 can't be liquidated for more than their eligibility"
+  (free.charkha-controller.liquidate "sender02" "sender01" "KETH"
+    (+ 1.0 (free.charkha-controller.liquidation-eligible "sender01" "KETH"))))
+
+(let
+  ((eligible (free.charkha-controller.liquidation-eligible "sender01" "KETH")))
+  (env-gas 0)
+  (expect "sender01 has been liquidated in the KETH market" "Completed liquidation."
+    (free.charkha-controller.liquidate "sender02" "sender01" "KETH" eligible))
+  (print (format "(charkha-controller.liquidate) gas cost: {}" [(env-gas)])))
+
+; After liquidation they do:
+(expect "sender02 now has cwKETH in the liquidated amount" 0.8058090088326 (free.cwKETH.get-supply "sender02"))
+
+; And they received it at a discount — their supply is worth 0.848 KETH, but they
+; only actually transferred 0.7632 KETH for it.
+(expect "sender02 only transferred 0.7655 KETH" (- 10.0 0.76551855839099375) (free.KETH.get-balance "sender02"))
+(commit-tx)
+
+; TODO TODO TODO
+; The issue with liquidation is that you might buy their supply in one market,
+; but then you have to figure out where to cancel out their borrows. TODO for
+; tomorrow.
+
+; ----------
+; REDEEM & REPAY
+
+; When you are ready to exit the protocol you can redeem your cTokens for the
+; underlying asset, and you can repay your loans by sending the underlying asset
+; to the protocol (with interest). In this section we'll verify we can take both
+; actions.
+(begin-tx)
+
+(env-chain-data { "block-height": 30 })
+
+; First, we'll have our liquidator (sender02) redeem their cTokens that they
+; acquired by liquidating sender01:
+(env-gas 0)
+(free.charkha-controller.redeem "sender02" "KETH" (free.cwKETH.get-balance "sender02"))
+(print (format "(charkha-controller.redeem) gas cost: {}" [(env-gas)]))
+
+; In USD, at a price of $1400 per KETH, sender02 pocketed a profit of $56.40 for
+; their liquidation (the 0.04029 KETH they earned).
+(expect "sender02 has redeemed their ctokens and have none left" 0.0 (round (free.cwKETH.get-supply "sender02") 10))
+(expect "sender02 has earned a profit" 10.04029045044100625 (free.KETH.get-balance "sender02"))
+
+; Finally, let's have sender01 repay some of their debts.
+(env-sigs [ { "key": test-keys.SENDER01, "caps": [ (coin.TRANSFER "sender01" "charkha" 10000.0) ] } ])
+(let ((owed:decimal (free.cwKDA.get-borrow "sender01")))
+  (env-gas 0)
+  (free.charkha-controller.repay "sender01" "KDA" (floor owed (coin.precision)))
+  (print (format "(charkha-controller.repay) gas cost: {}" [(env-gas)])))
+
+(expect "sender01 has a ~zero balance" 0.0 (floor (free.cwKDA.get-borrow "sender01") (coin.precision)))
+
+(commit-tx)
+
+; ----------
+; CHRK MAX SUPPLY
+
+; Finally, let's verify that CHRK stops distributing rewards when we reach the
+; maximum supply. We began on block 3 with 1 market, and moved to 3 markets on
+; block 6. Therefore we should have 3 CHRK by block 6, and then should accrue 3
+; per block after that.
+(begin-tx)
+(env-chain-data { "block-height": 3333338 })
+(free.CHRK.accrue)
+(expect "Total is 9,999,999" 9999999 (free.CHRK.get-total-supply))
+
+(env-chain-data { "block-height": 3333339 })
+; Now, while we technically accrue 3 CHRK, only one is actually added to the
+; total supply because we would otherwise exceed the maximum.
+(expect "Last accrual succeeds." "Accrued 3 CHRK." (free.CHRK.accrue))
+(expect "Total wraps to the the max supply" free.CHRK.MAX_SUPPLY (free.CHRK.get-total-supply))
+
+; Millions of blocks later, we still can't accrue CHRK.
+(env-chain-data { "block-height": 10000000 })
+(expect "No accrual beyond the max supply" "The maximum supply of CHRK has been reached." (free.CHRK.accrue))
+(expect "Total is the max supply." free.CHRK.MAX_SUPPLY (free.CHRK.get-total-supply))
+(commit-tx)

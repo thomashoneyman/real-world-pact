@@ -1,0 +1,125 @@
+(load "../../../pact-repl-utils/init.repl")
+
+; To set up our test environment we must register the Charkha admin keyset (as
+; it is required for the contract deployment).
+(begin-tx)
+(env-data { "charkha-admin-keyset": { "keys": [ "charkha-admin-key" ], "pred": "keys-all" } })
+(namespace "free")
+(define-keyset "free.charkha-admin-keyset" (read-keyset "charkha-admin-keyset"))
+(commit-tx)
+
+; Next, we can sign a transaction in which we "deploy" the KETH contract.
+(begin-tx)
+(env-data { "init": true })
+(env-sigs [ { "key": "charkha-admin-key", "caps": [] } ])
+(load "./keth.pact")
+(commit-tx)
+(print "Loaded KETH contract! Ready for testing...")
+
+; As our first test we'll formally verify the KETH contract. This will also
+; verify that we have properly implemented the fungible-v2 interface; try
+; commenting out a required function like (rotate) to see an error like this:
+;   keth.pact:11:0: found unimplemented member while resolving model constraints: rotate
+(verify "free.KETH")
+
+; Next, we'll unit-test the bridge-specific functions we added to the contract,
+; namely the (MINT) capability and the (mint) and (burn) functions. Remember:
+; we're only implementing the Chainweb side of things, in which the Charkha
+; administrator allows you to mint KETH if you deposit to the Ethereum bridge,
+; and you can burn at any time to unlock the ability to withdraw from the
+; Ethereum bridge.
+(begin-tx)
+(use free.KETH)
+(env-data { "eth-user-keyset": { "keys": [ "eth-user-key" ], "pred": "keys-all" } })
+(expect-failure "Cannot mint funds without the MINT capability." (mint "eth-user" (read-keyset "eth-user-keyset") 5.0))
+
+(env-sigs [ { "key": "eth-user-key", "caps": [ (MINT "eth-user" 10.0) ] } ])
+(expect-failure "Cannot mint funds without the Charkha signature." (mint "eth-user" (read-keyset "eth-user-keyset") 5.0))
+
+; Now we have the correct signature we can call (mint) as much as we want:
+(env-sigs [ { "key": "charkha-admin-key", "caps": [ (MINT "eth-user" 10.0) ] } ])
+(mint "eth-user" (read-keyset "eth-user-keyset") 5.0)
+(mint "eth-user" (read-keyset "eth-user-keyset") 5.0)
+
+; But without exceeding the amount described by the MINT capability.
+(expect-failure "Cannot mint more than the funding amount Charkha signed for." (mint "eth-user" (read-keyset "eth-user-keyset") 1.0))
+
+; You should have been credited your KETH.
+(expect "Balance should be 10.0" 10.0 (get-balance "eth-user"))
+
+; We can also test burning. You should be able to burn any KETH you have, but no
+; more. Burning your KETH should reduce your balance.
+(env-sigs [])
+(expect-failure "Cannot burn funds without the BURN capability." (burn "eth-user" 10.0))
+
+; No one (not even the admin) can burn funds except the account owner.
+(env-sigs [ { "key": "charkha-admin-key", "caps": [ (BURN "eth-user" 10.0) ] } ])
+(expect-failure "Cannot burn funds without the account owner's signature." (burn "eth-user" 10.0))
+
+; However, if you sign for it, you can burn funds in your account up to the total.
+(env-sigs [ { "key": "eth-user-key", "caps": [ (BURN "eth-user" 11.0) ] } ])
+(burn "eth-user" 5.0)
+(burn "eth-user" 5.0)
+(expect-failure "Cannot burn more funds than you have available." (burn "eth-user" 1.0))
+
+; Finally, remember that while these functions look like the same ones you use
+; to pass around KDA, we've been working in the context of our own token. The
+; user has no KDA.
+(expect-failure "eth-user does not exist according to the coin contract" (coin.get-balance "eth-user"))
+(expect "eth-user exists according to the KETH contract" 0.0 (get-balance "eth-user"))
+
+(env-sigs [])
+(env-data {})
+(commit-tx)
+
+; We could unit-test each method of the fungible-v2 interface as well, and that
+; would be the best practice. However, for brevity, I'm going to focus only on
+; the (transfer-crosschain) function, since you may not have seen how to execute
+; pacts in the REPL before.
+;
+; Adding tests for the other fungible-v2 interface methods is left as an
+; exercise for the user!
+(begin-tx)
+(use free.KETH)
+(env-data
+  { "user1-keyset": { "keys": [ "user1-key" ], "pred": "keys-all" }
+  , "user2-keyset": { "keys": [ "user2-key" ], "pred": "keys-all" }
+  })
+
+; We are going to execute a cross-chain transfer from Chain 0 to Chain 20. Let's
+; establish that we are currently on Chain 0.
+(env-chain-data { "chain-id" : "0" })
+
+; First, we'll create the "user1" account on Chain 0.
+(env-sigs [ { "key": "user1-key", "caps": [] } ])
+(create-account "user1" (read-keyset "user1-keyset"))
+
+; We'll assume they deposited 100 ETH on the bridge, and can therefore
+; mint 100 KETH.
+(env-sigs [ { "key": "charkha-admin-key", "caps": [ (MINT "user1" 100.0) ] } ])
+(mint "user1" (read-keyset "user1-keyset") 100.0)
+
+; Next, they will transfer their KETH to "user2" on Chain 20. To do this we will
+; need to execute several steps of the pact. The first step must happen on the
+; chain where user1 has funds, ie. Chain 0. As we initiate the pact, we'll
+; assign this transaction a hash (this is done automatically on-chain). When we
+; continue the pact we will supply the hash of this transaction.
+(env-hash (hash "hash-this-transaction"))
+(env-sigs [ { "key": "user1-key", "caps": [ (TRANSFER "user1" "user2" 100.0) ] } ])
+(transfer-crosschain "user1" "user2" (read-keyset "user2-keyset") "20" 100.0)
+
+; We can see that the user1 account has been debited...
+(expect "user1 funds have been debited" 0.0 (get-balance "user1"))
+
+(env-chain-data { "chain-id" : "20" })
+; ...but user2 has not received the funds. That's because we have only executed
+; the first step of our 2-step pact. If you ever hear of someone "finishing a
+; cross-chain transfer", this is what they're talking about!
+(expect-failure "user2 account has not yet been created on chain 20" (get-balance "user2"))
+
+; To complete the pact, we need to use the (continue-pact) function:
+; https://pact-language.readthedocs.io/en/stable/pact-functions.html#continue-pact
+(continue-pact 1 false (hash "hash-this-transaction"))
+
+(expect "user2 funds have been received" 100.0 (get-balance "user2"))
+(commit-tx)

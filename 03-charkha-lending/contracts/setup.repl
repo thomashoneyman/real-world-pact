@@ -1,0 +1,54 @@
+; The Charkha contracts are intertwined and require the Charkha admin key to
+; deploy, so this setup REPL file makes it a little easier to test by loading
+; all the contracts together.
+;
+; Once loaded, you can test just the contract you care about, but without having
+; to do the setup. You can see this setup used in the test.repl file, or you can
+; set up your own additional test files using this setup.
+(load "../../pact-repl-utils/init.repl")
+
+; First we'll load the interfaces, which don't require any keys to be present.
+(begin-tx)
+(load "interfaces/market-interface.pact")
+(load "interfaces/controller-interface.pact")
+(commit-tx)
+
+; Then we'll load the contracts that do require Charkha to deploy them. Each
+; contract specifies the 'charkha-admin-keyset' as administrator so we'll start
+; by registering that keyset.
+(begin-tx)
+(env-data { "charkha-admin-keyset": { "keys": [ "charkha-admin-key" ], "pred": "keys-all" } })
+(namespace "free")
+(define-keyset "free.charkha-admin-keyset" (read-keyset "charkha-admin-keyset"))
+(commit-tx)
+(print "Defined the charkha-admin-keyset")
+
+; We can then "deploy" as the administrator:
+(begin-tx)
+(env-data { "init": true })
+(env-sigs [ { "key": "charkha-admin-key", "caps": [] } ])
+(load "oracle/oracle.pact")
+(load "tokens/keth.pact")
+(load "tokens/chrk.pact")
+(load "markets/cwCHRK.pact")
+(load "markets/cwKETH.pact")
+(load "markets/cwKDA.pact")
+(load "governance.pact")
+(load "controller.pact")
+(commit-tx)
+(print "Loaded the Charkha and token contracts")
+
+; Finally, since several of these contracts refer to another, they need to be
+; initialized with the proper references:
+(begin-tx)
+(free.CHRK.init free.charkha-controller)
+
+(free.cwKDA.init free.charkha-controller)
+(free.cwKETH.init free.charkha-controller)
+(free.cwCHRK.init free.charkha-controller)
+(commit-tx)
+(print "Initialized contract references. Ready for testing!")
+
+(env-data {})
+(env-sigs [])
+(env-gas 0)

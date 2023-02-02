@@ -27,5 +27,5 @@
 ; to treat gas measurements as estimates and round them up by at least 1% when
 ; submitting requests to Chainweb.
 (env-gasmodel "table")
-(env-gaslimit 150000)
-(print "Initialized gas model 'table' with default limit '150_000'. Change limit with (env-gaslimit :int).")
+(env-gaslimit 1000000)
+(print "Initialized gas model 'table'")

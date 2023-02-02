@@ -183,7 +183,9 @@
          \latin-1 character set."
 
     (enforce
-      (is-charset COIN_CHARSET account)
+      ; We comment this out in our local copy of the coin-v5 contract because
+      ; we otherwise see "OutputWarning: Unsupported operation is-charset"
+      true ;(is-charset COIN_CHARSET account)
       (format
         "Account does not conform to the coin contract charset: {}"
         [account]))
@@ -513,8 +515,10 @@
 
   (defun enforce-reserved:bool (account:string guard:guard)
     @doc "Enforce reserved account name protocols."
-    (if (validate-principal guard account)
-      true
+    ; We comment this out in our local copy of the coin-v5 contract because
+    ; we otherwise see "OutputWarning: Unsupported operation validate-principal"
+    ;  (if (validate-principal guard account)
+    ;    true
       (let ((r (check-reserved account)))
         (if (= r "")
           true
@@ -522,7 +526,7 @@
             (enforce false "Single-key account protocol violation")
             (enforce false
               (format "Reserved protocol guard violation: {}" [r]))
-            )))))
+            ))))
 
 
   (defschema crosschain-schema

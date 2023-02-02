@@ -151,6 +151,11 @@
 (commit-tx)
 (env-data {})
 
+; Let's set a gaslimit of 150_000 to simulate everything in this REPL file
+; happening in the space of a single block. (Chainweb nodes reject transactions
+; over this gas amount.)
+(env-gaslimit 150000)
+
 ; First we try requesting funds. Recall that the (request-funds) function relies
 ; on the (coin.TRANSFER) capability because it calls the (coin.transfer-create)
 ; function, and therefore we must scope the faucet's signature to this capability
@@ -166,7 +171,6 @@
 ; what happens if you comment out the below line.
 (env-sigs [ { "key": "goliath-faucet-public-key", "caps": [ (coin.TRANSFER "goliath-faucet" "user" 1000.0) ] } ])
 (begin-tx)
-
 (free.goliath-faucet.request-funds "user" (describe-keyset "free.user-keyset") 20.0)
 ; Great – we've requested funds for the "user" account! It began with no funds
 ; at all, so let's let's verify this worked by checking that this account now
@@ -230,7 +234,7 @@
 (env-gaslog)
 (free.goliath-faucet.request-funds "user" (describe-keyset "free.user-keyset") 100.0)
 (env-gaslog)
-(let (( expected-gas 2638 ))
+(let (( expected-gas 2634 ))
   (expect (format "Requesting funds costs {} gas" [expected-gas]) expected-gas (env-gas)))
 (expect "User account has 200.0 KDA." 200.0 (coin.get-balance "user"))
 (commit-tx)

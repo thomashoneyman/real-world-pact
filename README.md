@@ -1,26 +1,33 @@
 # Real World Pact
 
-Real World Pact is a short guide and collection of example projects that demonstrate building with Pact on Kadena's Chainweb blockchain. The projects are self-contained and demonstrate critical concepts ranging from beginner to intermediate.
+Real World Pact is a collection of thoroughly-commented, fully-functioning example projects that demonstrate building with Pact on Kadena's Chainweb blockchain. The projects are self-contained and demonstrate critical concepts ranging from beginner to intermediate. Each project can be run on a local devnet (simulation of Chainweb) and has a real world UI you can use to interact with the smart contracts.
 
-:warning: The projects in this repository are still under development! The Goliath faucet contract and wallet are largely complete, but the core concepts guide and Charkha lending protocol are unfinished.
+If you're brand-new to Pact then you should begin with the [core concepts guide](./00-core-concepts/) and then move through the projects one-by-one. If you're already familiar with Pact and are looking for a well-commented, real-world example application, you can skip straight to the [Charkha lending protocol](./03-charkha-lending) and accompanying [white paper](./03-charkha-lending/Charkha-Protocol-Whitepaper.pdf).
+
+:warning: The core concepts guide and Charkha lending protocol frontend are still under development. Stay tuned!
 
 ## Included Projects
 
-1. [**Goliath Faucet Contract**](./01-faucet-contract) (Complete)
+1. [**Goliath Faucet Contract**](./01-faucet-contract) (Beginner, Pact)
+
    The faucet contract demonstrates how to write a smart contract with Pact, use the REPL to iterate on and test your code, and use the devnet test blockchain to deploy and interact with your smart contract. You'll learn the core concepts of Pact, such as modules, capabilities, property tests, tables and schemas, dependency management, and deploying your code.
 
-2. [**Goliath Wallet UI**](./02-goliath-wallet) (Complete)
+2. [**Goliath Wallet UI**](./02-goliath-wallet) (Beginner, TypeScript + React)
+
    The Goliath wallet demonstrates how to build a frontend application in TypeScript + React and use the [pact-lang-api](https://github.com/kadena-io/pact-lang-api) library to interact with Chainweb. You'll learn how to generate accounts, transfer and receive KDA, interact with contracts on-chain from your frontend, and more. Goliath is named after the Goliath bird-eating spider.
 
-3. **[Charkha Lending Protocol](./03-charkha-lending)** (Upcoming)
-   The Charkha lending protocol is an advanced project that demonstrates building a real-world application on Pact and Chainweb. You'll see how to implement a white paper describing a lending protocol as a set of smart contracts. You'll also connect a full frontend to the protocol. You'll learn a mixture of Pact, Chainweb, and DeFi concepts, such as smart contract performance, governance, and minimizing gas fees. Charkha is named for the common spinning wheels used to spin silk.
+3. **[Charkha Lending Protocol](./03-charkha-lending)** (Intermediate / Advanced, Full Stack)
+
+   The Charkha lending protocol is an advanced project that demonstrates building a real-world application on Pact and Chainweb. You'll see how to implement a white paper describing a lending protocol as a set of smart contracts. You'll also connect a full frontend to the protocol. You'll learn a mixture of Pact, Chainweb, and DeFi concepts, such as oracles, community governance, implementing your own tokens, minimizing gas fees, and more. Charkha is named for the common spinning wheels used to spin silk.
 
 All three projects expect that you have first read the **Core Concepts**, a short crash-course on building applications with Pact. There are also two directories containing utility code which you should review:
 
-1. **[Pact REPL Utils](./pact-repl-utils)**
+1. **[Pact REPL Utils](./pact-repl-utils)** (Pact)
+
    The Pact REPL simulates contract operations on a Pact-supporting blockchain such as Chainweb. However, the REPL has no knowledge of the namespaces, guards, and contracts that have been deployed to Chainweb. The REPL utilities help you set up your REPL to mimic the Chainweb environment you will be deploying to -- such as making dependencies like the `coin-v5` contract available.
 
-2. **[Pact API Utils](./pact-api-utils)**
+2. **[Pact API Utils](./pact-api-utils)** (TypeScript + React)
+
    The [pact-lang-api](https://github.com/kadena-io/pact-lang-api) library provides basic building blocks for interacting with the Pact endpoint on a Chainweb node. However, it's too low-level for use in a serious application, so I've implemented a layer on top of it we'll use to build and send requests in our TypeScript & React applications. Feel free to use it in your own projects!
 
 ## Running the Apps
@@ -72,6 +79,8 @@ This repository is broken into several directories. You can look at the README.m
 - `01-faucet-contract`: Contains the implementation for our faucet contract (beginner friendly, Pact code)
 - `02-goliath-wallet`: Contains the implementation for the Goliath wallet (beginner friendly, TypeScript + React code)
 - `03-charkha-lending`: Contains the implementation for the Charkha lending protocol (intermediate, full application)
+- `pact-repl-utils`: Contains Pact utilities for working in the Pact REPL.
+- `pact-api-utils`: Contains TypeScript utilities for working with the Pact API on a Chainweb node.
 - `devnet`: Contains a checkout of Kadena's [devnet](https://github.com/kadena-io/devnet) as a Git submodule. This isn't our code! You don't really need to look at it.
 - `theme`: Contains the TypeScript for common UI components used in our application. You don't need to look at this, as it's nothing to do with Pact or Chainweb and solely so our apps look good.
 

@@ -1,11 +1,61 @@
-# Charkha Lending Project (WIP)
+# Charkha Lending Project
 
-The Charkha lending protocol is a full-stack decentralized finance app built on Kadena's Chainweb blockchain. DeFi has been one of the standout uses of smart contracts, and Charkha is inspired by the popular [Compound](https://compound.finance) lending protocol on the Ethereum blockchain. However, Charkha is stripped to the bare essentials so that it is usable as a learning project.
+:warning: Charkha is still under active development. Stay tuned!
 
-Charkha combines a TypeScript + React frontend using [kadena.js](https://github.com/kadena-community/kadena.js) and a smart contract lending protocol written in Pact. It demonstrates a number of advanced concepts for dapp development on Chainweb, including:
+The Charkha lending protocol is a complete decentralized lending app built on Kadena's Chainweb blockchain. Decentralized finance has been one of the standout uses of smart contracts and Charkha is inspired by the popular [Compound](https://compound.finance) lending protocol.
 
-- Developing sophisticated, real-world smart contracts to implement a "white paper" spec
-- Interact with off-chain data (real-world asset prices, for example)
-- Implementing unit tests, integration tests, and formal verification for our contracts
+Charkha contains all the components of a real-world DeFi project, including:
 
-Charkha is still under development. Stay tuned!
+1. The [Charkha white paper](./Charkha-Protocol-Whitepaper.pdf) which describes the protocol in depth, and which you should read first (it also has [a collection of examples](./Charkha-Protocol-Examples.pdf)).
+2. A [development guide](./guide), which explains the major concepts that are implemented in the smart contracts.
+3. A collection of [thoroughly-commented smart contracts](./contracts) that implement the protocol and tests.
+4. A complete [TypeScript + React frontend](./frontend) that shows the current markets and their interest rates and allows you to lend and borrow assets, submit governance proposals, liquidate under-collateralized accounts, and more.
+
+As you read through the white paper, contracts, and frontend, you'll see how to:
+
+- Develop sophisticated, real-world smart contracts to implement a "white paper" spec
+- Bring off-chain data to the blockchain (real-world asset prices, for example)
+- Implement your own tokens according to the KIP-0005 token standard
+- Design a rewards accrual system that incentivizes participation in the protocol
+- Establish community governance for our smart contracts, where participants submit proposals and vote on protocol changes with their CHRK reward holdings
+- Take full advantage of decentralization by designing features that require no participation from an administrator — including borrowing real-world assets like KDA
+- Navigate around smart contract performance limitations by establishing index values, snapshotting to the database, and more
+
+Finally, Charkha is a fully-functioning lending protocol with a corresponding frontend. I encourage you to run the app yourself, lend some funds, submit some governance proposals, and earn some interest!
+
+## Run the Application
+
+Assuming you have cloned this repository and initialized the `devnet` submodule as described in the main README, you can run Charkha yourself with a simulation of Chainweb with:
+
+```sh
+# Enter the Nix shell (use nix-shell if your Nix installation does not support flakes)
+nix develop
+
+# Add your CoinMarketCap API key to the .env file
+echo "CMC_API_KEY=my-api-key" >> ./frontend/.env
+
+# Start the simulation blockchain (run devnet-stop to stop the simulation)
+devnet-start
+
+# Deploy the Charkha contracts
+charkha-deploy
+
+# Start the Charkha frontend (Ctrl+C to exit)
+charkha-start
+```
+
+### Development
+
+Each of the smart contracts in the `contracts` subdirectory has an accompanying REPL file. If you make tweaks to the contracts, make sure to update the corresponding REPL file. So long as you don't change the module names or the Charkha keyset reference you should still be able to use the deployment scripts.
+
+```sh
+# in the 03-charkha-lending/contracts directory
+pact oracle/oracle.repl
+```
+
+To work on the frontend, you can use the command below in the `frontend` subdirectory to start Charkha in development mode. Feel free to make changes to the source code – the UI will hot-reload with your changes. Remember: this will only work if you are running devnet!
+
+```sh
+# in the 03-charkha-lending/frontend directory
+pnpm run dev
+```
