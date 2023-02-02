@@ -37,6 +37,7 @@
     (enforce (!= receiver "") "Receiver cannot be empty.")
     (enforce-unit amount) ; see (enforce-unit) later in this file for details.
     (enforce (> amount 0.0) "Transfer limit must be positive.")
+    (enforce-guard (at 'guard (read participants-table sender)))
     ; Here we enforce that the user has sufficient borrowing capacity that
     ; transferring AMOUNT will still leave them with some borrow capacity.
     (with-read refs-table REF_KEY { "controller-ref" := controller-ref:module{charkha-controller-iface} }

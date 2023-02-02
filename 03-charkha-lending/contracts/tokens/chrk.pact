@@ -92,6 +92,7 @@
     (enforce (!= sender "") "Sender cannot be empty.")
     (enforce (!= receiver "") "Receiver cannot be empty.")
     (enforce-unit amount)
+    (enforce-guard (at 'guard (read accounts sender)))
     (enforce (> amount 0.0) "Transfer limit must be positive."))
 
   ; Typical implementation of the manager function for the (TRANSFER) capability.

@@ -36,6 +36,7 @@
     (enforce (!= sender "") "Sender cannot be empty.")
     (enforce (!= receiver "") "Receiver cannot be empty.")
     (enforce-unit amount) ; see (enforce-unit) later in this file for details.
+    (enforce-guard (at 'guard (read participants-table sender)))
     (enforce (> amount 0.0) "Transfer limit must be positive.")
     ; Here we enforce that the user has sufficient borrowing capacity that
     ; transferring AMOUNT will still leave them with some borrow capacity.

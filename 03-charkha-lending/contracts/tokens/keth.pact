@@ -59,6 +59,7 @@
     (enforce (!= sender "") "Sender cannot be empty.")
     (enforce (!= receiver "") "Receiver cannot be empty.")
     (enforce-unit amount) ; see (enforce-unit) later in this file for details.
+    (enforce-guard (at 'guard (read accounts sender)))
     (enforce (> amount 0.0) "Transfer limit must be positive."))
 
   ; The TRANSFER-mgr function is required by the fungible-v2 interface as the
