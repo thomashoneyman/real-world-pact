@@ -7,19 +7,36 @@
 (env-data {})
 (env-sigs [])
 
-; We'll start by verifying each of the contracts. Note that modrefs are not
-; supported by analysis, so you will see "can't translate an empty body" in
-; the log output.
+; We'll start by verifying each of the contracts. Note that we need to use the
+; (env-dynref) repl-only function to tell formal verification what contract to
+; use when it encounters a modref.
 (print "Verifying contracts...")
+
+; Disabled until Pact 4.6
+; (env-dynref fungible-v2 free.KETH)
+; (env-dynref free.charkha-market-iface free.cwKDA)
+; (env-dynref free.charkha-controller-iface free.charkha-controller)
+
+(verify "free.charkha-oracle")
+(print "Verified oracle contract.")
+
+(verify "free.KETH")
+(print "Verified CHRK contract.")
+
+(verify "free.CHRK")
+(print "Verified CHRK contract.")
 
 (verify "free.cwKDA")
 (print "Verified cwKDA contract.")
 
+(verify "free.cwCHRK")
+(print "Verified cwCHRK contract.")
+
+(verify "free.cwKETH")
+(print "Verified cwKETH contract.")
+
 (verify "free.charkha-governance")
 (print "Verified governance contract.")
-
-(verify "free.charkha-controller")
-(print "Verified controller contract.")
 
 ; ----------
 ; ORACLE INITIALIZATION

@@ -227,13 +227,13 @@
         (update accounts sender { "balance": (- sender-balance amount) }))
 
       (with-default-read accounts receiver
-        { "balance": 0.0, "guard": receiver-guard }
-        { "balance" := receiver-balance, "guard" := existing-guard }
+        { "balance": 0.0, "guard": receiver-guard, "last-claimed": (- (at 'block-height (chain-data)) 1) }
+        { "balance" := receiver-balance, "guard" := existing-guard, "last-claimed" := last-claimed }
         (enforce (= receiver-guard existing-guard) "Supplied receiver guard must match existing guard.")
         (write accounts receiver
           { "balance": (+ receiver-balance amount)
           , "guard": receiver-guard
-          , "account": receiver
+          , "last-claimed": last-claimed
           }))))
 
   ; The fungible-v2 interface requires (transfer-crosschain), but we don't
