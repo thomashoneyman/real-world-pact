@@ -1,13 +1,13 @@
 # Charkha Lending Project
 
-:warning: Charkha is still under active development. Stay tuned!
+:warning: The Charkha frontend is still in active development. Stay tuned!
 
 The Charkha lending protocol is a complete decentralized lending app built on Kadena's Chainweb blockchain. Decentralized finance has been one of the standout uses of smart contracts and Charkha is inspired by the popular [Compound](https://compound.finance) lending protocol.
 
 Charkha contains all the components of a real-world DeFi project, including:
 
 1. The [Charkha white paper](./Charkha-Protocol-Whitepaper.pdf) which describes the protocol in depth, and which you should read first (it also has [a collection of examples](./Charkha-Protocol-Examples.pdf)).
-2. A [development guide](./guide), which explains the major concepts that are implemented in the smart contracts.
+2. A [development guide](./guide), which explains how we translated the white paper into smart contract implementations.
 3. A collection of [thoroughly-commented smart contracts](./contracts) that implement the protocol and tests.
 4. A complete [TypeScript + React frontend](./frontend) that shows the current markets and their interest rates and allows you to lend and borrow assets, submit governance proposals, liquidate under-collateralized accounts, and more.
 
@@ -42,20 +42,4 @@ charkha-deploy
 
 # Start the Charkha frontend (Ctrl+C to exit)
 charkha-start
-```
-
-### Development
-
-Each of the smart contracts in the `contracts` subdirectory has an accompanying REPL file. If you make tweaks to the contracts, make sure to update the corresponding REPL file. So long as you don't change the module names or the Charkha keyset reference you should still be able to use the deployment scripts.
-
-```sh
-# in the 03-charkha-lending/contracts directory
-pact oracle/oracle.repl
-```
-
-To work on the frontend, you can use the command below in the `frontend` subdirectory to start Charkha in development mode. Feel free to make changes to the source code – the UI will hot-reload with your changes. Remember: this will only work if you are running devnet!
-
-```sh
-# in the 03-charkha-lending/frontend directory
-pnpm run dev
 ```
