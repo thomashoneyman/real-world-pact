@@ -2,9 +2,9 @@
 
 Real World Pact is a collection of thoroughly-commented, fully-functioning example projects that demonstrate building with Pact on Kadena's Chainweb blockchain. The projects are self-contained and demonstrate critical concepts ranging from beginner to intermediate. Each project can be run on a local devnet (simulation of Chainweb) and has a real world UI you can use to interact with the smart contracts.
 
-If you're brand-new to Pact then you should begin with the [core concepts guide](./00-core-concepts/) and then move through the projects one-by-one. If you're already familiar with Pact and are looking for a well-commented, real-world example application, you can skip straight to the [Charkha lending protocol](./03-charkha-lending) and accompanying [white paper](./03-charkha-lending/Charkha-Protocol-Whitepaper.pdf).
+If you're brand-new to Pact then you should begin with the [core concepts guide]() and then move through the projects one-by-one. If you're already familiar with Pact and are looking for a well-commented, real-world example application, you can skip straight to the [Charkha lending protocol](./03-charkha-lending) and accompanying [white paper](./03-charkha-lending/Charkha-Protocol-Whitepaper.pdf).
 
-:warning: The core concepts guide and Charkha lending protocol frontend are still under development. Stay tuned!
+:warning: The core concepts guide is still under development. Stay tuned!
 
 ## Included Projects
 
@@ -75,13 +75,13 @@ You don't have to use Nix. If you would prefer not to, then you should install `
 
 This repository is broken into several directories. You can look at the README.md stored in each directory for more detailed information about each piece. Use the list below to help guide yourself:
 
-- `00-core-concepts`: Contains a short guide covering the core concepts of dapp development with Pact on Chainweb (WIP)
 - `01-faucet-contract`: Contains the implementation for our faucet contract (beginner friendly, Pact code)
 - `02-goliath-wallet`: Contains the implementation for the Goliath wallet (beginner friendly, TypeScript + React code)
 - `03-charkha-lending`: Contains the implementation for the Charkha lending protocol (intermediate, full application)
 - `pact-repl-utils`: Contains Pact utilities for working in the Pact REPL.
 - `pact-api-utils`: Contains TypeScript utilities for working with the Pact API on a Chainweb node.
 - `devnet`: Contains a checkout of Kadena's [devnet](https://github.com/kadena-io/devnet) as a Git submodule. This isn't our code! You don't really need to look at it.
+- `devnet-backup`: Contains a snapshot of the devnet local database so that we can reset devnet to a clean state (none of our contracts exist), but which still supports recent Pact versions.
 - `theme`: Contains the TypeScript for common UI components used in our application. You don't need to look at this, as it's nothing to do with Pact or Chainweb and solely so our apps look good.
 
 ## Necessary Tools

@@ -16,6 +16,15 @@ export default defineConfig({
       plugins: [NodeGlobalsPolyfillPlugin({ buffer: true })],
     },
   },
+  server: {
+    proxy: {
+      "/proxy": {
+        target: "https://pro-api.coinmarketcap.com/",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/proxy/, ""),
+      },
+    },
+  },
   build: {
     rollupOptions: {
       plugins: [rollupNodePolyFill()],

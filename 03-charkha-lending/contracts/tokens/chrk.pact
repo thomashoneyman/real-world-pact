@@ -70,6 +70,7 @@
 
   (defschema ref
     @doc "Schema for a reference to the Charkha controlling module."
+    initialized:bool
     controller-ref:module{charkha-controller-iface})
 
   (deftable refs:{ref})
@@ -108,12 +109,17 @@
   ; in the (init) function to creat the contract. This can only be run once
   ; because of the calls to (insert).
   (defun init (controller-ref:module{charkha-controller-iface})
-    (enforce-guard (keyset-ref-guard "free.charkha-admin-keyset"))
-    (insert refs REF_KEY { "controller-ref": controller-ref })
-    (insert accruals ACCRUALS_KEY
-      { "last-accrued": (at 'block-height (chain-data))
-      , "accrued": 0
-      }))
+    (let ((initialized (is-initialized)))
+      (enforce (not initialized) "Cannot initialize more than once."))
+    (with-capability (ADMIN)
+      (insert refs REF_KEY { "controller-ref": controller-ref, "initialized": true })
+      (insert accruals ACCRUALS_KEY
+        { "last-accrued": (at 'block-height (chain-data))
+        , "accrued": 0
+        })))
+
+  (defun is-initialized:bool ()
+    (with-default-read refs REF_KEY { "initialized": false } { "initialized" := initialized } initialized))
 
   ; The claim function lets you claim your accrued CHRK rewards. Your share of
   ; CHRK rewards depends on your share of overall market activity for each

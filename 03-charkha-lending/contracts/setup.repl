@@ -42,7 +42,6 @@
 ; initialized with the proper references:
 (begin-tx)
 (free.CHRK.init free.charkha-controller)
-
 (free.cwKDA.init free.charkha-controller)
 (free.cwKETH.init free.charkha-controller)
 (free.cwCHRK.init free.charkha-controller)

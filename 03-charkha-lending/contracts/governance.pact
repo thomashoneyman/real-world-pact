@@ -188,6 +188,10 @@
           (update proposals-table proposal-id { "for": (+ [account] for) })
           (update proposals-table proposal-id { "against": (+ [account] against) })))))
 
+  (defun get-proposal-ids:[string] ()
+    @doc "Read all proposal IDs from the table."
+    (keys proposals-table))
+
   (defun get-proposal:object{proposal} (proposal-id:string)
     @doc "Get the proposal at the given ID, such as CP-1."
     (read proposals-table proposal-id))

@@ -1,0 +1,523 @@
+2023/02/11-15:56:18.276228 70 [db/db_impl/db_impl_open.cc:199] file size check will be skipped during open.
+2023/02/11-15:56:18.276384 70 RocksDB version: 6.29.3
+2023/02/11-15:56:18.276389 70 DB SUMMARY
+2023/02/11-15:56:18.276390 70 DB Session ID:  JGFGXYB5AHSCYTFJDHC9
+2023/02/11-15:56:18.276402 70 SST files in /chainweb/db/0/rocksDb dir, Total Num: 0, files: 
+2023/02/11-15:56:18.276403 70 Write Ahead Log file in /chainweb/db/0/rocksDb: 
+2023/02/11-15:56:18.276404 70                         Options.error_if_exists: 0
+2023/02/11-15:56:18.276405 70                       Options.create_if_missing: 1
+2023/02/11-15:56:18.276405 70                         Options.paranoid_checks: 0
+2023/02/11-15:56:18.276406 70             Options.flush_verify_memtable_count: 1
+2023/02/11-15:56:18.276407 70                               Options.track_and_verify_wals_in_manifest: 0
+2023/02/11-15:56:18.276407 70                                     Options.env: 0x5432a80
+2023/02/11-15:56:18.276408 70                                      Options.fs: PosixFileSystem
+2023/02/11-15:56:18.276409 70                                Options.info_log: 0x7f4cc8005730
+2023/02/11-15:56:18.276409 70                Options.max_file_opening_threads: 16
+2023/02/11-15:56:18.276410 70                              Options.statistics: (nil)
+2023/02/11-15:56:18.276411 70                               Options.use_fsync: 0
+2023/02/11-15:56:18.276411 70                       Options.max_log_file_size: 0
+2023/02/11-15:56:18.276412 70                  Options.max_manifest_file_size: 1073741824
+2023/02/11-15:56:18.276413 70                   Options.log_file_time_to_roll: 0
+2023/02/11-15:56:18.276413 70                       Options.keep_log_file_num: 1000
+2023/02/11-15:56:18.276414 70                    Options.recycle_log_file_num: 0
+2023/02/11-15:56:18.276414 70                         Options.allow_fallocate: 1
+2023/02/11-15:56:18.276415 70                        Options.allow_mmap_reads: 0
+2023/02/11-15:56:18.276416 70                       Options.allow_mmap_writes: 0
+2023/02/11-15:56:18.276416 70                        Options.use_direct_reads: 0
+2023/02/11-15:56:18.276417 70                        Options.use_direct_io_for_flush_and_compaction: 0
+2023/02/11-15:56:18.276417 70          Options.create_missing_column_families: 0
+2023/02/11-15:56:18.276418 70                              Options.db_log_dir: 
+2023/02/11-15:56:18.276418 70                                 Options.wal_dir: 
+2023/02/11-15:56:18.276419 70                Options.table_cache_numshardbits: 6
+2023/02/11-15:56:18.276420 70                         Options.WAL_ttl_seconds: 0
+2023/02/11-15:56:18.276420 70                       Options.WAL_size_limit_MB: 0
+2023/02/11-15:56:18.276421 70                        Options.max_write_batch_group_size_bytes: 1048576
+2023/02/11-15:56:18.276421 70             Options.manifest_preallocation_size: 4194304
+2023/02/11-15:56:18.276422 70                     Options.is_fd_close_on_exec: 1
+2023/02/11-15:56:18.276423 70                   Options.advise_random_on_open: 1
+2023/02/11-15:56:18.276423 70                   Options.experimental_mempurge_threshold: 0.000000
+2023/02/11-15:56:18.276425 70                    Options.db_write_buffer_size: 0
+2023/02/11-15:56:18.276426 70                    Options.write_buffer_manager: 0x7f4cc8003de0
+2023/02/11-15:56:18.276427 70         Options.access_hint_on_compaction_start: 1
+2023/02/11-15:56:18.276427 70  Options.new_table_reader_for_compaction_inputs: 0
+2023/02/11-15:56:18.276428 70           Options.random_access_max_buffer_size: 1048576
+2023/02/11-15:56:18.276428 70                      Options.use_adaptive_mutex: 0
+2023/02/11-15:56:18.276429 70                            Options.rate_limiter: (nil)
+2023/02/11-15:56:18.276430 70     Options.sst_file_manager.rate_bytes_per_sec: 0
+2023/02/11-15:56:18.276430 70                       Options.wal_recovery_mode: 2
+2023/02/11-15:56:18.276431 70                  Options.enable_thread_tracking: 0
+2023/02/11-15:56:18.276432 70                  Options.enable_pipelined_write: 0
+2023/02/11-15:56:18.276432 70                  Options.unordered_write: 0
+2023/02/11-15:56:18.276433 70         Options.allow_concurrent_memtable_write: 1
+2023/02/11-15:56:18.276440 70      Options.enable_write_thread_adaptive_yield: 1
+2023/02/11-15:56:18.276440 70             Options.write_thread_max_yield_usec: 100
+2023/02/11-15:56:18.276441 70            Options.write_thread_slow_yield_usec: 3
+2023/02/11-15:56:18.276442 70                               Options.row_cache: None
+2023/02/11-15:56:18.276442 70                              Options.wal_filter: None
+2023/02/11-15:56:18.276443 70             Options.avoid_flush_during_recovery: 0
+2023/02/11-15:56:18.276443 70             Options.allow_ingest_behind: 0
+2023/02/11-15:56:18.276444 70             Options.preserve_deletes: 0
+2023/02/11-15:56:18.276444 70             Options.two_write_queues: 0
+2023/02/11-15:56:18.276445 70             Options.manual_wal_flush: 0
+2023/02/11-15:56:18.276446 70             Options.atomic_flush: 0
+2023/02/11-15:56:18.276446 70             Options.avoid_unnecessary_blocking_io: 0
+2023/02/11-15:56:18.276447 70                 Options.persist_stats_to_disk: 0
+2023/02/11-15:56:18.276447 70                 Options.write_dbid_to_manifest: 0
+2023/02/11-15:56:18.276448 70                 Options.log_readahead_size: 0
+2023/02/11-15:56:18.276448 70                 Options.file_checksum_gen_factory: Unknown
+2023/02/11-15:56:18.276449 70                 Options.best_efforts_recovery: 0
+2023/02/11-15:56:18.276450 70                Options.max_bgerror_resume_count: 2147483647
+2023/02/11-15:56:18.276450 70            Options.bgerror_resume_retry_interval: 1000000
+2023/02/11-15:56:18.276451 70             Options.allow_data_in_errors: 0
+2023/02/11-15:56:18.276451 70             Options.db_host_id: __hostname__
+2023/02/11-15:56:18.276452 70             Options.max_background_jobs: 2
+2023/02/11-15:56:18.276453 70             Options.max_background_compactions: -1
+2023/02/11-15:56:18.276453 70             Options.max_subcompactions: 1
+2023/02/11-15:56:18.276454 70             Options.avoid_flush_during_shutdown: 0
+2023/02/11-15:56:18.276454 70           Options.writable_file_max_buffer_size: 1048576
+2023/02/11-15:56:18.276455 70             Options.delayed_write_rate : 16777216
+2023/02/11-15:56:18.276456 70             Options.max_total_wal_size: 0
+2023/02/11-15:56:18.276456 70             Options.delete_obsolete_files_period_micros: 21600000000
+2023/02/11-15:56:18.276457 70                   Options.stats_dump_period_sec: 600
+2023/02/11-15:56:18.276457 70                 Options.stats_persist_period_sec: 600
+2023/02/11-15:56:18.276458 70                 Options.stats_history_buffer_size: 1048576
+2023/02/11-15:56:18.276459 70                          Options.max_open_files: -1
+2023/02/11-15:56:18.276459 70                          Options.bytes_per_sync: 0
+2023/02/11-15:56:18.276460 70                      Options.wal_bytes_per_sync: 0
+2023/02/11-15:56:18.276460 70                   Options.strict_bytes_per_sync: 0
+2023/02/11-15:56:18.276461 70       Options.compaction_readahead_size: 0
+2023/02/11-15:56:18.276461 70                  Options.max_background_flushes: -1
+2023/02/11-15:56:18.276462 70 Compression algorithms supported:
+2023/02/11-15:56:18.276463 70 	kZSTDNotFinalCompression supported: 1
+2023/02/11-15:56:18.276465 70 	kZSTD supported: 1
+2023/02/11-15:56:18.276465 70 	kXpressCompression supported: 0
+2023/02/11-15:56:18.276466 70 	kLZ4HCCompression supported: 1
+2023/02/11-15:56:18.276467 70 	kLZ4Compression supported: 1
+2023/02/11-15:56:18.276467 70 	kBZip2Compression supported: 1
+2023/02/11-15:56:18.276468 70 	kZlibCompression supported: 1
+2023/02/11-15:56:18.276469 70 	kSnappyCompression supported: 1
+2023/02/11-15:56:18.276470 70 Fast CRC32 supported: Not supported on x86
+2023/02/11-15:56:18.288772 70 [db/db_impl/db_impl_open.cc:307] Creating manifest 1 
+2023/02/11-15:56:18.307008 70 [db/version_set.cc:4873] Recovering from manifest file: /chainweb/db/0/rocksDb/MANIFEST-000001
+2023/02/11-15:56:18.307172 70 [db/column_family.cc:605] --------------- Options for column family [default]:
+2023/02/11-15:56:18.307175 70               Options.comparator: leveldb.BytewiseComparator
+2023/02/11-15:56:18.307187 70           Options.merge_operator: None
+2023/02/11-15:56:18.307188 70        Options.compaction_filter: None
+2023/02/11-15:56:18.307189 70        Options.compaction_filter_factory: None
+2023/02/11-15:56:18.307190 70  Options.sst_partitioner_factory: None
+2023/02/11-15:56:18.307191 70         Options.memtable_factory: SkipListFactory
+2023/02/11-15:56:18.307192 70            Options.table_factory: BlockBasedTable
+2023/02/11-15:56:18.307218 70            table_factory options:   flush_block_policy_factory: FlushBlockBySizePolicyFactory (0x7f4cc80013b0)
+  cache_index_and_filter_blocks: 0
+  cache_index_and_filter_blocks_with_high_priority: 1
+  pin_l0_filter_and_index_blocks_in_cache: 0
+  pin_top_level_index_and_filter: 1
+  index_type: 0
+  data_block_index_type: 0
+  index_shortening: 1
+  data_block_hash_table_util_ratio: 0.750000
+  hash_index_allow_collision: 1
+  checksum: 1
+  no_block_cache: 0
+  block_cache: 0x7f4cc8001690
+  block_cache_name: LRUCache
+  block_cache_options:
+    capacity : 8388608
+    num_shard_bits : 4
+    strict_capacity_limit : 0
+    memory_allocator : None
+    high_pri_pool_ratio: 0.000
+  block_cache_compressed: (nil)
+  persistent_cache: (nil)
+  block_size: 4096
+  block_size_deviation: 10
+  block_restart_interval: 16
+  index_block_restart_interval: 1
+  metadata_block_size: 4096
+  partition_filters: 0
+  use_delta_encoding: 1
+  filter_policy: nullptr
+  whole_key_filtering: 1
+  verify_compression: 0
+  read_amp_bytes_per_bit: 0
+  format_version: 5
+  enable_index_compression: 1
+  block_align: 0
+  max_auto_readahead_size: 262144
+  prepopulate_block_cache: 0
+2023/02/11-15:56:18.307220 70        Options.write_buffer_size: 67108864
+2023/02/11-15:56:18.307221 70  Options.max_write_buffer_number: 2
+2023/02/11-15:56:18.307223 70          Options.compression: Snappy
+2023/02/11-15:56:18.307224 70                  Options.bottommost_compression: Disabled
+2023/02/11-15:56:18.307225 70       Options.prefix_extractor: nullptr
+2023/02/11-15:56:18.307226 70   Options.memtable_insert_with_hint_prefix_extractor: nullptr
+2023/02/11-15:56:18.307227 70             Options.num_levels: 7
+2023/02/11-15:56:18.307228 70        Options.min_write_buffer_number_to_merge: 1
+2023/02/11-15:56:18.307229 70     Options.max_write_buffer_number_to_maintain: 0
+2023/02/11-15:56:18.307230 70     Options.max_write_buffer_size_to_maintain: 0
+2023/02/11-15:56:18.307231 70            Options.bottommost_compression_opts.window_bits: -14
+2023/02/11-15:56:18.307232 70                  Options.bottommost_compression_opts.level: 32767
+2023/02/11-15:56:18.307233 70               Options.bottommost_compression_opts.strategy: 0
+2023/02/11-15:56:18.307234 70         Options.bottommost_compression_opts.max_dict_bytes: 0
+2023/02/11-15:56:18.307235 70         Options.bottommost_compression_opts.zstd_max_train_bytes: 0
+2023/02/11-15:56:18.307237 70         Options.bottommost_compression_opts.parallel_threads: 1
+2023/02/11-15:56:18.307238 70                  Options.bottommost_compression_opts.enabled: false
+2023/02/11-15:56:18.307239 70         Options.bottommost_compression_opts.max_dict_buffer_bytes: 0
+2023/02/11-15:56:18.307240 70            Options.compression_opts.window_bits: -14
+2023/02/11-15:56:18.307241 70                  Options.compression_opts.level: 32767
+2023/02/11-15:56:18.307242 70               Options.compression_opts.strategy: 0
+2023/02/11-15:56:18.307243 70         Options.compression_opts.max_dict_bytes: 0
+2023/02/11-15:56:18.307244 70         Options.compression_opts.zstd_max_train_bytes: 0
+2023/02/11-15:56:18.307245 70         Options.compression_opts.parallel_threads: 1
+2023/02/11-15:56:18.307247 70                  Options.compression_opts.enabled: false
+2023/02/11-15:56:18.307248 70         Options.compression_opts.max_dict_buffer_bytes: 0
+2023/02/11-15:56:18.307249 70      Options.level0_file_num_compaction_trigger: 4
+2023/02/11-15:56:18.307250 70          Options.level0_slowdown_writes_trigger: 20
+2023/02/11-15:56:18.307251 70              Options.level0_stop_writes_trigger: 36
+2023/02/11-15:56:18.307252 70                   Options.target_file_size_base: 67108864
+2023/02/11-15:56:18.307261 70             Options.target_file_size_multiplier: 1
+2023/02/11-15:56:18.307262 70                Options.max_bytes_for_level_base: 268435456
+2023/02/11-15:56:18.307263 70 Options.level_compaction_dynamic_level_bytes: 0
+2023/02/11-15:56:18.307264 70          Options.max_bytes_for_level_multiplier: 10.000000
+2023/02/11-15:56:18.307266 70 Options.max_bytes_for_level_multiplier_addtl[0]: 1
+2023/02/11-15:56:18.307267 70 Options.max_bytes_for_level_multiplier_addtl[1]: 1
+2023/02/11-15:56:18.307268 70 Options.max_bytes_for_level_multiplier_addtl[2]: 1
+2023/02/11-15:56:18.307269 70 Options.max_bytes_for_level_multiplier_addtl[3]: 1
+2023/02/11-15:56:18.307270 70 Options.max_bytes_for_level_multiplier_addtl[4]: 1
+2023/02/11-15:56:18.307271 70 Options.max_bytes_for_level_multiplier_addtl[5]: 1
+2023/02/11-15:56:18.307272 70 Options.max_bytes_for_level_multiplier_addtl[6]: 1
+2023/02/11-15:56:18.307273 70       Options.max_sequential_skip_in_iterations: 8
+2023/02/11-15:56:18.307274 70                    Options.max_compaction_bytes: 1677721600
+2023/02/11-15:56:18.307275 70                        Options.arena_block_size: 1048576
+2023/02/11-15:56:18.307277 70   Options.soft_pending_compaction_bytes_limit: 68719476736
+2023/02/11-15:56:18.307278 70   Options.hard_pending_compaction_bytes_limit: 274877906944
+2023/02/11-15:56:18.307279 70       Options.rate_limit_delay_max_milliseconds: 100
+2023/02/11-15:56:18.307280 70                Options.disable_auto_compactions: 0
+2023/02/11-15:56:18.307282 70                        Options.compaction_style: kCompactionStyleLevel
+2023/02/11-15:56:18.307284 70                          Options.compaction_pri: kMinOverlappingRatio
+2023/02/11-15:56:18.307285 70 Options.compaction_options_universal.size_ratio: 1
+2023/02/11-15:56:18.307286 70 Options.compaction_options_universal.min_merge_width: 2
+2023/02/11-15:56:18.307287 70 Options.compaction_options_universal.max_merge_width: 4294967295
+2023/02/11-15:56:18.307288 70 Options.compaction_options_universal.max_size_amplification_percent: 200
+2023/02/11-15:56:18.307289 70 Options.compaction_options_universal.compression_size_percent: -1
+2023/02/11-15:56:18.307290 70 Options.compaction_options_universal.stop_style: kCompactionStopStyleTotalSize
+2023/02/11-15:56:18.307291 70 Options.compaction_options_fifo.max_table_files_size: 1073741824
+2023/02/11-15:56:18.307292 70 Options.compaction_options_fifo.allow_compaction: 0
+2023/02/11-15:56:18.307295 70                   Options.table_properties_collectors: 
+2023/02/11-15:56:18.307296 70                   Options.inplace_update_support: 0
+2023/02/11-15:56:18.307297 70                 Options.inplace_update_num_locks: 10000
+2023/02/11-15:56:18.307298 70               Options.memtable_prefix_bloom_size_ratio: 0.000000
+2023/02/11-15:56:18.307299 70               Options.memtable_whole_key_filtering: 0
+2023/02/11-15:56:18.307300 70   Options.memtable_huge_page_size: 0
+2023/02/11-15:56:18.307301 70                           Options.bloom_locality: 0
+2023/02/11-15:56:18.307302 70                    Options.max_successive_merges: 0
+2023/02/11-15:56:18.307303 70                Options.optimize_filters_for_hits: 0
+2023/02/11-15:56:18.307304 70                Options.paranoid_file_checks: 0
+2023/02/11-15:56:18.307305 70                Options.force_consistency_checks: 1
+2023/02/11-15:56:18.307313 70                Options.report_bg_io_stats: 0
+2023/02/11-15:56:18.307314 70                               Options.ttl: 2592000
+2023/02/11-15:56:18.307316 70          Options.periodic_compaction_seconds: 0
+2023/02/11-15:56:18.307316 70                       Options.enable_blob_files: false
+2023/02/11-15:56:18.307317 70                           Options.min_blob_size: 0
+2023/02/11-15:56:18.307319 70                          Options.blob_file_size: 268435456
+2023/02/11-15:56:18.307320 70                   Options.blob_compression_type: NoCompression
+2023/02/11-15:56:18.307321 70          Options.enable_blob_garbage_collection: false
+2023/02/11-15:56:18.307331 70      Options.blob_garbage_collection_age_cutoff: 0.250000
+2023/02/11-15:56:18.307334 70 Options.blob_garbage_collection_force_threshold: 1.000000
+2023/02/11-15:56:18.307335 70          Options.blob_compaction_readahead_size: 0
+2023/02/11-15:56:18.307814 70 [db/version_set.cc:4913] Recovered from manifest file:/chainweb/db/0/rocksDb/MANIFEST-000001 succeeded,manifest_file_number is 1, next_file_number is 3, last_sequence is 0, log_number is 0,prev_log_number is 0,max_column_family is 0,min_log_number_to_keep is 0
+2023/02/11-15:56:18.307817 70 [db/version_set.cc:4928] Column family [default] (ID 0), log number is 0
+2023/02/11-15:56:18.307851 70 [db/version_set.cc:4393] Creating manifest 4
+2023/02/11-15:56:18.338727 70 [db/db_impl/db_impl_open.cc:1798] SstFileManager instance 0x7f4cc8003e80
+2023/02/11-15:56:18.338741 70 DB pointer 0x7f4cc8005890
+2023/02/11-15:56:18.338897 91 [db/db_impl/db_impl.cc:1004] ------- DUMPING STATS -------
+2023/02/11-15:56:18.338909 91 [db/db_impl/db_impl.cc:1006] 
+** DB Stats **
+Uptime(secs): 0.0 total, 0.0 interval
+Cumulative writes: 1 writes, 1 keys, 1 commit groups, 1.0 writes per commit group, ingest: 0.00 GB, 0.00 MB/s
+Cumulative WAL: 1 writes, 0 syncs, 1.00 writes per sync, written: 0.00 GB, 0.00 MB/s
+Cumulative stall: 00:00:0.000 H:M:S, 0.0 percent
+Interval writes: 1 writes, 1 keys, 1 commit groups, 1.0 writes per commit group, ingest: 0.00 MB, 0.00 MB/s
+Interval WAL: 1 writes, 0 syncs, 1.00 writes per sync, written: 0.00 GB, 0.00 MB/s
+Interval stall: 00:00:0.000 H:M:S, 0.0 percent
+
+** Compaction Stats [default] **
+Level    Files   Size     Score Read(GB)  Rn(GB) Rnp1(GB) Write(GB) Wnew(GB) Moved(GB) W-Amp Rd(MB/s) Wr(MB/s) Comp(sec) CompMergeCPU(sec) Comp(cnt) Avg(sec) KeyIn KeyDrop Rblob(GB) Wblob(GB)
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Sum      0/0    0.00 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      0.0      0.00              0.00         0    0.000       0      0       0.0       0.0
+ Int      0/0    0.00 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      0.0      0.00              0.00         0    0.000       0      0       0.0       0.0
+
+** Compaction Stats [default] **
+Priority    Files   Size     Score Read(GB)  Rn(GB) Rnp1(GB) Write(GB) Wnew(GB) Moved(GB) W-Amp Rd(MB/s) Wr(MB/s) Comp(sec) CompMergeCPU(sec) Comp(cnt) Avg(sec) KeyIn KeyDrop Rblob(GB) Wblob(GB)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Blob file count: 0, total size: 0.0 GB
+
+Uptime(secs): 0.0 total, 0.0 interval
+Flush(GB): cumulative 0.000, interval 0.000
+AddFile(GB): cumulative 0.000, interval 0.000
+AddFile(Total Files): cumulative 0, interval 0
+AddFile(L0 Files): cumulative 0, interval 0
+AddFile(Keys): cumulative 0, interval 0
+Cumulative compaction: 0.00 GB write, 0.00 MB/s write, 0.00 GB read, 0.00 MB/s read, 0.0 seconds
+Interval compaction: 0.00 GB write, 0.00 MB/s write, 0.00 GB read, 0.00 MB/s read, 0.0 seconds
+Stalls(count): 0 level0_slowdown, 0 level0_slowdown_with_compaction, 0 level0_numfiles, 0 level0_numfiles_with_compaction, 0 stop for pending_compaction_bytes, 0 slowdown for pending_compaction_bytes, 0 memtable_compaction, 0 memtable_slowdown, interval 0 total count
+Block cache LRUCache@0x7f4cc8001690#1 capacity: 8.00 MB collections: 1 last_copies: 0 last_secs: 3.4e-05 secs_since: 0
+Block cache entry stats(count,size,portion): Misc(1,0.00 KB,0%)
+
+** File Read Latency Histogram By Level [default] **
+2023/02/11-15:56:23.408673 41 [db/db_impl/db_impl_write.cc:1852] [default] New memtable created with log file: #8. Immutable memtables: 0.
+2023/02/11-15:56:23.408723 75 (Original Log Time 2023/02/11-15:56:23.408709) [db/db_impl/db_impl_compaction_flush.cc:2732] Calling FlushMemTableToOutputFile with column family [default], flush slots available 1, compaction slots available 1, flush slots scheduled 1, compaction slots scheduled 0
+2023/02/11-15:56:23.408726 75 [db/flush_job.cc:816] [default] [JOB 2] Flushing memtable with next log file: 8
+2023/02/11-15:56:23.408749 75 EVENT_LOG_v1 {"time_micros": 1676130983408742, "job": 2, "event": "flush_started", "num_memtables": 1, "num_entries": 143, "num_deletes": 0, "total_data_size": 989321, "memory_usage": 1001536, "flush_reason": "Manual Compaction"}
+2023/02/11-15:56:23.408751 75 [db/flush_job.cc:845] [default] [JOB 2] Level-0 flush table #9: started
+2023/02/11-15:56:23.419568 75 EVENT_LOG_v1 {"time_micros": 1676130983419553, "cf_name": "default", "job": 2, "event": "table_file_creation", "file_number": 9, "file_size": 69562, "file_checksum": "", "file_checksum_func_name": "Unknown", "table_properties": {"data_size": 68203, "index_size": 200, "index_partitions": 0, "top_level_index_size": 0, "index_key_is_user_key": 1, "index_value_is_delta_encoded": 1, "filter_size": 0, "raw_key_size": 3567, "raw_average_key_size": 61, "raw_value_size": 150587, "raw_average_value_size": 2596, "num_data_blocks": 8, "num_entries": 58, "num_filter_entries": 0, "num_deletions": 2, "num_merge_operands": 0, "num_range_deletions": 2, "format_version": 0, "fixed_key_len": 0, "filter_policy": "", "column_family_name": "default", "column_family_id": 0, "comparator": "leveldb.BytewiseComparator", "merge_operator": "nullptr", "prefix_extractor_name": "nullptr", "property_collectors": "[]", "compression": "Snappy", "compression_options": "window_bits=-14; level=32767; strategy=0; max_dict_bytes=0; zstd_max_train_bytes=0; enabled=0; max_dict_buffer_bytes=0; ", "creation_time": 1676130978, "oldest_key_time": 1676130978, "file_creation_time": 1676130983, "slow_compression_estimated_data_size": 0, "fast_compression_estimated_data_size": 0, "db_id": "d8d936d9-dc78-47dc-a76b-24d019f06973", "db_session_id": "JGFGXYB5AHSCYTFJDHC9", "orig_file_number": 9}}
+2023/02/11-15:56:23.419583 75 [db/flush_job.cc:930] [default] [JOB 2] Level-0 flush table #9: 69562 bytes OK
+2023/02/11-15:56:23.431749 75 [db/flush_job.cc:983] [default] [JOB 2] Flush lasted 23021 microseconds, and 906 cpu microseconds.
+2023/02/11-15:56:23.438241 75 (Original Log Time 2023/02/11-15:56:23.431763) [db/memtable_list.cc:469] [default] Level-0 commit table #9 started
+2023/02/11-15:56:23.438244 75 (Original Log Time 2023/02/11-15:56:23.438097) [db/memtable_list.cc:672] [default] Level-0 commit table #9: memtable #1 done
+2023/02/11-15:56:23.438245 75 (Original Log Time 2023/02/11-15:56:23.438147) EVENT_LOG_v1 {"time_micros": 1676130983438137, "job": 2, "event": "flush_finished", "output_compression": "Snappy", "lsm_state": [1, 0, 0, 0, 0, 0, 0], "immutable_memtables": 0}
+2023/02/11-15:56:23.438246 75 (Original Log Time 2023/02/11-15:56:23.438194) [db/db_impl/db_impl_compaction_flush.cc:262] [default] Level summary: files[1 0 0 0 0 0 0] max score 0.25
+2023/02/11-15:56:23.438255 75 [db/db_impl/db_impl_files.cc:434] [JOB 2] Try to delete WAL files size 989580, prev total WAL file size 989580, number of live WAL files 2.
+2023/02/11-15:56:23.438593 75 [file/delete_scheduler.cc:73] Deleted file /chainweb/db/0/rocksDb/000005.log immediately, rate_bytes_per_sec 0, total_trash_size 0 max_trash_db_ratio 0.250000
+2023/02/11-15:56:23.438727 41 [db/db_impl/db_impl_compaction_flush.cc:1848] [default] Manual compaction starting
+2023/02/11-15:56:23.445633 74 (Original Log Time 2023/02/11-15:56:23.438868) [db/db_impl/db_impl_compaction_flush.cc:3081] [default] Manual compaction from level-0 to level-1 from '2D43757448617368657324' seq:72057594037927935, type:20 .. '2D4375744861736865732400000000000000000000000000000000000000000000000000000000000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF' seq:0, type:0; will stop at (end)
+2023/02/11-15:56:23.445640 74 (Original Log Time 2023/02/11-15:56:23.438885) [db/db_impl/db_impl_compaction_flush.cc:3257] [default] Moving #9 to level-1 69562 bytes
+2023/02/11-15:56:23.445641 74 (Original Log Time 2023/02/11-15:56:23.445557) EVENT_LOG_v1 {"time_micros": 1676130983445546, "job": 3, "event": "trivial_move", "destination_level": 1, "files": 1, "total_files_size": 69562}
+2023/02/11-15:56:23.445643 74 (Original Log Time 2023/02/11-15:56:23.445581) [db/db_impl/db_impl_compaction_flush.cc:3286] [default] Moved #1 files to level-1 69562 bytes OK: files[0 1 0 0 0 0 0] max score 0.00
+2023/02/11-16:06:18.339084 91 [db/db_impl/db_impl.cc:1004] ------- DUMPING STATS -------
+2023/02/11-16:06:18.339114 91 [db/db_impl/db_impl.cc:1006] 
+** DB Stats **
+Uptime(secs): 600.0 total, 600.0 interval
+Cumulative writes: 1719 writes, 2005 keys, 1701 commit groups, 1.0 writes per commit group, ingest: 0.00 GB, 0.00 MB/s
+Cumulative WAL: 1719 writes, 0 syncs, 1719.00 writes per sync, written: 0.00 GB, 0.00 MB/s
+Cumulative stall: 00:00:0.000 H:M:S, 0.0 percent
+Interval writes: 1718 writes, 2004 keys, 1700 commit groups, 1.0 writes per commit group, ingest: 1.43 MB, 0.00 MB/s
+Interval WAL: 1718 writes, 0 syncs, 1718.00 writes per sync, written: 0.00 GB, 0.00 MB/s
+Interval stall: 00:00:0.000 H:M:S, 0.0 percent
+
+** Compaction Stats [default] **
+Level    Files   Size     Score Read(GB)  Rn(GB) Rnp1(GB) Write(GB) Wnew(GB) Moved(GB) W-Amp Rd(MB/s) Wr(MB/s) Comp(sec) CompMergeCPU(sec) Comp(cnt) Avg(sec) KeyIn KeyDrop Rblob(GB) Wblob(GB)
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  L0      0/0    0.00 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   1.0      0.0      2.9      0.02              0.00         1    0.023       0      0       0.0       0.0
+  L1      1/0   67.93 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      0.0      0.00              0.00         0    0.000       0      0       0.0       0.0
+ Sum      1/0   67.93 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   1.0      0.0      2.9      0.02              0.00         1    0.023       0      0       0.0       0.0
+ Int      0/0    0.00 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   1.0      0.0      2.9      0.02              0.00         1    0.023       0      0       0.0       0.0
+
+** Compaction Stats [default] **
+Priority    Files   Size     Score Read(GB)  Rn(GB) Rnp1(GB) Write(GB) Wnew(GB) Moved(GB) W-Amp Rd(MB/s) Wr(MB/s) Comp(sec) CompMergeCPU(sec) Comp(cnt) Avg(sec) KeyIn KeyDrop Rblob(GB) Wblob(GB)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+High      0/0    0.00 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      2.9      0.02              0.00         1    0.023       0      0       0.0       0.0
+
+Blob file count: 0, total size: 0.0 GB
+
+Uptime(secs): 600.0 total, 600.0 interval
+Flush(GB): cumulative 0.000, interval 0.000
+AddFile(GB): cumulative 0.000, interval 0.000
+AddFile(Total Files): cumulative 0, interval 0
+AddFile(L0 Files): cumulative 0, interval 0
+AddFile(Keys): cumulative 0, interval 0
+Cumulative compaction: 0.00 GB write, 0.00 MB/s write, 0.00 GB read, 0.00 MB/s read, 0.0 seconds
+Interval compaction: 0.00 GB write, 0.00 MB/s write, 0.00 GB read, 0.00 MB/s read, 0.0 seconds
+Stalls(count): 0 level0_slowdown, 0 level0_slowdown_with_compaction, 0 level0_numfiles, 0 level0_numfiles_with_compaction, 0 stop for pending_compaction_bytes, 0 slowdown for pending_compaction_bytes, 0 memtable_compaction, 0 memtable_slowdown, interval 0 total count
+Block cache LRUCache@0x7f4cc8001690#1 capacity: 8.00 MB collections: 2 last_copies: 0 last_secs: 2e-05 secs_since: 0
+Block cache entry stats(count,size,portion): DataBlock(4,17.30 KB,0.211143%) OtherBlock(1,0.30 KB,0.00362396%) Misc(1,0.00 KB,0%)
+
+** File Read Latency Histogram By Level [default] **
+2023/02/11-16:16:18.339291 91 [db/db_impl/db_impl.cc:1004] ------- DUMPING STATS -------
+2023/02/11-16:16:18.339335 91 [db/db_impl/db_impl.cc:1006] 
+** DB Stats **
+Uptime(secs): 1200.0 total, 600.0 interval
+Cumulative writes: 2877 writes, 3356 keys, 2859 commit groups, 1.0 writes per commit group, ingest: 0.00 GB, 0.00 MB/s
+Cumulative WAL: 2877 writes, 0 syncs, 2877.00 writes per sync, written: 0.00 GB, 0.00 MB/s
+Cumulative stall: 00:00:0.000 H:M:S, 0.0 percent
+Interval writes: 1158 writes, 1351 keys, 1158 commit groups, 1.0 writes per commit group, ingest: 0.35 MB, 0.00 MB/s
+Interval WAL: 1158 writes, 0 syncs, 1158.00 writes per sync, written: 0.00 GB, 0.00 MB/s
+Interval stall: 00:00:0.000 H:M:S, 0.0 percent
+
+** Compaction Stats [default] **
+Level    Files   Size     Score Read(GB)  Rn(GB) Rnp1(GB) Write(GB) Wnew(GB) Moved(GB) W-Amp Rd(MB/s) Wr(MB/s) Comp(sec) CompMergeCPU(sec) Comp(cnt) Avg(sec) KeyIn KeyDrop Rblob(GB) Wblob(GB)
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  L0      0/0    0.00 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   1.0      0.0      2.9      0.02              0.00         1    0.023       0      0       0.0       0.0
+  L1      1/0   67.93 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      0.0      0.00              0.00         0    0.000       0      0       0.0       0.0
+ Sum      1/0   67.93 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   1.0      0.0      2.9      0.02              0.00         1    0.023       0      0       0.0       0.0
+ Int      0/0    0.00 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      0.0      0.00              0.00         0    0.000       0      0       0.0       0.0
+
+** Compaction Stats [default] **
+Priority    Files   Size     Score Read(GB)  Rn(GB) Rnp1(GB) Write(GB) Wnew(GB) Moved(GB) W-Amp Rd(MB/s) Wr(MB/s) Comp(sec) CompMergeCPU(sec) Comp(cnt) Avg(sec) KeyIn KeyDrop Rblob(GB) Wblob(GB)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+High      0/0    0.00 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      2.9      0.02              0.00         1    0.023       0      0       0.0       0.0
+
+Blob file count: 0, total size: 0.0 GB
+
+Uptime(secs): 1200.0 total, 600.0 interval
+Flush(GB): cumulative 0.000, interval 0.000
+AddFile(GB): cumulative 0.000, interval 0.000
+AddFile(Total Files): cumulative 0, interval 0
+AddFile(L0 Files): cumulative 0, interval 0
+AddFile(Keys): cumulative 0, interval 0
+Cumulative compaction: 0.00 GB write, 0.00 MB/s write, 0.00 GB read, 0.00 MB/s read, 0.0 seconds
+Interval compaction: 0.00 GB write, 0.00 MB/s write, 0.00 GB read, 0.00 MB/s read, 0.0 seconds
+Stalls(count): 0 level0_slowdown, 0 level0_slowdown_with_compaction, 0 level0_numfiles, 0 level0_numfiles_with_compaction, 0 stop for pending_compaction_bytes, 0 slowdown for pending_compaction_bytes, 0 memtable_compaction, 0 memtable_slowdown, interval 0 total count
+Block cache LRUCache@0x7f4cc8001690#1 capacity: 8.00 MB collections: 3 last_copies: 0 last_secs: 2.2e-05 secs_since: 0
+Block cache entry stats(count,size,portion): DataBlock(4,17.30 KB,0.211143%) OtherBlock(1,0.30 KB,0.00362396%) Misc(1,0.00 KB,0%)
+
+** File Read Latency Histogram By Level [default] **
+2023/02/11-16:26:18.339514 91 [db/db_impl/db_impl.cc:1004] ------- DUMPING STATS -------
+2023/02/11-16:26:18.339541 91 [db/db_impl/db_impl.cc:1006] 
+** DB Stats **
+Uptime(secs): 1800.0 total, 600.0 interval
+Cumulative writes: 4041 writes, 4714 keys, 4023 commit groups, 1.0 writes per commit group, ingest: 0.00 GB, 0.00 MB/s
+Cumulative WAL: 4041 writes, 0 syncs, 4041.00 writes per sync, written: 0.00 GB, 0.00 MB/s
+Cumulative stall: 00:00:0.000 H:M:S, 0.0 percent
+Interval writes: 1164 writes, 1358 keys, 1164 commit groups, 1.0 writes per commit group, ingest: 0.36 MB, 0.00 MB/s
+Interval WAL: 1164 writes, 0 syncs, 1164.00 writes per sync, written: 0.00 GB, 0.00 MB/s
+Interval stall: 00:00:0.000 H:M:S, 0.0 percent
+
+** Compaction Stats [default] **
+Level    Files   Size     Score Read(GB)  Rn(GB) Rnp1(GB) Write(GB) Wnew(GB) Moved(GB) W-Amp Rd(MB/s) Wr(MB/s) Comp(sec) CompMergeCPU(sec) Comp(cnt) Avg(sec) KeyIn KeyDrop Rblob(GB) Wblob(GB)
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  L0      0/0    0.00 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   1.0      0.0      2.9      0.02              0.00         1    0.023       0      0       0.0       0.0
+  L1      1/0   67.93 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      0.0      0.00              0.00         0    0.000       0      0       0.0       0.0
+ Sum      1/0   67.93 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   1.0      0.0      2.9      0.02              0.00         1    0.023       0      0       0.0       0.0
+ Int      0/0    0.00 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      0.0      0.00              0.00         0    0.000       0      0       0.0       0.0
+
+** Compaction Stats [default] **
+Priority    Files   Size     Score Read(GB)  Rn(GB) Rnp1(GB) Write(GB) Wnew(GB) Moved(GB) W-Amp Rd(MB/s) Wr(MB/s) Comp(sec) CompMergeCPU(sec) Comp(cnt) Avg(sec) KeyIn KeyDrop Rblob(GB) Wblob(GB)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+High      0/0    0.00 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      2.9      0.02              0.00         1    0.023       0      0       0.0       0.0
+
+Blob file count: 0, total size: 0.0 GB
+
+Uptime(secs): 1800.0 total, 600.0 interval
+Flush(GB): cumulative 0.000, interval 0.000
+AddFile(GB): cumulative 0.000, interval 0.000
+AddFile(Total Files): cumulative 0, interval 0
+AddFile(L0 Files): cumulative 0, interval 0
+AddFile(Keys): cumulative 0, interval 0
+Cumulative compaction: 0.00 GB write, 0.00 MB/s write, 0.00 GB read, 0.00 MB/s read, 0.0 seconds
+Interval compaction: 0.00 GB write, 0.00 MB/s write, 0.00 GB read, 0.00 MB/s read, 0.0 seconds
+Stalls(count): 0 level0_slowdown, 0 level0_slowdown_with_compaction, 0 level0_numfiles, 0 level0_numfiles_with_compaction, 0 stop for pending_compaction_bytes, 0 slowdown for pending_compaction_bytes, 0 memtable_compaction, 0 memtable_slowdown, interval 0 total count
+Block cache LRUCache@0x7f4cc8001690#1 capacity: 8.00 MB collections: 4 last_copies: 0 last_secs: 2.3e-05 secs_since: 0
+Block cache entry stats(count,size,portion): DataBlock(4,17.30 KB,0.211143%) OtherBlock(1,0.30 KB,0.00362396%) Misc(1,0.00 KB,0%)
+
+** File Read Latency Histogram By Level [default] **
+2023/02/11-16:36:18.339716 91 [db/db_impl/db_impl.cc:1004] ------- DUMPING STATS -------
+2023/02/11-16:36:18.339750 91 [db/db_impl/db_impl.cc:1006] 
+** DB Stats **
+Uptime(secs): 2400.0 total, 600.0 interval
+Cumulative writes: 5591 writes, 6522 keys, 5573 commit groups, 1.0 writes per commit group, ingest: 0.00 GB, 0.00 MB/s
+Cumulative WAL: 5591 writes, 0 syncs, 5591.00 writes per sync, written: 0.00 GB, 0.00 MB/s
+Cumulative stall: 00:00:0.000 H:M:S, 0.0 percent
+Interval writes: 1550 writes, 1808 keys, 1550 commit groups, 1.0 writes per commit group, ingest: 0.48 MB, 0.00 MB/s
+Interval WAL: 1550 writes, 0 syncs, 1550.00 writes per sync, written: 0.00 GB, 0.00 MB/s
+Interval stall: 00:00:0.000 H:M:S, 0.0 percent
+
+** Compaction Stats [default] **
+Level    Files   Size     Score Read(GB)  Rn(GB) Rnp1(GB) Write(GB) Wnew(GB) Moved(GB) W-Amp Rd(MB/s) Wr(MB/s) Comp(sec) CompMergeCPU(sec) Comp(cnt) Avg(sec) KeyIn KeyDrop Rblob(GB) Wblob(GB)
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  L0      0/0    0.00 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   1.0      0.0      2.9      0.02              0.00         1    0.023       0      0       0.0       0.0
+  L1      1/0   67.93 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      0.0      0.00              0.00         0    0.000       0      0       0.0       0.0
+ Sum      1/0   67.93 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   1.0      0.0      2.9      0.02              0.00         1    0.023       0      0       0.0       0.0
+ Int      0/0    0.00 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      0.0      0.00              0.00         0    0.000       0      0       0.0       0.0
+
+** Compaction Stats [default] **
+Priority    Files   Size     Score Read(GB)  Rn(GB) Rnp1(GB) Write(GB) Wnew(GB) Moved(GB) W-Amp Rd(MB/s) Wr(MB/s) Comp(sec) CompMergeCPU(sec) Comp(cnt) Avg(sec) KeyIn KeyDrop Rblob(GB) Wblob(GB)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+High      0/0    0.00 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      2.9      0.02              0.00         1    0.023       0      0       0.0       0.0
+
+Blob file count: 0, total size: 0.0 GB
+
+Uptime(secs): 2400.0 total, 600.0 interval
+Flush(GB): cumulative 0.000, interval 0.000
+AddFile(GB): cumulative 0.000, interval 0.000
+AddFile(Total Files): cumulative 0, interval 0
+AddFile(L0 Files): cumulative 0, interval 0
+AddFile(Keys): cumulative 0, interval 0
+Cumulative compaction: 0.00 GB write, 0.00 MB/s write, 0.00 GB read, 0.00 MB/s read, 0.0 seconds
+Interval compaction: 0.00 GB write, 0.00 MB/s write, 0.00 GB read, 0.00 MB/s read, 0.0 seconds
+Stalls(count): 0 level0_slowdown, 0 level0_slowdown_with_compaction, 0 level0_numfiles, 0 level0_numfiles_with_compaction, 0 stop for pending_compaction_bytes, 0 slowdown for pending_compaction_bytes, 0 memtable_compaction, 0 memtable_slowdown, interval 0 total count
+Block cache LRUCache@0x7f4cc8001690#1 capacity: 8.00 MB collections: 5 last_copies: 0 last_secs: 2.2e-05 secs_since: 0
+Block cache entry stats(count,size,portion): DataBlock(4,17.30 KB,0.211143%) OtherBlock(1,0.30 KB,0.00362396%) Misc(1,0.00 KB,0%)
+
+** File Read Latency Histogram By Level [default] **
+2023/02/11-16:46:18.339914 91 [db/db_impl/db_impl.cc:1004] ------- DUMPING STATS -------
+2023/02/11-16:46:18.339946 91 [db/db_impl/db_impl.cc:1006] 
+** DB Stats **
+Uptime(secs): 3000.0 total, 600.0 interval
+Cumulative writes: 7937 writes, 9259 keys, 7919 commit groups, 1.0 writes per commit group, ingest: 0.00 GB, 0.00 MB/s
+Cumulative WAL: 7937 writes, 0 syncs, 7937.00 writes per sync, written: 0.00 GB, 0.00 MB/s
+Cumulative stall: 00:00:0.000 H:M:S, 0.0 percent
+Interval writes: 2346 writes, 2737 keys, 2346 commit groups, 1.0 writes per commit group, ingest: 0.81 MB, 0.00 MB/s
+Interval WAL: 2346 writes, 0 syncs, 2346.00 writes per sync, written: 0.00 GB, 0.00 MB/s
+Interval stall: 00:00:0.000 H:M:S, 0.0 percent
+
+** Compaction Stats [default] **
+Level    Files   Size     Score Read(GB)  Rn(GB) Rnp1(GB) Write(GB) Wnew(GB) Moved(GB) W-Amp Rd(MB/s) Wr(MB/s) Comp(sec) CompMergeCPU(sec) Comp(cnt) Avg(sec) KeyIn KeyDrop Rblob(GB) Wblob(GB)
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  L0      0/0    0.00 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   1.0      0.0      2.9      0.02              0.00         1    0.023       0      0       0.0       0.0
+  L1      1/0   67.93 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      0.0      0.00              0.00         0    0.000       0      0       0.0       0.0
+ Sum      1/0   67.93 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   1.0      0.0      2.9      0.02              0.00         1    0.023       0      0       0.0       0.0
+ Int      0/0    0.00 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      0.0      0.00              0.00         0    0.000       0      0       0.0       0.0
+
+** Compaction Stats [default] **
+Priority    Files   Size     Score Read(GB)  Rn(GB) Rnp1(GB) Write(GB) Wnew(GB) Moved(GB) W-Amp Rd(MB/s) Wr(MB/s) Comp(sec) CompMergeCPU(sec) Comp(cnt) Avg(sec) KeyIn KeyDrop Rblob(GB) Wblob(GB)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+High      0/0    0.00 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      2.9      0.02              0.00         1    0.023       0      0       0.0       0.0
+
+Blob file count: 0, total size: 0.0 GB
+
+Uptime(secs): 3000.0 total, 600.0 interval
+Flush(GB): cumulative 0.000, interval 0.000
+AddFile(GB): cumulative 0.000, interval 0.000
+AddFile(Total Files): cumulative 0, interval 0
+AddFile(L0 Files): cumulative 0, interval 0
+AddFile(Keys): cumulative 0, interval 0
+Cumulative compaction: 0.00 GB write, 0.00 MB/s write, 0.00 GB read, 0.00 MB/s read, 0.0 seconds
+Interval compaction: 0.00 GB write, 0.00 MB/s write, 0.00 GB read, 0.00 MB/s read, 0.0 seconds
+Stalls(count): 0 level0_slowdown, 0 level0_slowdown_with_compaction, 0 level0_numfiles, 0 level0_numfiles_with_compaction, 0 stop for pending_compaction_bytes, 0 slowdown for pending_compaction_bytes, 0 memtable_compaction, 0 memtable_slowdown, interval 0 total count
+Block cache LRUCache@0x7f4cc8001690#1 capacity: 8.00 MB collections: 6 last_copies: 0 last_secs: 2.1e-05 secs_since: 0
+Block cache entry stats(count,size,portion): DataBlock(4,17.30 KB,0.211143%) OtherBlock(1,0.30 KB,0.00362396%) Misc(1,0.00 KB,0%)
+
+** File Read Latency Histogram By Level [default] **
+2023/02/11-16:56:18.340362 91 [db/db_impl/db_impl.cc:1004] ------- DUMPING STATS -------
+2023/02/11-16:56:18.340400 91 [db/db_impl/db_impl.cc:1006] 
+** DB Stats **
+Uptime(secs): 3600.0 total, 600.0 interval
+Cumulative writes: 10K writes, 12K keys, 10K commit groups, 1.0 writes per commit group, ingest: 0.00 GB, 0.00 MB/s
+Cumulative WAL: 10K writes, 0 syncs, 10656.00 writes per sync, written: 0.00 GB, 0.00 MB/s
+Cumulative stall: 00:00:0.000 H:M:S, 0.0 percent
+Interval writes: 2719 writes, 3172 keys, 2719 commit groups, 1.0 writes per commit group, ingest: 0.96 MB, 0.00 MB/s
+Interval WAL: 2719 writes, 0 syncs, 2719.00 writes per sync, written: 0.00 GB, 0.00 MB/s
+Interval stall: 00:00:0.000 H:M:S, 0.0 percent
+
+** Compaction Stats [default] **
+Level    Files   Size     Score Read(GB)  Rn(GB) Rnp1(GB) Write(GB) Wnew(GB) Moved(GB) W-Amp Rd(MB/s) Wr(MB/s) Comp(sec) CompMergeCPU(sec) Comp(cnt) Avg(sec) KeyIn KeyDrop Rblob(GB) Wblob(GB)
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  L0      0/0    0.00 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   1.0      0.0      2.9      0.02              0.00         1    0.023       0      0       0.0       0.0
+  L1      1/0   67.93 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      0.0      0.00              0.00         0    0.000       0      0       0.0       0.0
+ Sum      1/0   67.93 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   1.0      0.0      2.9      0.02              0.00         1    0.023       0      0       0.0       0.0
+ Int      0/0    0.00 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      0.0      0.00              0.00         0    0.000       0      0       0.0       0.0
+
+** Compaction Stats [default] **
+Priority    Files   Size     Score Read(GB)  Rn(GB) Rnp1(GB) Write(GB) Wnew(GB) Moved(GB) W-Amp Rd(MB/s) Wr(MB/s) Comp(sec) CompMergeCPU(sec) Comp(cnt) Avg(sec) KeyIn KeyDrop Rblob(GB) Wblob(GB)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+High      0/0    0.00 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      2.9      0.02              0.00         1    0.023       0      0       0.0       0.0
+
+Blob file count: 0, total size: 0.0 GB
+
+Uptime(secs): 3600.0 total, 600.0 interval
+Flush(GB): cumulative 0.000, interval 0.000
+AddFile(GB): cumulative 0.000, interval 0.000
+AddFile(Total Files): cumulative 0, interval 0
+AddFile(L0 Files): cumulative 0, interval 0
+AddFile(Keys): cumulative 0, interval 0
+Cumulative compaction: 0.00 GB write, 0.00 MB/s write, 0.00 GB read, 0.00 MB/s read, 0.0 seconds
+Interval compaction: 0.00 GB write, 0.00 MB/s write, 0.00 GB read, 0.00 MB/s read, 0.0 seconds
+Stalls(count): 0 level0_slowdown, 0 level0_slowdown_with_compaction, 0 level0_numfiles, 0 level0_numfiles_with_compaction, 0 stop for pending_compaction_bytes, 0 slowdown for pending_compaction_bytes, 0 memtable_compaction, 0 memtable_slowdown, interval 0 total count
+Block cache LRUCache@0x7f4cc8001690#1 capacity: 8.00 MB collections: 7 last_copies: 0 last_secs: 2.3e-05 secs_since: 0
+Block cache entry stats(count,size,portion): DataBlock(4,17.30 KB,0.211143%) OtherBlock(1,0.30 KB,0.00362396%) Misc(1,0.00 KB,0%)
+
+** File Read Latency Histogram By Level [default] **
+2023/02/11-16:58:14.172717 70 [db/db_impl/db_impl.cc:472] Shutdown: canceling all background work
+2023/02/11-16:58:14.172977 70 [db/db_impl/db_impl.cc:685] Shutdown complete

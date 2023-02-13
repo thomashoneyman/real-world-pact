@@ -38,7 +38,11 @@ help = "Start the Goliath wallet frontend (Ctrl+C to stop)"
 [[commands]]
 name = "charkha-start"
 category = "03 charkha lending"
-command = "echo 'unimplemented'"
+command = """
+  cd $(git rev-parse --show-toplevel)/03-charkha-lending/frontend
+  pnpm install
+  pnpm run dev
+  """
 help = "Start the Charkha lending dapp (Ctrl+C to stop)"
 
 # Devnet
@@ -51,6 +55,12 @@ command = """
   echo "Starting devnet (takes about 60 seconds...)"
   git submodule update --init
   docker compose pull
+
+  if [ ! -d "db" ]; then
+    echo "db directory does not exist, creating one from snapshot."
+    cp -r ../devnet-backup/db .
+  fi
+
   docker compose -f docker-compose.minimal.yaml up --detach --remove-orphans
   """
 help = "Start the devnet blockchain simulator"
@@ -61,7 +71,10 @@ category = "devnet"
 command = """
   cd $(git rev-parse --show-toplevel)/devnet
   docker compose -f docker-compose.minimal.yaml down
-  sudo rm -rf db
+  if [ -d "db" ]; then
+    echo "Replacing db directory with snapshot."
+    sudo rm -rf db && cp -r ../devnet-backup/db .
+  fi
   """
 help = "Stop the devnet blockchain simulator and reset the database."
 

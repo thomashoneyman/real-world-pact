@@ -1,6 +1,6 @@
 # Charkha Lending Project
 
-:warning: The Charkha frontend is still in active development. Stay tuned!
+:warning: The Charkha frontend is complete but still under review. The code may change somewhat in the coming weeks.
 
 The Charkha lending protocol is a complete decentralized lending app built on Kadena's Chainweb blockchain. Decentralized finance has been one of the standout uses of smart contracts and Charkha is inspired by the popular [Compound](https://compound.finance) lending protocol.
 
@@ -28,17 +28,15 @@ Finally, Charkha is a fully-functioning lending protocol with a corresponding fr
 Assuming you have cloned this repository and initialized the `devnet` submodule as described in the main README, you can run Charkha yourself with a simulation of Chainweb with:
 
 ```sh
+# Add your CoinMarketCap API key to the .env file (see the development guide for
+# instructions on getting your own API key):
+echo "VITE_CMC_API_KEY=<your-key>" >> 03-charkha-lending/frontend/.env
+
 # Enter the Nix shell (use nix-shell if your Nix installation does not support flakes)
 nix develop
 
-# Add your CoinMarketCap API key to the .env file
-echo "CMC_API_KEY=my-api-key" >> ./frontend/.env
-
-# Start the simulation blockchain (run devnet-stop to stop the simulation)
+# Start the simulation blockchain (run devnet-stop to stop the simulation and devnet-clean to reset to a clean state).
 devnet-start
-
-# Deploy the Charkha contracts
-charkha-deploy
 
 # Start the Charkha frontend (Ctrl+C to exit)
 charkha-start

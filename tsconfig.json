@@ -14,7 +14,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
   },
-  "include": ["theme", "02-goliath-wallet", "03-charkha-lending", "pact-api-utils"]
+  "include": ["theme", "02-goliath-wallet", "03-charkha-lending", "pact-api-utils"],
 }

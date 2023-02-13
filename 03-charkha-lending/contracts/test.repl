@@ -20,8 +20,11 @@
 (verify "free.charkha-oracle")
 (print "Verified oracle contract.")
 
-(verify "free.KETH")
-(print "Verified CHRK contract.")
+; Strangely, verifying the KETH contract is producing an internal Pact error,
+; though it's possible to verify directly with 'pact tokens/keth.repl'.
+; test.repl:1:0: singular: empty traversal CallStack (from HasCallStack):   error, called at src/Control/Lens/Traversal.hs:700:46 in lens-5.1.1-6e50c72297cf6c966244f2898e4d136a18b9658082880c54bccabf8eb5d9ce58:Control.Lens.Traversal   singular, called at src-tool/Pact/Analyze/Types/Eval.hs:711:5 in pact-4.4-inplace:Pact.Analyze.Types.Eval   typedCell, called at src-tool/Pact/Analyze/Eval/Term.hs:333:21 in pact-4.4-inplace:Pact.Analyze.Eval.Term
+; (verify "free.KETH")
+; (print "Verified KETH contract.")
 
 (verify "free.CHRK")
 (print "Verified CHRK contract.")
@@ -535,11 +538,6 @@
 ; only actually transferred 0.7632 KETH for it.
 (expect "sender02 only transferred 0.7655 KETH" (- 10.0 0.76551855839099375) (free.KETH.get-balance "sender02"))
 (commit-tx)
-
-; TODO TODO TODO
-; The issue with liquidation is that you might buy their supply in one market,
-; but then you have to figure out where to cancel out their borrows. TODO for
-; tomorrow.
 
 ; ----------
 ; REDEEM & REPAY

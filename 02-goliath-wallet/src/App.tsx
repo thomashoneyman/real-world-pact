@@ -13,7 +13,7 @@ import * as Pact from "pact-lang-api";
 
 import { Box, Container, Flex } from "@real-world-pact/theme/components/Container";
 import { GlobalStyles } from "@real-world-pact/theme/components/GlobalStyles";
-import { Navbar } from "@real-world-pact/theme/components/Navbar";
+import { GoliathLogo, Navbar } from "@real-world-pact/theme/components/Navbar";
 
 import * as coin from "./contracts/coin-v5";
 import * as faucet from "./contracts/goliath-faucet";
@@ -98,7 +98,7 @@ const App = () => {
   return (
     <GlobalStyles>
       <Box css={{ padding: "0 $1" }}>
-        <Navbar>
+        <Navbar logo={<GoliathLogo />}>
           <Flex css={{ alignItems: "center" }}>
             <AdminModal
               css={{ marginRight: "$3" }}

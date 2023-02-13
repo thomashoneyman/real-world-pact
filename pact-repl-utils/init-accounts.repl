@@ -17,8 +17,8 @@
 ; expect to see there. That way our REPL test code is also usable in the devnet
 ; test environment.
 
-; First, let's define the public and secret keys for each account, copied from
-; the 'keys.yaml' file linked above.
+; First, let's define the public  keys for each account, copied from the
+; 'keys.yaml' file linked above.
 (begin-tx)
 (module test-keys GOVERNANCE
   (defcap GOVERNANCE () true)

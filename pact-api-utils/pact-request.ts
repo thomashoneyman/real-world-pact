@@ -35,15 +35,19 @@ The Pact API on a Chainweb node exposes two endpoints for executing Pact code:
 
 // A local request is executed on the Chainweb node only and can only read data.
 // It can't modify the state of the blockchain, so it does not get broadcast to
-// other nodes, does not cost gas, and does not need a sender.
+// other nodes, does not cost gas, and does not need a sender. You should execute
+// 'send' requests on the /local endpoint as a pre-flight check (we do that in
+// the PactAPI class).
 export interface LocalRequest<a> {
   // The code that should be executed on the Chainweb node
-  code: PactCode;
+  code: PactCode | PactCode[] | string;
   // Data that should be included on the transaction so Pact code can read it
   data?: { [key: string]: Pact.PactValue | Pact.KeySet };
   // Signers of the transaction along with any capabilities the signatures
   // should be scoped to.
   signers?: Pact.KeyPairCapabilities | Pact.KeyPairCapabilities[];
+  // An optional maximum amount of gas this request is allowed to take
+  gasLimit?: number;
   transformResponse: (response: Pact.PactValue) => a;
 }
 
@@ -56,7 +60,7 @@ export interface SendRequest<a> {
   // The maximum amount of gas this request is allowed to take
   gasLimit: number;
   // The code that should be executed on the Chainweb node
-  code: PactCode;
+  code: PactCode | PactCode[] | string;
   // Data that should be included on the transaction so Pact code can read it
   data?: { [key: string]: Pact.PactValue | Pact.KeySet };
   // Signers of the transaction along with any capabilities the signatures
@@ -147,13 +151,20 @@ export interface Success<a> {
   parsed: a;
 }
 
+export const mergeStatuses = (a: Status, b: Status): Status => {
+  if (a === PENDING || b === PENDING) return PENDING;
+  if (a === REQUEST_ERROR || b === REQUEST_ERROR) return REQUEST_ERROR;
+  if (a === EXEC_ERROR || b === EXEC_ERROR) return EXEC_ERROR;
+  return SUCCESS;
+};
+
 // The possible result of sending a request for execution
 export type RequestResult<a> = RequestError | ExecError | Success<a>;
 
 // The possible statuses of sending a request for execution
 export type RequestStatus<a> = Pending | RequestResult<a>;
 
-/* 3.  EXECUTING REQUESTS
+/* 3. EXECUTING REQUESTS
 
 Alright! We've created types to capture the Pact code we will send to our
 Chainweb node for executaion and the possible results of that request. Now it's
@@ -241,7 +252,7 @@ export class PactAPI {
 
   // Format a request into an ExecCmd suitable for use with pact-lang-api
   // functions.
-  private format<a>(
+  format<a>(
     request: PactRequest<a>,
     sender: string,
     gasLimit: number,
@@ -251,7 +262,7 @@ export class PactAPI {
     const chainId = config?.chainId || this.defaults.chainId;
     return {
       networkId,
-      pactCode: formatPactCode(request.code),
+      pactCode: typeof request.code === "string" ? request.code : formatPactCode(request.code),
       envData: request.data,
       keyPairs: request.signers,
       meta: {
@@ -341,6 +352,16 @@ export class PactAPI {
     const hostname = config?.hostname || this.defaults.hostname;
     const cmd = this.format(request, request.sender, request.gasLimit, config);
     const endpoint = this.apiHost(hostname, cmd.networkId, cmd.meta.chainId);
+
+    // We first send a local response so that we can see error messages, if any.
+    // The 'send' endpoints do not return them.
+    const localRequest = { ...request };
+    const localResponse = await this.local(localRequest, config);
+
+    // Errors should return immediately, but if the local response is successful
+    // then we can move on to actually process the transaction.
+    if (localResponse.status !== SUCCESS) return localResponse;
+
     try {
       const sendResponse = await Pact.fetch.send(cmd, endpoint);
 

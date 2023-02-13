@@ -8,13 +8,24 @@ export interface PactCode {
   args: Array<PactCode | Pact.PactValue>;
 }
 
+export const isPactCode = (p: any): p is PactCode => p.cmd && Array.isArray(p.args);
+export const isPactInt = (p: any): p is Pact.PactInt => p.int;
+export const isPactDecimal = (p: any): p is Pact.PactDecimal => p.decimal;
+export const isPactReference = (p: any): p is Pact.PactReference => p.ref;
+
+export const formatPactNumericResponse = (value: Pact.PactInt | Pact.PactDecimal | number) => {
+  if (isPactInt(value)) {
+    return parseFloat(value.int);
+  } else if (isPactDecimal(value)) {
+    return parseFloat(value.decimal);
+  } else {
+    return value;
+  }
+};
+
 // A helper function to format our representation of Pact code into a string
 // that we can send off to Chainweb for evaluation.
-export const formatPactCode = (code: PactCode): string => {
-  const isPactCode = (p: any): p is PactCode => p.cmd && Array.isArray(p.args);
-  const isPactInt = (p: any): p is Pact.PactInt => p.int;
-  const isPactDecimal = (p: any): p is Pact.PactDecimal => p.decimal;
-
+export const formatPactCode = (code: PactCode | PactCode[]): string => {
   const formatPactValue = (value: Pact.PactValue): string => {
     if (typeof value === "boolean") {
       return value.toString();
@@ -24,6 +35,8 @@ export const formatPactCode = (code: PactCode): string => {
       return value.int;
     } else if (isPactDecimal(value)) {
       return value.decimal;
+    } else if (isPactReference(value)) {
+      return value.ref;
     } else if (Array.isArray(value)) {
       return `[ ${value.map(formatPactValue)} ]`;
     } else {
@@ -42,7 +55,11 @@ export const formatPactCode = (code: PactCode): string => {
     }
   };
 
-  return `(${code.cmd} ${code.args.map(format).join(" ")})`;
+  if (isPactCode(code)) {
+    return `(${code.cmd} ${code.args.map(format).join(" ")})`;
+  } else {
+    return code.map(formatPactCode).join("\n");
+  }
 };
 
 // We'll validate that the provided input is parseable into a Pact decimal.

@@ -341,7 +341,7 @@
         ; With enforcement handled by the (BORROW) capability we can tell the
         ; market to increase the account's borrows.
         (write balance-change-table account { "market": market, "borrow": amount, "supply": 0.0 })
-        (market-ref::apply-balance-change account (at 'guard (token-ref::details account)))
+        (market-ref::apply-balance-change account guard)
         (update balance-change-table account { "borrow": 0.0, "supply": 0.0 })
 
         ; If everything so far has succeeded we can process the user's borrow.

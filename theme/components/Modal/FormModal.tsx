@@ -101,24 +101,30 @@ export interface FormRequestModalProps {
 }
 
 export const FormRequestModal = (props: FormRequestModalProps) => {
+  const [submitted, setSubmitted] = useState(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (props.request.status === "SUCCESS") {
+    if (submitted && props.request.status === "SUCCESS") {
       setOpen(false);
+      setSubmitted(false);
     }
   }, [props.request]);
 
   const renderActions = (isValid: boolean) => (
     <Flex css={{ marginTop: 25, justifyContent: "flex-end" }}>
-      <Button disabled={!isValid || props.request.status === "PENDING"} type="submit">
+      <Button
+        disabled={!isValid || props.request.status === "PENDING"}
+        onClick={() => setSubmitted(true)}
+        type="submit"
+      >
         {props.request.status === "PENDING" ? <Spinner /> : props.confirmLabel}
       </Button>
     </Flex>
   );
 
   const renderError = props.request.status === "ERROR" && (
-    <Box css={{ paddingTop: "$4" }}>{props.request.message}</Box>
+    <Box css={{ color: "$crimson11" }}>{props.request.message}</Box>
   );
 
   return (

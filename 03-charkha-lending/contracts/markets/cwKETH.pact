@@ -18,7 +18,9 @@
   (deftable participants-table:{charkha-market-iface.participant})
 
   (defconst REF_KEY "ref")
-  (defschema ref controller-ref:module{charkha-controller-iface})
+  (defschema ref
+    initialized:bool
+    controller-ref:module{charkha-controller-iface})
   (deftable refs-table:{ref})
 
   ; ----------
@@ -56,7 +58,10 @@
 
   (defun init (controller-ref:module{charkha-controller-iface})
     (with-capability (ADMIN)
-      (insert refs-table REF_KEY { "controller-ref": controller-ref })))
+      (insert refs-table REF_KEY { "controller-ref": controller-ref, "initialized": true })))
+
+  (defun is-initialized:bool ()
+    (with-default-read refs-table REF_KEY { "initialized": false } { "initialized" := initialized } initialized))
 
   (defun get-participant:object{charkha-market-iface.participant} (account:string)
     (read participants-table account))

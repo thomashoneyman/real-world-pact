@@ -74,7 +74,6 @@ export const Transactions = ({ limits, transactions }: TransactionsProps) => {
           css={{
             color: "$crimson11",
             paddingTop: 1,
-            marginTop: "$2",
           }}
         >
           Account Limits

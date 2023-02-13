@@ -48,12 +48,14 @@ const App = () => {
 ```
 */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   isSendRequest,
   PactAPI,
   PactAPIConfig,
   PactRequest,
+  Pending,
+  PENDING,
   RequestResult,
   RequestStatus,
 } from "./pact-request";
@@ -76,6 +78,41 @@ export const makeUsePactRequest = (api: PactAPI) => {
     };
 
     return [status, fetch];
+  };
+};
+
+// A Hook that immediately sends a request and returns its status and a function
+// to send it again.
+export const makeUseImmediatePactRequest = (api: PactAPI) => {
+  return <a>(request: PactRequest<a>, config?: Partial<PactAPIConfig>): RequestStatus<a> => {
+    const initialState = (): Pending => {
+      if (isSendRequest(request)) {
+        return {
+          status: PENDING,
+          request: api.format(request, request.sender, request.gasLimit, config),
+        };
+      } else {
+        return {
+          status: PENDING,
+          request: api.format(request, "", 150_000, config),
+        };
+      }
+    };
+
+    const [status, setStatus] = useState<RequestStatus<a>>(initialState());
+
+    useEffect(() => {
+      const run = async () => {
+        if (isSendRequest(request)) {
+          await api.sendWithCallback(request, setStatus, config);
+        } else {
+          await api.localWithCallback(request, setStatus, config);
+        }
+      };
+      run();
+    }, []);
+
+    return status;
   };
 };
 

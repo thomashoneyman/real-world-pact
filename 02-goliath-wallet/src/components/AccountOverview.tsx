@@ -34,7 +34,7 @@ export const AccountOverview = ({ balances }: AccountOverviewProps) => {
     <Box css={{ padding: "$8 $1" }}>
       <Header>Account</Header>
       <Flex css={{ justifyContent: "space-between" }}>
-        <Text css={{ maxWidth: "66%", marginTop: "$2", color: "$mauve11" }}>{description}</Text>
+        <Text css={{ maxWidth: "66%", color: "$mauve11" }}>{description}</Text>
         <Box css={{ marginLeft: "$8" }}>
           <Text
             css={{
@@ -149,7 +149,6 @@ const AccountTable = ({ balances }: AccountTableProps) => {
             <Box css={{ fontWeight: "bold" }}>
               <Text as="span">{trimDecimal(amount)}</Text>
               <Text as="span" css={{ fontSize: "$2xs", color: "$crimson12" }}>
-                {" "}
                 KDA
               </Text>
             </Box>

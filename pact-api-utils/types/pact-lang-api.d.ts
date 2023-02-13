@@ -24,12 +24,17 @@ declare module "pact-lang-api" {
     decimal: string;
   }
 
+  interface PactReference {
+    ref: string;
+  }
+
   type PactValue =
     | string
     | PactInt
     | PactDecimal
     | boolean
     | PactValue[]
+    | PactReference
     | { [key: string]: PactValue };
 
   interface KeyPair {
