@@ -23,6 +23,18 @@ As you read through the white paper, contracts, and frontend, you'll see how to:
 
 Finally, Charkha is a fully-functioning lending protocol with a corresponding frontend. I encourage you to run the app yourself, lend some funds, submit some governance proposals, and earn some interest!
 
+## Features
+
+Charkha is a lending application that supports several markets. In the main "markets" page you can see your lending and borrowing activity and the current state of the markets supported in the protocol. Asset prices are recorded in USD using the Charkha oracle contract.
+
+![](./frontend/screenshots/10-market-before-proposal.png)
+
+Charkha also allows the community to create and vote on proposals to change the protocol itself. Charkha participants earn the CHRK rewards token by participating in markets and can use this token to vote on proposals. Here's an open proposal that changes the base borrower interest rate in the KDA market:
+
+![](./frontend/screenshots/09-proposal-open.png)
+
+To fully explore Charkha, please read the white paper and run the application locally!
+
 ## Run the Application
 
 Assuming you have cloned this repository and initialized the `devnet` submodule as described in the main README, you can run Charkha yourself with a simulation of Chainweb with:
@@ -41,3 +53,7 @@ devnet-start
 # Start the Charkha frontend (Ctrl+C to exit)
 charkha-start
 ```
+
+If successful, you will see the deployment screen:
+
+![](./frontend/screenshots/01-deployment.png)
