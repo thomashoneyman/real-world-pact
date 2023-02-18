@@ -2,10 +2,15 @@
 This module supplies requests for the 'free.charkha-controller' Pact module.
 */
 
-import Pact from "pact-lang-api";
-import { coercePactValue, LocalRequest, SendRequest } from "@real-world-pact/utils/pact-request";
+import Pact, { KeyPair } from "pact-lang-api";
+import {
+  coercePactNumber,
+  coercePactObject,
+  coercePactValue,
+  LocalRequest,
+  SendRequest,
+} from "@real-world-pact/utils/pact-request";
 import { charkhaAddress, charkhaKeyPair, sender02Address, sender02KeyPair } from "../constants";
-import { formatPactCode, formatPactNumericResponse } from "@real-world-pact/utils/pact-code";
 
 export const BLOCKS_PER_YEAR = 1051920;
 
@@ -65,7 +70,7 @@ export const registerMarket = (asset: AssetName): SendRequest<string> => ({
 
 export const getMarketCount = (): LocalRequest<number> => ({
   code: { cmd: "free.charkha-controller.get-market-count", args: [] },
-  transformResponse: (response) => formatPactNumericResponse(coercePactValue(response)),
+  transformResponse: coercePactNumber,
 });
 
 export const getMarketNames = (): LocalRequest<string[]> => ({
@@ -76,63 +81,55 @@ export const getMarketNames = (): LocalRequest<string[]> => ({
 export const getMarket = (asset: AssetName): LocalRequest<MarketState> => ({
   code: { cmd: "free.charkha-controller.get-market", args: [asset] },
   transformResponse: (response) => {
-    interface PactMarketState {
-      "total-borrows": Pact.PactDecimal | Pact.PactInt | number;
-      "total-supply": Pact.PactDecimal | Pact.PactInt | number;
-      "total-reserves": Pact.PactDecimal | number;
-      "last-updated": number;
-      "interest-rate-index": number;
-      "exchange-rate": number;
-      "reward-share": number;
-    }
-    const parsed: PactMarketState = coercePactValue(response);
+    const parsed = coercePactObject(response);
     return {
-      totalBorrows: formatPactNumericResponse(parsed["total-borrows"]),
-      totalSupply: formatPactNumericResponse(parsed["total-supply"]),
-      totalReserves: formatPactNumericResponse(parsed["total-reserves"]),
-      lastUpdated: formatPactNumericResponse(parsed["last-updated"]),
-      interestRateIndex: formatPactNumericResponse(parsed["interest-rate-index"]),
-      exchangeRate: formatPactNumericResponse(parsed["exchange-rate"]),
-      rewardShare: formatPactNumericResponse(parsed["reward-share"]),
+      totalBorrows: coercePactNumber(parsed["total-borrows"]),
+      totalSupply: coercePactNumber(parsed["total-supply"]),
+      totalReserves: coercePactNumber(parsed["total-reserves"]),
+      lastUpdated: coercePactNumber(parsed["last-updated"]),
+      interestRateIndex: coercePactNumber(parsed["interest-rate-index"]),
+      exchangeRate: coercePactNumber(parsed["exchange-rate"]),
+      rewardShare: coercePactNumber(parsed["reward-share"]),
     };
   },
 });
 
 export const getInterestRateIndex = (asset: AssetName): LocalRequest<number> => ({
   code: { cmd: "free.charkha-controller.get-interest-rate-index", args: [asset] },
-  transformResponse: (response) => formatPactNumericResponse(coercePactValue(response)),
+  transformResponse: coercePactNumber,
 });
 
 export const getExchangeRate = (asset: AssetName): LocalRequest<number> => ({
   code: { cmd: "free.charkha-controller.get-exchange-rate", args: [asset] },
-  transformResponse: (response) => formatPactNumericResponse(coercePactValue(response)),
+  transformResponse: coercePactNumber,
 });
 
 interface BorrowingCapacityArgs {
   account: string;
+  accountKeys: KeyPair;
   asset: AssetName;
 }
 
 export const borrowingCapacity = (args: BorrowingCapacityArgs): SendRequest<number> => ({
   code: { cmd: "free.charkha-controller.borrowing-capacity", args: [args.account, args.asset] },
-  gasLimit: 900,
-  sender: sender02Address,
+  gasLimit: 1200,
+  sender: args.account,
   signers: {
-    ...sender02KeyPair,
+    ...args.accountKeys,
     clist: [{ name: "coin.GAS", args: [] }],
   },
-  transformResponse: (response) => formatPactNumericResponse(coercePactValue(response)),
+  transformResponse: coercePactNumber,
 });
 
 export const borrowingCapacityUSD = (account: string): SendRequest<number> => ({
   code: { cmd: "free.charkha-controller.borrowing-capacity-usd", args: [account] },
-  gasLimit: 900,
+  gasLimit: 1200,
   sender: sender02Address,
   signers: {
     ...sender02KeyPair,
     clist: [{ name: "coin.GAS", args: [] }],
   },
-  transformResponse: (response) => formatPactNumericResponse(coercePactValue(response)),
+  transformResponse: coercePactNumber,
 });
 
 export interface LiquidationEligibleArgs {
@@ -148,22 +145,22 @@ export const liquidationEligible = (args: LiquidationEligibleArgs): SendRequest<
     ...sender02KeyPair,
     clist: [{ name: "coin.GAS", args: [] }],
   },
-  transformResponse: coercePactValue,
+  transformResponse: coercePactNumber,
 });
 
 export const getUtilization = (market: AssetName): LocalRequest<number> => ({
   code: { cmd: "free.charkha-controller.get-utilization", args: [market] },
-  transformResponse: (response) => formatPactNumericResponse(coercePactValue(response)),
+  transformResponse: coercePactNumber,
 });
 
 export const getBorrowInterestRate = (market: AssetName): LocalRequest<number> => ({
   code: { cmd: "free.charkha-controller.get-borrow-interest-rate", args: [market] },
-  transformResponse: (response) => formatPactNumericResponse(coercePactValue(response)),
+  transformResponse: coercePactNumber,
 });
 
 export const getSupplyInterestRate = (market: AssetName): LocalRequest<number> => ({
   code: { cmd: "free.charkha-controller.get-supply-interest-rate", args: [market] },
-  transformResponse: (response) => formatPactNumericResponse(coercePactValue(response)),
+  transformResponse: coercePactNumber,
 });
 
 export interface SupplyArgs {
@@ -258,11 +255,14 @@ export const repay = ({
   amount,
 }: RepayArgs): SendRequest<string> => ({
   code: { cmd: "free.charkha-controller.repay", args: [account, market, amount] },
-  gasLimit: 3500,
+  gasLimit: 8500,
   sender: account,
   signers: {
     ...accountKeys,
-    clist: [{ name: "coin.GAS", args: [] }],
+    clist: [
+      { name: "coin.GAS", args: [] },
+      { name: "free.CHRK.TRANSFER", args: [account, "charkha", amount] },
+    ],
   },
   transformResponse: coercePactValue,
 });

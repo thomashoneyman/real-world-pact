@@ -97,6 +97,7 @@ importers:
       '@radix-ui/colors': ^0.1.8
       '@radix-ui/react-dialog': ^0.1.8-rc.39
       '@radix-ui/react-icons': ^1.1.1
+      '@real-world-pact/utils': workspace:*
       '@stitches/react': ^1.2.8
       '@types/react': ^18.0.0
       react: ^18.0.0
@@ -105,6 +106,7 @@ importers:
       '@radix-ui/colors': 0.1.8
       '@radix-ui/react-dialog': 0.1.8-rc.54_zxljzmqdrxwnuenbkrz77w74uy
       '@radix-ui/react-icons': 1.1.1_react@18.2.0
+      '@real-world-pact/utils': link:../pact-api-utils
       '@stitches/react': 1.2.8_react@18.2.0
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0

@@ -15,7 +15,7 @@ to either project and feel free to copy this code into your own projects.
 */
 
 import * as Pact from "pact-lang-api";
-import { formatPactCode, PactCode } from "./pact-code";
+import { formatPactCode, isPactDecimal, isPactInt, PactCode } from "./pact-code";
 
 /* 1. REQUEST TYPES
 
@@ -71,9 +71,25 @@ export interface SendRequest<a> {
 
 // A helper function to coerce the result of a successful Pact execution into
 // the specified type, which can be used for 'transformResponse' when you know the
-// result can be mapped to JSON.
+// result can be mapped exactly JSON.
 export const coercePactValue = <a>(data: Pact.PactValue): a => {
   return JSON.parse(JSON.stringify(data)) as a;
+};
+
+// The Chainweb endpoints can return numbers in a variety of formats. If you
+// always want a number then this function can help.
+export const coercePactNumber = (value: Pact.PactValue | number): number => {
+  if (isPactInt(value)) {
+    return parseFloat(value.int);
+  } else if (isPactDecimal(value)) {
+    return parseFloat(value.decimal);
+  } else {
+    return value as number;
+  }
+};
+
+export const coercePactObject = (value: Pact.PactValue): { [x: string]: Pact.PactValue } => {
+  return coercePactValue(value);
 };
 
 export type PactRequest<a> = LocalRequest<a> | SendRequest<a>;

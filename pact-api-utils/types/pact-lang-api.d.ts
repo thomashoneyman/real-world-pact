@@ -20,6 +20,10 @@ declare module "pact-lang-api" {
     int: string;
   }
 
+  interface PactDate {
+    timep: string;
+  }
+
   interface PactDecimal {
     decimal: string;
   }
@@ -35,6 +39,7 @@ declare module "pact-lang-api" {
     | boolean
     | PactValue[]
     | PactReference
+    | PactDate
     | { [key: string]: PactValue };
 
   interface KeyPair {

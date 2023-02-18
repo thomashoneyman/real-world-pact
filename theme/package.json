@@ -2,6 +2,7 @@
   "name": "@real-world-pact/theme",
   "private": true,
   "dependencies": {
+    "@real-world-pact/utils": "workspace:*",
     "@radix-ui/colors": "^0.1.8",
     "@radix-ui/react-dialog": "^0.1.8-rc.39",
     "@radix-ui/react-icons": "^1.1.1",

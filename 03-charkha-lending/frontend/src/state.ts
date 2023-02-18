@@ -80,9 +80,7 @@ export const useOracleStore = create<OracleState>()((set, get) => ({
           usdPrices: state.usdPrices.set(asset, status),
         }));
       });
-    await getPrice("KDA");
-    await getPrice("KETH");
-    await getPrice("CHRK");
+    await Promise.allSettled([getPrice("KDA"), getPrice("KETH"), getPrice("CHRK")]);
   },
 }));
 
@@ -217,15 +215,15 @@ export interface GovernanceState {
 export const useGovernanceStore = create<GovernanceState>()((set, get) => ({
   proposals: new Map(),
   getProposals: async () => {
-    const allProposals = await pactAPI.local(governance.getProposals());
-    if (allProposals.status === SUCCESS) {
+    const ids = await pactAPI.local(governance.getProposalIds());
+    if (ids.status === SUCCESS) {
       const { proposals } = get();
-      const needed = allProposals.parsed.filter((proposal) => {
+      const needed = ids.parsed.filter((proposal) => {
         const existing = proposals.get(proposal);
         // We only need to re-check open proposals or proposals that have never
         // been checked before.
         if (existing?.status === SUCCESS && existing.parsed.status === "OPEN") {
-          return false;
+          return true;
         } else {
           return existing === undefined;
         }
@@ -234,7 +232,7 @@ export const useGovernanceStore = create<GovernanceState>()((set, get) => ({
         pactAPI.localWithCallback(governance.getProposal(id), (status) => {
           set((state) => ({ ...state, proposals: state.proposals.set(id, status) }));
         });
-      await Promise.allSettled(needed.map(getProposal));
+      await Promise.all(needed.map(getProposal));
     }
   },
 }));

@@ -12,16 +12,7 @@ export const isPactCode = (p: any): p is PactCode => p.cmd && Array.isArray(p.ar
 export const isPactInt = (p: any): p is Pact.PactInt => p.int;
 export const isPactDecimal = (p: any): p is Pact.PactDecimal => p.decimal;
 export const isPactReference = (p: any): p is Pact.PactReference => p.ref;
-
-export const formatPactNumericResponse = (value: Pact.PactInt | Pact.PactDecimal | number) => {
-  if (isPactInt(value)) {
-    return parseFloat(value.int);
-  } else if (isPactDecimal(value)) {
-    return parseFloat(value.decimal);
-  } else {
-    return value;
-  }
-};
+export const isPactDate = (p: any): p is Pact.PactDate => p.timep;
 
 // A helper function to format our representation of Pact code into a string
 // that we can send off to Chainweb for evaluation.
@@ -37,6 +28,8 @@ export const formatPactCode = (code: PactCode | PactCode[]): string => {
       return value.decimal;
     } else if (isPactReference(value)) {
       return value.ref;
+    } else if (isPactDate(value)) {
+      return value.timep;
     } else if (Array.isArray(value)) {
       return `[ ${value.map(formatPactValue)} ]`;
     } else {

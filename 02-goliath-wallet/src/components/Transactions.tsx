@@ -9,7 +9,7 @@ lists out the current per-request and per-account limits for the user.
 
 import * as Pact from "pact-lang-api";
 import { ReactNode, useState } from "react";
-import { DetailsModal } from "@real-world-pact/theme/components/Modal/DetailsModal";
+import { CloseButton, Modal } from "@real-world-pact/theme/components/Modal";
 import { Box, Flex, Grid } from "@real-world-pact/theme/components/Container";
 import { Header, Link, Text } from "@real-world-pact/theme/components/Text";
 import { Spinner } from "@real-world-pact/theme/components/Spinner";
@@ -199,11 +199,10 @@ const TransactionDetails = ({ transaction }: TransactionDetailsProps) => {
   })();
 
   return (
-    <DetailsModal
+    <Modal
       title="Transaction Details"
       description="Transactions, whether they fail or succeed, contain plenty of metadata."
       trigger={<Link>See Details</Link>}
-      confirmLabel="Done"
     >
       <Box>
         <Label>Status</Label>
@@ -231,7 +230,8 @@ const TransactionDetails = ({ transaction }: TransactionDetailsProps) => {
         <Label>Metadata</Label>
         <Text>{JSON.stringify(transaction.request.request.meta)}</Text>
       </Box>
-    </DetailsModal>
+      <CloseButton label="Done" />
+    </Modal>
   );
 };
 

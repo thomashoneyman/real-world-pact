@@ -23,7 +23,7 @@ export const SuccessIcon = styled(CheckCircledIcon, {
 });
 
 export const ErrorIcon = styled(CrossCircledIcon, {
-  color: "$red9",
+  color: "$crimson11",
 
   variants: {
     size: {

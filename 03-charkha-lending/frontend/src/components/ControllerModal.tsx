@@ -1,30 +1,32 @@
 import { Button } from "@real-world-pact/theme/components/Button";
 import { Fieldset, Input, Label } from "@real-world-pact/theme/components/Form";
-import { FormRequestModal } from "@real-world-pact/theme/components/Modal/FormModal";
 import { Link, Text } from "@real-world-pact/theme/components/Text";
 
 import * as Pact from "pact-lang-api";
 
 import { Formik } from "formik";
-import { ReactNode } from "react";
+import { useState } from "react";
 import { parsePactDecimal } from "@real-world-pact/utils/pact-code";
-import { toModalRequestStatus, usePactRequest } from "../pact-api";
+import { usePactRequest } from "../pact-api";
 import { syncState, useUserStore } from "../state";
 import { AssetName } from "../contracts/controller";
 
 import * as controller from "../contracts/controller";
-import { Balances, BorrowingCapacity } from "./UserSection";
+import { Balances, BorrowingCapacity } from "./UserDetails";
 import { SUCCESS } from "@real-world-pact/utils/pact-request";
+import { ControlledModal, FormRequestButton } from "@real-world-pact/theme/components/Modal";
 
 type Action = "BORROW" | "SUPPLY" | "REPAY" | "REDEEM";
 
 export interface ControllerModalProps {
   action: Action;
   market: AssetName;
-  [x: string]: any;
+  [x: string]: unknown;
 }
 
 export const ControllerModal = ({ action, market, ...props }: ControllerModalProps) => {
+  const [open, setOpen] = useState(false);
+
   const userStore = useUserStore((state) => ({
     address: state.address,
     keys: state.keys,
@@ -103,60 +105,66 @@ export const ControllerModal = ({ action, market, ...props }: ControllerModalPro
         {mode.title}
       </Button>
     ) : action === "SUPPLY" ? (
-      <Button variant="secondary" {...props}>
+      <Button variant="secondary" outlined {...props}>
         {mode.title}
       </Button>
     ) : (
       <Link {...props}>{mode.title}</Link>
     );
 
-  const renderForm = (renderError: ReactNode, renderActions: (isValid: boolean) => ReactNode) => (
-    <Formik
-      initialValues={{ amount: "" }}
-      onSubmit={async (values) => {
-        const parsed = parsePactDecimal(values.amount) as Pact.PactDecimal;
-        const result = await request(parsed);
-        if (result.status === SUCCESS) {
-          await syncState();
-        }
-      }}
-      validate={(values) => {
-        let errors: { amount?: string } = {};
-        if (values.amount === "") errors.amount = "Required.";
-        const parsed = parsePactDecimal(values.amount);
-        if (typeof parsed === "string") errors.amount = parsed;
-        return errors;
-      }}
-    >
-      {(formik) => (
-        <form onSubmit={formik.handleSubmit}>
-          <BorrowingCapacity />
-          <Balances />
-          <Fieldset>
-            <Label htmlFor="amount">Borrow {market} Amount</Label>
-            <Input
-              id="amount"
-              name="amount"
-              onChange={formik.handleChange}
-              value={formik.values.amount}
-            />
-            <Text css={{ fontSize: "$xs", color: "$crimson11" }}>{formik.errors.amount}</Text>
-          </Fieldset>
-          {renderError}
-          {renderActions(formik.isValid && formik.dirty)}
-        </form>
-      )}
-    </Formik>
-  );
-
   return (
-    <FormRequestModal
+    <ControlledModal
+      open={open}
+      onOpenChange={setOpen}
       title={mode.title}
       description={description}
       trigger={trigger}
-      confirmLabel={`${mode.title} ${market}`}
-      request={toModalRequestStatus(requestStatus)}
-      renderForm={renderForm}
-    ></FormRequestModal>
+    >
+      <Formik
+        initialValues={{ amount: "" }}
+        onSubmit={async (values) => {
+          const parsed = parsePactDecimal(values.amount) as Pact.PactDecimal;
+          const result = await request(parsed);
+          if (result.status === SUCCESS) {
+            await syncState();
+            setOpen(false);
+          }
+        }}
+        validate={(values) => {
+          let errors: { amount?: string } = {};
+          if (values.amount === "") errors.amount = "Required.";
+          const parsed = parsePactDecimal(values.amount);
+          if (typeof parsed === "string") errors.amount = parsed;
+          return errors;
+        }}
+      >
+        {(formik) => (
+          <form onSubmit={formik.handleSubmit}>
+            <BorrowingCapacity />
+            <Balances />
+            <Fieldset>
+              <Label htmlFor="amount">
+                {mode.title} {market} Amount
+              </Label>
+              <Input
+                id="amount"
+                name="amount"
+                onChange={formik.handleChange}
+                value={formik.values.amount}
+              />
+              <Text color="primary" css={{ fontSize: "$xs" }}>
+                {formik.errors.amount}
+              </Text>
+            </Fieldset>
+            <FormRequestButton
+              request={requestStatus}
+              isValid={formik.isValid && formik.dirty}
+              label={`${mode.title} ${market}`}
+              onOpenChange={setOpen}
+            />
+          </form>
+        )}
+      </Formik>
+    </ControlledModal>
   );
 };

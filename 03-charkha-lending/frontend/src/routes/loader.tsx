@@ -69,13 +69,6 @@ import {
 } from "../state";
 import { AssetName } from "../contracts/controller";
 
-/* REQUESTS
-
-Each of the functions below is a Pact request suitable to be sent with either
-the pactAPI class or a usePactRequest hook.
-
-*/
-
 const describeCharkhaKeyset = (): LocalRequest<string> => ({
   code: { cmd: "describe-keyset", args: ["free.charkha-admin-keyset"] },
   transformResponse: (response) => coercePactValue(response),
@@ -377,21 +370,21 @@ const Loader = ({ children }: { children: ReactElement }): ReactElement => {
     const loop = async () => {
       if (!initialized && allSucceeded) {
         setInitialized();
-        syncState();
+        await syncState();
         while (true) {
           if (allSucceeded) {
             // Then we'll fetch new price data and update the oracle contract.
+            await oracleStore.getPrices();
             await cmcStore.getPrices();
             const { lastPrices } = useCoinMarketCapStore.getState();
             const setPrice = (symbol: AssetName) =>
               pactAPI.send(
                 oracle.setPrice({ symbol, price: { decimal: lastPrices[symbol].toFixed(13) } })
               );
-            await Promise.allSettled([setPrice("KDA"), setPrice("KETH"), setPrice("CHRK")]);
-            await oracleStore.getPrices();
+            await Promise.all([setPrice("KDA"), setPrice("KETH"), setPrice("CHRK")]);
             await userStore.getBorrowingCapacity();
           }
-          await (async () => new Promise((resolve) => setTimeout(resolve, 240_000)))();
+          await (async () => new Promise((resolve) => setTimeout(resolve, 120_000)))();
           continue;
         }
       }
@@ -404,11 +397,11 @@ const Loader = ({ children }: { children: ReactElement }): ReactElement => {
   already */
   useEffect(() => {
     const run = async () => {
-      const kdaMarket = marketStore.markets.get("KDA")!;
-      if (kdaMarket.status === SUCCESS && kdaMarket.parsed.totalSupply === 0.0) {
-        // First we'll have sender01 supply KDA to the market and sender02 will
-        // lock up some ETH to mint KETH.
-        await Promise.allSettled([
+      if (initialized && allSucceeded) {
+        const kdaMarket = marketStore.markets.get("KDA")!;
+        if (kdaMarket.status === SUCCESS && kdaMarket.parsed.totalSupply === 0.0) {
+          // First we'll have sender01 supply KDA to the market and sender02 will
+          // lock up some ETH to mint KETH.
           await pactAPI
             .send(
               controller.supply({
@@ -418,7 +411,9 @@ const Loader = ({ children }: { children: ReactElement }): ReactElement => {
                 amount: { decimal: "12000.0" },
               })
             )
-            .then((resp) => console.log("sender01 supply KDA", resp)),
+            .then((resp) => console.log("sender01 supply KDA", resp));
+
+          await syncState();
 
           await pactAPI
             .send(
@@ -430,64 +425,56 @@ const Loader = ({ children }: { children: ReactElement }): ReactElement => {
                 amount: { decimal: "485.0" },
               })
             )
-            .then((resp) => console.log("sender02 mint KETH", resp)),
-        ]);
+            .then((resp) => console.log("sender02 mint KETH", resp));
 
-        await syncState();
-      }
-
-      const kethMarket = marketStore.markets.get("KDA")!;
-      if (kethMarket.status === SUCCESS && kethMarket.parsed.totalSupply === 0.0) {
-        // Then we'll have sender02 lend their KETH to the markets.
-        await pactAPI
-          .send(
-            controller.supply({
-              account: sender02Address,
-              accountKeys: sender02KeyPair,
-              market: "KETH",
-              amount: { decimal: "50.0" },
-            })
-          )
-          .then((resp) => console.log("sender02 supply KETH", resp)),
           await syncState();
-      }
 
-      // Finally, we'll have both senders take out borrows.
-      if (kdaMarket.status === SUCCESS && kdaMarket.parsed.totalBorrows === 0.0) {
-        await pactAPI
-          .send(
-            controller.borrow({
-              account: sender01Address,
-              accountKeys: sender01KeyPair,
-              accountKeySet: sender01Keyset,
-              market: "KETH",
-              tokens: { decimal: "20.0" },
-            })
-          )
-          .then((resp) => console.log("sender01 borrow KETH", resp)),
-          await syncState();
-      }
+          // Then we'll have sender02 lend their KETH to the markets.
+          await pactAPI
+            .send(
+              controller.supply({
+                account: sender02Address,
+                accountKeys: sender02KeyPair,
+                market: "KETH",
+                amount: { decimal: "50.0" },
+              })
+            )
+            .then((resp) => console.log("sender02 supply KETH", resp));
 
-      if (kethMarket.status === SUCCESS && kethMarket.parsed.totalBorrows === 0.0) {
-        await pactAPI
-          .send(
-            controller.borrow({
-              account: sender02Address,
-              accountKeys: sender02KeyPair,
-              accountKeySet: sender02Keyset,
-              market: "KDA",
-              tokens: { decimal: "99500.0" },
-            })
-          )
-          .then((resp) => console.log("sender02 borrow KDA", resp)),
           await syncState();
+
+          await pactAPI
+            .send(
+              controller.borrow({
+                account: sender01Address,
+                accountKeys: sender01KeyPair,
+                accountKeySet: sender01Keyset,
+                market: "KETH",
+                tokens: { decimal: "20.0" },
+              })
+            )
+            .then((resp) => console.log("sender01 borrow KETH", resp));
+
+          await syncState();
+
+          await pactAPI
+            .send(
+              controller.borrow({
+                account: sender02Address,
+                accountKeys: sender02KeyPair,
+                accountKeySet: sender02Keyset,
+                market: "KDA",
+                tokens: { decimal: "99500.0" },
+              })
+            )
+            .then((resp) => console.log("sender02 borrow KDA", resp));
+
+          await syncState();
+        }
       }
     };
-
-    if (initialized && allSucceeded) {
-      run();
-    }
-  }, [initialized, allSucceeded]);
+    run();
+  }, [initialized]);
 
   /* Finally, we can render the loader or the application, depending on whether
   all requests have completed. */
@@ -504,7 +491,11 @@ const Loader = ({ children }: { children: ReactElement }): ReactElement => {
         {children}
         <Text css={{ marginTop: "-2px", marginLeft: "$1" }}>{label}</Text>
       </Flex>
-      {error ? <Text css={{ marginLeft: "$6", color: "$red9" }}>{error}</Text> : null}
+      {error ? (
+        <Text color="primary" css={{ marginLeft: "$6" }}>
+          {error}
+        </Text>
+      ) : null}
     </Box>
   );
 
@@ -554,12 +545,6 @@ const Loader = ({ children }: { children: ReactElement }): ReactElement => {
               <SuccessIcon size="medium"></SuccessIcon>
             </RequestRow>
           );
-        default:
-          return (
-            <RequestRow label={label} error={request}>
-              <ErrorIcon size="medium" />
-            </RequestRow>
-          );
       }
     } else {
       return (
@@ -572,8 +557,8 @@ const Loader = ({ children }: { children: ReactElement }): ReactElement => {
 
   return (
     <Container size="md">
-      {cmcStore.error && <Text css={{ color: "$red9" }}>{cmcStore.error}</Text>}
-      {allSucceeded ? (
+      {cmcStore.error && <Text color="primary">{cmcStore.error}</Text>}
+      {initialized ? (
         children
       ) : (
         <Box css={{ padding: "$8 $1" }}>

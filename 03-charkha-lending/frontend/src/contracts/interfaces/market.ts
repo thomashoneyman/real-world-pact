@@ -8,20 +8,19 @@ entire module.
 
 */
 
-import Pact from "pact-lang-api";
-import { coercePactValue, LocalRequest, SendRequest } from "@real-world-pact/utils/pact-request";
+import {
+  coercePactNumber,
+  coercePactObject,
+  LocalRequest,
+} from "@real-world-pact/utils/pact-request";
 import { MarketToken } from "../controller";
-import { formatPactNumericResponse } from "@real-world-pact/utils/pact-code";
 
 // The address to look up details about.
 export interface Participant {
-  "last-updated": number;
-  "last-rate-index": number;
+  lastUpdated: number;
+  lastRateIndex: number;
   balance: number;
   borrows: number;
-  // Technically, there are more guard types than a keyset, but it's the only
-  // one we use in our contract code.
-  guard: Pact.KeySet;
 }
 
 export interface GetParticipantArgs {
@@ -31,15 +30,23 @@ export interface GetParticipantArgs {
 
 export const getParticipant = (args: GetParticipantArgs): LocalRequest<Participant> => ({
   code: { cmd: `free.${args.market}.get-participant`, args: [args.account] },
-  transformResponse: coercePactValue,
+  transformResponse: (response) => {
+    const object = coercePactObject(response);
+    return {
+      lastUpdated: coercePactNumber(object["last-updated"]),
+      lastRateIndex: coercePactNumber(object["last-rate-index"]),
+      balance: coercePactNumber(object["balance"]),
+      borrows: coercePactNumber(object["borrows"]),
+    };
+  },
 });
 
 export const getBorrow = (args: GetParticipantArgs): LocalRequest<number> => ({
   code: { cmd: `free.${args.market}.get-borrow`, args: [args.account] },
-  transformResponse: (response) => formatPactNumericResponse(coercePactValue(response)),
+  transformResponse: coercePactNumber,
 });
 
 export const getSupply = (args: GetParticipantArgs): LocalRequest<number> => ({
   code: { cmd: `free.${args.market}.get-supply`, args: [args.account] },
-  transformResponse: (response) => formatPactNumericResponse(coercePactValue(response)),
+  transformResponse: coercePactNumber,
 });

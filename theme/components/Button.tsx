@@ -80,6 +80,9 @@ export const Button = styled("button", {
         "&:hover": {
           borderColor: "$mauve12",
         },
+        "&:disabled": {
+          borderColor: "$mauve10",
+        },
       },
     },
   ],

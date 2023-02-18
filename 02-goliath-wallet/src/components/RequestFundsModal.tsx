@@ -10,21 +10,25 @@ This file isn't commented because this is standard React code.
 
 import { Button } from "@real-world-pact/theme/components/Button";
 import { Fieldset, Input, Label } from "@real-world-pact/theme/components/Form";
-import { FormModal } from "@real-world-pact/theme/components/Modal/FormModal";
 import { Text } from "@real-world-pact/theme/components/Text";
 
 import * as Pact from "pact-lang-api";
 
 import { Formik } from "formik";
-import { ReactNode } from "react";
+import { useState } from "react";
 import { parsePactDecimal } from "@real-world-pact/utils/pact-code";
+import { ControlledModal, FormSubmitButton } from "@real-world-pact/theme/components/Modal";
 
 export interface RequestFundsModalProps {
   onSubmit: (amount: Pact.PactDecimal) => any;
-  [x: string]: any;
+  [x: string]: unknown;
 }
 
 export const RequestFundsModal = ({ onSubmit, ...props }: RequestFundsModalProps) => {
+  const [open, setOpen] = useState(false);
+
+  const title = "Request Funds";
+
   const description = (
     <Text>
       Other Kadena addresses can send their KDA to you. You simply need to share your account
@@ -41,46 +45,49 @@ export const RequestFundsModal = ({ onSubmit, ...props }: RequestFundsModalProps
     </Button>
   );
 
-  const renderForm = (renderActions: (isValid: boolean) => ReactNode) => (
-    <Formik
-      initialValues={{ amount: "" }}
-      onSubmit={(values) => {
-        const parsed = parsePactDecimal(values.amount) as Pact.PactDecimal;
-        onSubmit(parsed);
-      }}
-      validate={(values) => {
-        let errors: { amount?: string } = {};
-        if (values.amount === "") errors.amount = "Required.";
-        const parsed = parsePactDecimal(values.amount);
-        if (typeof parsed === "string") errors.amount = parsed;
-        return errors;
-      }}
-    >
-      {(formik) => (
-        <form onSubmit={formik.handleSubmit}>
-          <Fieldset>
-            <Label htmlFor="amount">Request Amount</Label>
-            <Input
-              id="amount"
-              name="amount"
-              onChange={formik.handleChange}
-              value={formik.values.amount}
-            />
-            <Text css={{ fontSize: "$xs", color: "$crimson11" }}>{formik.errors.amount}</Text>
-            {renderActions(formik.isValid && formik.dirty)}
-          </Fieldset>
-        </form>
-      )}
-    </Formik>
-  );
-
   return (
-    <FormModal
-      title="Receive KDA"
+    <ControlledModal
+      open={open}
+      onOpenChange={setOpen}
+      title={title}
       description={description}
       trigger={trigger}
-      confirmLabel="Send Transaction"
-      renderForm={renderForm}
-    ></FormModal>
+    >
+      <Formik
+        initialValues={{ amount: "" }}
+        onSubmit={(values) => {
+          console.log(values);
+          const parsed = parsePactDecimal(values.amount) as Pact.PactDecimal;
+          onSubmit(parsed);
+        }}
+        validate={(values) => {
+          let errors: { amount?: string } = {};
+          if (values.amount === "") errors.amount = "Required.";
+          const parsed = parsePactDecimal(values.amount);
+          if (typeof parsed === "string") errors.amount = parsed;
+          return errors;
+        }}
+      >
+        {(formik) => (
+          <form onSubmit={formik.handleSubmit}>
+            <Fieldset>
+              <Label htmlFor="amount">Request Amount</Label>
+              <Input
+                id="amount"
+                name="amount"
+                onChange={formik.handleChange}
+                value={formik.values.amount}
+              />
+              <Text css={{ fontSize: "$xs", color: "$crimson11" }}>{formik.errors.amount}</Text>
+            </Fieldset>
+            <FormSubmitButton
+              isValid={formik.isValid && formik.dirty}
+              label={"Submit Transaction"}
+              onOpenChange={setOpen}
+            />
+          </form>
+        )}
+      </Formik>
+    </ControlledModal>
   );
 };
