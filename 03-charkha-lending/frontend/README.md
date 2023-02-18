@@ -34,7 +34,7 @@ We can try to submit a proposal, but if you don't have any CHRK tokens then you'
 
 Let's claim our CHRK tokens from the governance page that we've earned by participating in the KDA market. It's only been a few blocks so we haven't earned much:
 
-![](./screenshots/08-submit-proposal-failure.png)
+![](./screenshots/08-claimed-chrk.png)
 
 However, it's enough to submit a new proposal to change the KDA market base rate to 10%. This is the base interest rate charged to borrows before utilization and the multiplier are factored in. We can also create proposals to change those market factors, too.
 
