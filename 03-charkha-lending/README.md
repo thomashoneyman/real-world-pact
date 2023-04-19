@@ -1,7 +1,5 @@
 # Charkha Lending Project
 
-:warning: The Charkha frontend is complete but still under review. The code may change somewhat in the coming weeks.
-
 The Charkha lending protocol is a complete decentralized lending app built on Kadena's Chainweb blockchain. Decentralized finance has been one of the standout uses of smart contracts and Charkha is inspired by the popular [Compound](https://compound.finance) lending protocol.
 
 Charkha contains all the components of a real-world DeFi project, including:

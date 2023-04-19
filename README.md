@@ -2,11 +2,11 @@
 
 Real World Pact is a collection of thoroughly-commented, fully-functioning example projects that demonstrate building with Pact on Kadena's Chainweb blockchain. The projects are self-contained and demonstrate critical concepts ranging from beginner to intermediate. Each project can be run on a local devnet (simulation of Chainweb) and has a real world UI you can use to interact with the smart contracts.
 
-If you're brand-new to Pact then you should begin with the core concepts guide (**still under development, stay tuned!**) and then move through the projects one-by-one. If you're already familiar with Pact and are looking for a well-commented, real-world example application, you can skip straight to the [Charkha lending protocol](./03-charkha-lending) and accompanying [white paper](./03-charkha-lending/Charkha-Protocol-Whitepaper.pdf).
-
-:warning: The core concepts guide is still under development. Stay tuned!
+If you're brand-new to Pact then you should begin with the [core concepts guide](./00-core-concepts) and then move through the projects one-by-one. If you're already familiar with Pact and are looking for a well-commented, real-world example application, you can skip straight to the [Charkha lending protocol](./03-charkha-lending) and accompanying [white paper](./03-charkha-lending/Charkha-Protocol-Whitepaper.pdf).
 
 ## Included Projects
+
+Real World Pact includes three projects. Each project assumes that you have read the [**Pact Core Concepts** series](./00-core-concepts) and is otherwise self-contained.
 
 1. [**Goliath Faucet Contract**](./01-faucet-contract) (Beginner, Pact)
 
@@ -20,7 +20,7 @@ If you're brand-new to Pact then you should begin with the core concepts guide (
 
    The Charkha lending protocol is an advanced project that demonstrates building a real-world application on Pact and Chainweb. You'll see how to implement a white paper describing a lending protocol as a set of smart contracts. You'll also connect a full frontend to the protocol. You'll learn a mixture of Pact, Chainweb, and DeFi concepts, such as oracles, community governance, implementing your own tokens, minimizing gas fees, and more. Charkha is named for the common spinning wheels used to spin silk.
 
-All three projects expect that you have first read the **Core Concepts**, a short crash-course on building applications with Pact. There are also two directories containing utility code which you should review:
+There are also two directories containing utility code which you should review:
 
 1. **[Pact REPL Utils](./pact-repl-utils)** (Pact)
 
