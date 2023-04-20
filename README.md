@@ -1,10 +1,16 @@
 # Real World Pact
 
-Real World Pact is a collection of thoroughly-commented, fully-functioning example projects that demonstrate building with Pact on Kadena's Chainweb blockchain. The projects are self-contained and demonstrate critical concepts ranging from beginner to intermediate. Each project can be run on a local devnet (simulation of Chainweb) and has a real world UI you can use to interact with the smart contracts.
+Real World Pact is a series of thoroughly-commented, fully-functioning projects that demonstrate building decentralized apps with Pact on Kadena's Chainweb blockchain. The projects range from beginner to advanced; each can be deployed to a local devnet or to testnet and has an accompanying UI that demonstrates how to build a frontend to connect to your smart contracts.
 
-If you're brand-new to Pact then you should begin with the [core concepts guide](./00-core-concepts) and then move through the projects one-by-one. If you're already familiar with Pact and are looking for a well-commented, real-world example application, you can skip straight to the [Charkha lending protocol](./03-charkha-lending) and accompanying [white paper](./03-charkha-lending/Charkha-Protocol-Whitepaper.pdf).
+Begin with the [Pact Core Concepts series](./00-core-concepts):
 
-## Included Projects
+1. [Introduction to Blockchain Development with Kadena](./00-core-concepts/01-Introduction.md)
+2. Learn Pact in 20 Minutes (April 27)
+3. Testing and Formal Verification in the Pact REPL (May 4)
+
+Then, you can move through the projects below one-by-one. If you are already familiar with Pact and just want to see a significant, real-world example, then you can skip straight to the [Charkha lending protocol](./03-charkha-lending).
+
+## Pact Projects
 
 Real World Pact includes three projects. Each project assumes that you have read the [**Pact Core Concepts** series](./00-core-concepts) and is otherwise self-contained.
 
