@@ -1,12 +1,14 @@
 # 1. Introduction to Blockchain Development with Kadena
 
-Blockchain development is a departure from typical web development. I encountered a set of unfamiliar technologies with little idea of how they fit together, their limitations, and how to design programs for a radically different computing environment than a typical web application. It can be overwhelming.
+Welcome to the Pact Core Concepts series! 
+
+This short article series introduces you to the basics of blockchain development with Kadena. It only gives you a map of the territory: we won't go deep. We begin with an overview of blockchain technology in general and the Kadena ecosystem in particular; in subsequent articles you will learn to write and test smart contracts in the Pact language.
+
+Blockchain development is a departure from typical web development. I encountered a set of unfamiliar technologies with little idea of how they fit together, their limitations, and how to design programs for a radically different computing environment than a typical web application. It can be overwhelming!
 
 Yet blockchain technology is fascinating, not least because it enables a class of applications not previously possible. It's worth working through the disorienting initial experience to understand how blockchain development works and what applications it makes possible.
 
 I chose to develop my first blockchain application on Chainweb (Kadena's public blockchain). Chainweb is a great choice for web3 apps because of its low gas fees, multi-chain architecture, but mostly because of Kadena's well-designed smart contract language, Pact.
-
-This short article series introduces you to the basics of blockchain development with Kadena. It only gives you a map of the territory: we won't go deep. We begin with an overview of blockchain technology in general and the Kadena ecosystem in particular; in subsequent articles you will learn to write and test smart contracts in the Pact language.
 
 Without further ado: let's begin the crash course!
 
