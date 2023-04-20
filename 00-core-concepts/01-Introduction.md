@@ -2,7 +2,7 @@
 
 Welcome to the Pact Core Concepts series! 
 
-This short article series introduces you to the basics of blockchain development with Kadena. It only gives you a map of the territory: we won't go deep. We begin with an overview of blockchain technology in general and the Kadena ecosystem in particular; in subsequent articles you will learn to write and test smart contracts in the Pact language.
+This short article series introduces you to the basics of blockchain development with Kadena. It gives you a map of the territory so you can orient yourself in the Real World Pact projects. We'll begin with an overview of blockchain technology in general and the Kadena ecosystem in particular; in subsequent articles you will learn to write and test smart contracts in the Pact language.
 
 Blockchain development is a departure from typical web development. I encountered a set of unfamiliar technologies with little idea of how they fit together, their limitations, and how to design programs for a radically different computing environment than a typical web application. It can be overwhelming!
 
