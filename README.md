@@ -2,7 +2,7 @@
 
 Real World Pact is a series of thoroughly-commented, fully-functioning projects that demonstrate building decentralized apps with Pact on Kadena's Chainweb blockchain. The projects range from beginner to advanced; each can be deployed to a local devnet or to testnet and has an accompanying UI that demonstrates how to build a frontend to connect to your smart contracts.
 
-Begin with the [Pact Core Concepts series](./00-core-concepts):
+Begin with the **Pact Core Concepts** series:
 
 1. [Introduction to Blockchain Development with Kadena](./00-core-concepts/01-Introduction.md)
 2. Learn Pact in 20 Minutes (April 27)
@@ -12,7 +12,7 @@ Then, you can move through the projects below one-by-one. If you are already fam
 
 ## Pact Projects
 
-Real World Pact includes three projects. Each project assumes that you have read the [**Pact Core Concepts** series](./00-core-concepts) and is otherwise self-contained.
+Real World Pact includes three projects. Each project assumes that you have read the [**Pact Core Concepts**](./00-core-concepts) series and is otherwise self-contained.
 
 1. [**Goliath Faucet Contract**](./01-faucet-contract) (Beginner, Pact)
 
