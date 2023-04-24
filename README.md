@@ -5,7 +5,7 @@ Real World Pact is a series of thoroughly-commented, fully-functioning projects 
 Begin with the **Pact Core Concepts** series:
 
 1. [Introduction to Blockchain Development with Kadena](./00-core-concepts/01-Introduction.md)
-2. Learn Pact in 20 Minutes (April 27)
+2. [Learn Pact in 20 Minutes](./00-core-concepts/02-Pact-In-20-Minutes.md)
 3. Testing and Formal Verification in the Pact REPL (May 4)
 
 Then, you can move through the projects below one-by-one. If you are already familiar with Pact and just want to see a significant, real-world example, then you can skip straight to the [Charkha lending protocol](./03-charkha-lending).
