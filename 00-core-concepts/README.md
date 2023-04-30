@@ -4,6 +4,6 @@ The Core Concepts series is an introduction to building decentralized applicatio
 
 1. [Introduction to Blockchain Development with Kadena](./01-Introduction.md)
 2. [Learn Pact in 20 Minutes](./02-Pact-In-20-Minutes.md)
-3. Testing and Formal Verification in the Pact REPL (Publishing on **May 4**)
+3. [Testing and Formal Verification in the Pact REPL](./03-Testing-In-The-Pact-REPL.md)
 
 The Real World Pact repository demonstrates these concepts through several real-world projects building from a simple faucet contract to a full-featured lending app with formal verification and an accompanying whitepaper.
