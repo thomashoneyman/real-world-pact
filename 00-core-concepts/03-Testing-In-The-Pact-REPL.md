@@ -8,7 +8,7 @@ Most issues, however, can be caught with a combination of unit tests, typechecki
 
 Before we begin: this article was written with Pact 4.6. If you are a Nix user then you can get the same version of Pact in your shell from [pact-nix](https://github.com/thomashoneyman/pact-nix) with one of the following commands:
 
-```console
+```sh
 # To temporarily drop directly into the Pact interpreter
 $ nix run github:thomashoneyman/pact-nix#pact-4_6_0
 pact>
@@ -27,7 +27,7 @@ Pact supplies three basic functions for implementing unit tests in the REPL: `ex
 
 The `expect` function is a simple equality check that reports an error if the two provided expressions are not equal to one another.
 
-```console
+```sh
 pact> (expect "1 equals 1" 1 1)
 "Expect: success: 1 equals 1"
 
@@ -43,14 +43,14 @@ pact> (expect "different objects" { 'a': 1 } { 'a': 2 })
 
 The `expect-that` function is similar, but it uses a predicate function instead of simple equality to perform its test. Accordingly, `expect-that` is a little more versatile than `expect` because you only have to assert a condition, not a specific value. In fact, you can express `expect` via `expect-that` by providing equality as the predicate function:
 
-```console
+```sh
 pact> (expect-that "1 equals 1" (= 1) 1)
 "Expect-that: success: 1 equals 1"
 ```
 
 The `expect-that` function makes it easy to express a condition over a range of inputs. Below, we test a function to determine if a list is non-empty over a few inputs:
 
-```console
+```sh
 pact> (map (expect-that "nonempty" (compose (length) (< 0))) [[] [1] [1 2]])
 ["FAILURE: nonempty: did not satisfy (compose (length) (< 0)): []:[<a>]"
 "Expect-that: success: nonempty"
@@ -66,7 +66,7 @@ We got three lines of output here because we ran this interactively. However, if
 
 ...and then we execute that REPL file, you'll find that only the errors are printed:
 
-```console
+```sh
 $ pact pact.repl
 pact.repl:1:5: FAILURE: not empty: did not satisfy (compose (length) (< 0)): []:[<a>]
 Load failed
@@ -74,7 +74,7 @@ Load failed
 
 This is a useful bit of output filtering. You'll also see that the process exited with a failure status code (1), whereas if we remove the empty list and run this again we'll see a successful output with a success status code (0):
 
-```console
+```sh
 $ pact pact.repl
 Load successful
 
@@ -84,14 +84,14 @@ $ echo $?
 
 The third and final unit testing function provided for use in the Pact REPL is `expect-failure`. This function takes a single expression and expects it to throw an error — for example, because the function contains a call to `enforce` that should fail — and fails only if the provided function succeeds. It's useful for when you know some inputs to a function that definitely should not work.
 
-```console
+```sh
 pact> (expect-failure "Enforce should throw on false" (enforce false "Uh oh"))
 "Expect failure: success: Enforce should throw on false"
 ```
 
 You can optionally include the error message you expect to see; if the thrown error does not contain that message, then `expect-failure` will fail. This helps you verify that the error message you expect users to see when they call your contract code incorrect. Below, our provided expression throws as expected, but the error message is wrong.
 
-```console
+```sh
 pact> (expect-failure "Enforce should say 'Oh no'" "Oh no" (enforce false "Uh oh"))
 "FAILURE: Enforce should say 'Oh no': expected error message to contain 'Oh no', got '(enforce false "Uh oh"): Failure: Tx Failed: Uh oh'"
 ```
@@ -158,7 +158,7 @@ Let's write a few unit tests in a REPL file named `lists.repl`:
 
 If we then run this file at the command line we should see all tests pass:
 
-```console
+```sh
 $ pact lists.repl
 Load successful
 ```
@@ -175,7 +175,7 @@ The `expect` family of functions are wonderful for testing Pact functions based 
 
 The `env-data` function allows you to attach an object to a transaction. This should be used when a contract uses the `read` family of functions to read a transaction payload. The data object can either contain JSON-encoded values or it can contain Pact code directly.
 
-```console
+```sh
 pact> (read-integer "my-int")
 <interactive>:0:0: No such key in message: my-int
  at <interactive>:0:0: (read-integer "my-int")
@@ -189,7 +189,7 @@ pact> (read-integer "my-int")
 
 The `env-sigs` function allows you to attach digital signatures to a transaction. Each signature can be scoped to a specific capability, which means the signature is valid only for that capability and not others. The `env-sigs` function takes an array of keys and associated capabilities, which represents the transaction being signed with the private key associated with the indicated public key.
 
-```console
+```sh
 pact> (env-sigs [ { "key": "my-public-key" }, "caps": [] } ])
 ```
 
@@ -313,7 +313,7 @@ Static type-checking helps you verify that your module never uses a value of one
 
 You can ask Pact to check your types are correct for any module with the `typecheck` REPL-only function, which takes the name of the module to check as its argument. As a brief example (this will not actually work, since we haven't implemented a `my-module.pact`):
 
-```console
+```sh
 pact> (load "my-module.pact")
 Loaded module my-module, ...
 
@@ -327,7 +327,7 @@ Formal verification is one of my favorite Pact features. It's a way to mathemati
 
 You can verify a module as easily as you typechecked it (again, this will not actually work, since we haven't implemented a `my-module.pact`):
 
-```console
+```sh
 pact> (load "my-module.pact")
 Loaded module my-module, ...
 
@@ -339,7 +339,7 @@ The best way to learn the Pact property checking system is via the quite good [d
 
 To use the Pact property checking system you must have [z3 installed and available in your shell](https://github.com/Z3Prover/z3). If you don't have z3 already and have been following along with Nix, you can add z3 temporarily to your shell with the following command:
 
-```console
+```sh
 $ nix-shell -p z3
 ```
 
@@ -387,14 +387,14 @@ For the next short exercise, write the following module to the file `verifier.pa
 
 We can then load this into the Pact REPL and verify it:
 
-```console
+```sh
 pact> (load "verifier.pact")
 pact> (verify "verifier")
 ```
 
 Uh oh! z3 is able to locate a violation of our invariant that an account can never have a negative balance. It tells us the violated property was on line 7, and the error occurred within the `transfer` function. Let's take a look:
 
-```console
+```sh
 verifier.pact:7:17:OutputFailure: Invalidating model found in verifier.transfer
   Program trace:
     entering function verifier.transfer with arguments
@@ -405,14 +405,14 @@ verifier.pact:7:17:OutputFailure: Invalidating model found in verifier.transfer
 
 We begin with the arguments z3 provided to our function. Next, z3 walks through our code step-by-step. It steps through both our `enforce` calls and sees that they pass:
 
-```console
+```sh
       satisfied assertion: = from to) "C
       satisfied assertion:  amount 0.0) "C
 ```
 
 Next, we have our database reads and enforcement of the auth guard:
 
-```console
+```sh
       read { auth: 4, balance: 0.1 } from accounts at key "W" succeeds
       destructuring object
         from-funds := 0.1
@@ -425,14 +425,14 @@ Next, we have our database reads and enforcement of the auth guard:
 
 The sender "W" has a balance of 0.1 and the receiver "r" has a balance of 0.1. Next, the database updates happen:
 
-```console
+```sh
           update accounts at key "W" with { balance: -0.1 } succeeds
           update accounts at key "r" with { balance: 0.3 } succeeds
 ```
 
 Uh oh! There's the bug. The user "W" only has a balance of 0.1 but has sent 0.2, which produces a negative balance. This transaction should fail, but our current code allows it. z3 reaches the end of the transaction without a problem:
 
-```console
+```sh
       returning with "Write succeeded"
 ```
 
@@ -446,7 +446,7 @@ Let's start a new REPL session and explore the gas costs of a few common functio
 
 You can enable gas logging by setting a gas model via `env-gasmodel` (defaults to a fixed 0 gas per operation) and a gas limit via `env-gaslimit` (defaults to a limit of 0 gas). It's a common practice to use the "table" gasmodel in which the interpreter provides estimates and either an enormous gas limit (you don't care about the limit), or a limit of 180,000 (the maximum a transaction can consume), or a limit of what you feel is reasonable for your transaction.
 
-```console
+```sh
 pact> (env-gasmodel "table")
 "Set gas model to table-based cost model"
 
@@ -456,7 +456,7 @@ pact> (env-gaslimit 180000)
 
 Once you have set a gas model and limit you can use the `env-gas` function to set or read the amount of gas consumed. For example, it is common to set gas to 0 with `(env-gas 0)`, run a function, and then read how much gas was consumed with `(env-gas)`.
 
-```console
+```sh
 pact> (env-gas 0)
 "Set gas to 0"
 pact> (+ 1 2)
@@ -469,7 +469,7 @@ From this short session we can deduce that simple addition costs a single unit o
 
 How much do various math operations cost?
 
-```console
+```sh
 pact> (env-gas 0) (- 3 4) (env-gas)
 1
 
@@ -490,7 +490,7 @@ We can see that basic arithmetic is extremely cheap. Addition and subtraction co
 
 How about a more complicated function like `fold`?
 
-```console
+```sh
 pact> (env-gas 0) (fold (+) 0 []) (env-gas)
 3
 
@@ -505,7 +505,7 @@ Folding a list incurs 3 gas for the basic operation and then the cost of your ac
 
 It is critical to measure the gas consumption of your smart contract functions. Some calls can surprise you — for example, reading the keys of a totally empty table still costs a _ton_ of gas. Paste this module into the REPL:
 
-```console
+```sh
 (module test GOV
   (defcap GOV () true)
 
@@ -518,7 +518,7 @@ It is critical to measure the gas consumption of your smart contract functions. 
 
 Then, check the gas consumption of reading the table's keys:
 
-```console
+```sh
 pact> (env-gas 0) (keys table) (env-gas)
 40000
 ```

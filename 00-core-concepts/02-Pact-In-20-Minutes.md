@@ -2,20 +2,20 @@
 
 Pact is a wonderful language for smart contract development. It boasts a slew of features specific to the blockchain environment — and, notably, a lack of features that tend to produce costly mistakes — and it's such a small language that you can master it in a few months.
 
-However, Pact has a steep initial learning curve because so many concepts are a departure from standard programming languages you've seen before. It's an immutable, non-Turing-complete [Lisp language](https://en.wikipedia.org/wiki/Lisp_(programming_language)) with language constructs specifically designed for smart contract programming powerful features like fine-grained access control, sophisticated multi-signature authorization, on-chain data storage, cross-chain state transfers, and formal code verification. That's a lot to learn — especially if you're new to blockchain development!
+However, Pact has a steep initial learning curve because so many concepts are a departure from standard programming languages you've seen before. It's an immutable, non-Turing-complete [Lisp language](<https://en.wikipedia.org/wiki/Lisp_(programming_language)>) with language constructs specifically designed for smart contract programming powerful features like fine-grained access control, sophisticated multi-signature authorization, on-chain data storage, cross-chain state transfers, and formal code verification. That's a lot to learn — especially if you're new to blockchain development!
 
 This article is a crash course in the Pact language. We'll go through as many Pact snippets as we can in 20 minutes of reading time; by the time we're through you won't be an expert, but you'll be able to understand most Pact code you see in the wild. I recommend that you follow along in a Pact REPL session and/or by writing Pact code in a file named `twenty-minutes.pact`. You can see [installation instructions on the Pact repo](https://github.com/kadena-io/pact#installing-pact).
 
 This article was written with Pact 4.6. If you use Nix, you can drop into a Pact REPL session with the same executable I used in one line via [pact-nix](https://github.com/thomashoneyman/pact-nix):
 
-```console
+```sh
 $ nix run github:thomashoneyman/pact-nix#pact-4_6_0
 pact>
 ```
 
 Alternately, you can get the executable in your shell:
 
-```console
+```sh
 $ nix develop github:thomashoneyman/pact-nix#pact-4_6_0
 $ pact --version
 4.6.0
@@ -113,7 +113,7 @@ You can destructure objects with the `bind` function and the `:=` binding operat
 ```clojure
 (bind
   ; First, we supply the object that we want to destructure
-  { "a": 1, "b": 2, "c": 3, "d": 4 } 
+  { "a": 1, "b": 2, "c": 3, "d": 4 }
   ; Then, we bind the value of the "a" key to the name 'a-value', and the
   ; value of the "d" key to the name 'd-value'.
   { "a" := a-value, "d" := d-value }
@@ -124,7 +124,7 @@ You can destructure objects with the `bind` function and the `:=` binding operat
 ; 5
 ```
 
-Pact supports anonymous functions via the `lambda` keyword. A lambda takes a list of arguments and a body, which is an expression that can access those arguments (the same as a let or bind). 
+Pact supports anonymous functions via the `lambda` keyword. A lambda takes a list of arguments and a body, which is an expression that can access those arguments (the same as a let or bind).
 
 > Remember to try these snippets in a Pact REPL!
 
@@ -164,7 +164,7 @@ The `zip` function merges two lists together with a combining function. The comb
 ; [ { "x": 1, "y": 3 }, { "x": 2, "y": 4 } ]
 ```
 
-The `fold` function reduces a list of values to a value with a reducer function and an initial accumulator value. The reducer function takes two arguments — the accumulated value so far and  the next value from the list — and returns a new accumulator value.
+The `fold` function reduces a list of values to a value with a reducer function and an initial accumulator value. The reducer function takes two arguments — the accumulated value so far and the next value from the list — and returns a new accumulator value.
 
 ```clojure
 ; We can sum a list by adding all the values together.
@@ -190,7 +190,7 @@ We now know how to create literal values, bind them to names (ie. create atoms),
 
 Next, let's turn to conditional logic. Pact supports two forms of conditional logic: the `if` and `cond` functions. In Pact, functions are _total_, which means they always return a value. You can't handle only the `true` condition of an `if` statement, for example, unlike languages like JavaScript. Later' we'll see how to terminate a computation with an exception.
 
-The first conditional logic function is the traditional if-else expression. It takes a condition, an expression to return if true, and an expression to return if false. 
+The first conditional logic function is the traditional if-else expression. It takes a condition, an expression to return if true, and an expression to return if false.
 
 ```clojure
 (if
@@ -210,7 +210,7 @@ The second conditional logic function is `cond`, which is _technically_ a Pact s
 (let
   ((x:integer 5))
   ; cond takes a list of condition-return pairs (COND VALUE) and a default
-  ; value where if the condition is true then the value is returned, and if 
+  ; value where if the condition is true then the value is returned, and if
   ; none of the pairs match then the final default case is returned.
   (cond
     ((= x 1) "X is 1")
@@ -306,7 +306,7 @@ So what _is_ a keyset? A keyset combines a list of public keys with a predicate 
 
 // you can also specify a predicate function from a module for more
 // sophisticated situations
-{ "keys": ["pubkey1", "pubkey2"], "pred": "example.my-keyset-predicate" 
+{ "keys": ["pubkey1", "pubkey2"], "pred": "example.my-keyset-predicate"
 ```
 
 A keyset reference is a string identifying a keyset that has been registered on Chainweb with `define-keyset`. We can't write a keyset directly in Pact, but we can write one in JSON, attach it to a transaction, and then read the data from the transaction in Pact. Let's do that in the REPL:
@@ -330,7 +330,7 @@ A keyset reference is a string identifying a keyset that has been registered on 
 (typeof (read-keyset "my-keyset")) ; "keyset"
 
 ; Be careful! If you assert the wrong type, weird things can happen.
-(read-integer "my-decimal") ; 1 
+(read-integer "my-decimal") ; 1
 (read-integer "my-keyset")
 ; <interactive>:0:0: read-integer: parse failed: Failure parsing integer: Array [String "pubkey1"]: ["pubkey1"]
 ```
@@ -398,7 +398,7 @@ You can use a keyset reference to govern a Pact module, or you can use a governa
   (defcap GOVERNANCE () (enforce-keyset "free.admin-keyset")))
 ```
 
-You can define more than constants and capabilities in a Pact module. You can also define functions, object types (schemas), database tables, formal verification properties, and more. 
+You can define more than constants and capabilities in a Pact module. You can also define functions, object types (schemas), database tables, formal verification properties, and more.
 
 Functions are defined with the `defun` special form. They have a name, a list of arguments, and a function body. You can add type annotations for the arguments and the return type.
 
@@ -420,11 +420,11 @@ Modules, functions, and many other Pact forms can have documentation strings:
 ```clojure
 (module example "free.admin-keyset"
   @doc "An example module"
-  
+
   (defun square (x:integer)
     @doc "A function to square integers"
     (* x x))
-    
+
   (defun sum (xs:[integer])
     @doc "A function to sum a list"
     (fold (+) 0 xs))
@@ -579,7 +579,7 @@ However, once we commit our current transaction we can no longer acquire governa
 ; <interactive>:3:5: No governance
 ```
 
-You'll find that most Pact modules consist of one or more databases, a selection of functions  that manipulate the database, and a set of capabilities that control access to sensitive functions.
+You'll find that most Pact modules consist of one or more databases, a selection of functions that manipulate the database, and a set of capabilities that control access to sensitive functions.
 
 We have only a few minutes left, so let's talk about guards and capabilities. A _guard_ is a predicate function over some environment that enables a pass-fail operation. The most typical guard is a keyset, like we've seen before. Assuming you've been following along in the REPL:
 
@@ -691,14 +691,14 @@ Guards are especially useful because they can be stored in tables. For example, 
 ; functions or when governance is granted for a module. Right now we're in
 ; the deployment transaction so we can freely access both.
 
-(insert free.guard-example.account-table "Rick" 
+(insert free.guard-example.account-table "Rick"
   { "name": "Rick"
   , "address": "1111 Pine St"
   , "guard": (create-user-guard (free.guard-example.succeed))
   })
 ; "Write succeeded"
 
-(insert free.guard-example.account-table "Morty" 
+(insert free.guard-example.account-table "Morty"
   { "name": "Morty"
   , "address": "1111 Pine St"
   , "guard": (create-capability-guard (free.guard-example.CAP_SUCCEED))
@@ -717,7 +717,7 @@ Guards are especially useful because they can be stored in tables. For example, 
 
 ; We can acquire a capability via with-capability, but not at the
 ; top-level. We'll do it inside a let instead.
-(let ((_ 0)) 
+(let ((_ 0))
   ; with-capability attempts to acquire a capability, failing if the
   ; predicate function fails (for example, if the capability required
   ; a signature on the transaction and there was none). in this case,
@@ -748,7 +748,7 @@ Writing Pact is a different experience from reading it because you both must und
 
 For more Pact material you may want to check out:
 
-* The [Pact language documentation](https://pact-language.readthedocs.io/en/stable/)
-* The [Real World Pact](https://github.com/thomashoneyman/real-world-pact) project series
+- The [Pact language documentation](https://pact-language.readthedocs.io/en/stable/)
+- The [Real World Pact](https://github.com/thomashoneyman/real-world-pact) project series
 
 Have fun writing some Pact!
