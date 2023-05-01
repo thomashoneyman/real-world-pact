@@ -105,7 +105,7 @@
   (defcap VOTE:bool (account:string)
     @doc "A capability restricting voters to CHRK holders who have not voted."
 
-    (enforce (!= account "") "Account cannot be empty.")
+    (enforce (!= account "") "Account name cannot be empty.")
     (let ( (user (free.CHRK.details account)) )
       ; The user must sign the VOTE capability with the guard associated with
       ; their CHRK account.

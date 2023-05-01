@@ -62,7 +62,7 @@
     (require-capability (TREASURY)))
 
   (defcap BORROW (account:string market:string amount:decimal)
-    (enforce (!= account "") "Account cannot be empty")
+    (enforce (!= account "") "Account name cannot be empty.")
     (enforce (> amount 0.0) "Amount must be positive.")
     ; This weird little trick (saving the borrowing-capacity to a let binding
     ; before enforcing) is because the (enforce) function does not allow
@@ -354,7 +354,7 @@
         "Completed borrow.")))
 
   (defun repay:string (account:string market:string amount:decimal)
-    (enforce (!= account "") "Account cannot be empty.")
+    (enforce (!= account "") "Account name cannot be empty.")
     (enforce (> amount 0.0) "Repay amount must be greater than zero.")
     (with-capability (INTERNAL) (sync-protocol))
     (with-read markets-table market
@@ -384,7 +384,7 @@
   ; because they purchase the collateral at a 5% discount vs. the exchange rate.
   (defun liquidate:string (liquidator:string account:string market:string amount:decimal)
     (enforce (!= liquidator "") "Liquidator cannot be empty.")
-    (enforce (!= account "") "Account cannot be empty.")
+    (enforce (!= account "") "Account name cannot be empty.")
     (enforce (> amount 0.0) "Liquidate amount must be greater than zero.")
     (with-capability (INTERNAL) (sync-protocol))
     (with-read markets-table market

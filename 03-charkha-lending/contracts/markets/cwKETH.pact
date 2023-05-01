@@ -39,13 +39,7 @@
     (enforce (!= receiver "") "Receiver cannot be empty.")
     (enforce-unit amount) ; see (enforce-unit) later in this file for details.
     (enforce (> amount 0.0) "Transfer limit must be positive.")
-    (enforce-guard (at 'guard (read participants-table sender)))
-    ; Here we enforce that the user has sufficient borrowing capacity that
-    ; transferring AMOUNT will still leave them with some borrow capacity.
-    (with-read refs-table REF_KEY { "controller-ref" := controller-ref:module{charkha-controller-iface} }
-      (enforce
-        (> (- (controller-ref::borrowing-capacity sender SYMBOL) amount) 0.0)
-        "Insufficient borrowing capacity.")))
+    (enforce-guard (at 'guard (read participants-table sender))))
 
   ; Typical implementation of the manager function for the (TRANSFER) capability.
   (defun TRANSFER-mgr:decimal (managed:decimal requested:decimal)
@@ -130,10 +124,18 @@
             , "guard": guard
             })))))
 
+  ; Here we enforce that the user has sufficient borrowing capacity that
+  ; transferring AMOUNT will still leave them with some borrow capacity.
+  (defun validate-borrowing-capacity (sender amount)
+    (with-read refs-table REF_KEY { "controller-ref" := controller-ref:module{charkha-controller-iface} }
+      (let ((capacity:decimal (controller-ref::borrowing-capacity sender SYMBOL)))
+        (enforce (> (- capacity amount) 0.0) "Insufficient borrowing capacity."))))
+
   ; Typical implementation of the (transfer) function specified by fungible-v2.
   ; https://github.com/kadena-io/KIPs/blob/8ec1b7c6e2596778e169182339eeda7acbae4abc/kip-0005/fungible-v2.pact#L41-L53
   (defun transfer:string (sender:string receiver:string amount:decimal)
     (with-capability (TRANSFER sender receiver amount)
+      (validate-borrowing-capacity sender amount)
       (with-read participants-table sender { "balance" := balance }
         (enforce (<= amount balance) "Insufficient funds.")
         (update participants-table sender { "balance": (- balance amount) }))
@@ -179,12 +181,14 @@
   ; Typical implementation of the (get-balance) function specified by fungible-v2.
   ; https://github.com/kadena-io/KIPs/blob/8ec1b7c6e2596778e169182339eeda7acbae4abc/kip-0005/fungible-v2.pact#L97-L100
   (defun get-balance:decimal (account:string)
+    (enforce (!= account "") "Account cannot be empty.")
     (with-read participants-table account { "balance" := balance }
       balance))
 
   ; Typical implementation of the (details) function specified by fungible-v2.
   ; https://github.com/kadena-io/KIPs/blob/8ec1b7c6e2596778e169182339eeda7acbae4abc/kip-0005/fungible-v2.pact#L102-L106
   (defun details:object{fungible-v2.account-details} (account:string)
+    (enforce (!= account "") "Account cannot be empty.")
     (with-read participants-table account
       { "balance" := balance, "guard" := guard }
       { "account": account, "balance": balance, "guard": guard }))
@@ -197,11 +201,13 @@
   ; Typical implementation of the (enforce-unit) function specified by fungible-v2.
   ; https://github.com/kadena-io/KIPs/blob/8ec1b7c6e2596778e169182339eeda7acbae4abc/kip-0005/fungible-v2.pact#L113-L116
   (defun enforce-unit:bool (amount:decimal)
+    (enforce (> amount 0.0) "Amounts must be positive.")
     (enforce (= amount (floor amount 13)) "Amounts cannot exceed 13 decimal places."))
 
   ; Typical implementation of the (create-account) function specified by fungible-v2.
   ; https://github.com/kadena-io/KIPs/blob/8ec1b7c6e2596778e169182339eeda7acbae4abc/kip-0005/fungible-v2.pact#L118-L123
   (defun create-account:string (account:string guard:guard)
+    (enforce (!= account "") "Account cannot be empty.")
     (enforce-guard guard)
     (with-read refs-table REF_KEY { "controller-ref" := controller-ref:module{charkha-controller-iface} }
       (insert participants-table account
@@ -215,6 +221,7 @@
   ; Typical implementation of the (rotate) function specified by fungible-v2.
   ; https://github.com/kadena-io/KIPs/blob/8ec1b7c6e2596778e169182339eeda7acbae4abc/kip-0005/fungible-v2.pact#L125-L131
   (defun rotate:string (account:string new-guard:guard)
+    (enforce (!= account "") "Account name cannot be empty.")
     (with-read participants-table account { "guard" := old-guard }
       (enforce-guard old-guard)
       (update participants-table account { "guard": new-guard })))

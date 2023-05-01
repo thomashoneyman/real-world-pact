@@ -12,7 +12,7 @@
 ; several foundational contracts we might rely on in the 'contracts' directory.
 ; We can load these contracts into the REPL one-by-one.
 (begin-tx)
-(load "./contracts/fungible-v2.pact")
+(load "./contracts/fungible-v2-modified.pact")
 (load "./contracts/fungible-xchain-v1.pact")
 (load "./contracts/coin-v5.pact")
 

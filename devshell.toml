@@ -58,7 +58,13 @@ command = """
 
   if [ ! -d "db" ]; then
     echo "db directory does not exist, creating one from snapshot."
-    cp -r ../devnet-backup/db .
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+      cp -r ../devnet-backup/db-linux db
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+      cp -r ../devnet-backup/db-macos db
+    else
+      echo "unknown operating system (only linux and macos supported)"
+    fi
   fi
 
   docker compose -f docker-compose.minimal.yaml up --detach --remove-orphans
@@ -71,9 +77,17 @@ category = "devnet"
 command = """
   cd $(git rev-parse --show-toplevel)/devnet
   docker compose -f docker-compose.minimal.yaml down
+
   if [ -d "db" ]; then
     echo "Replacing db directory with snapshot."
-    sudo rm -rf db && cp -r ../devnet-backup/db .
+    sudo rm -rf db
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+      cp -r ../devnet-backup/db-linux db
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+      cp -r ../devnet-backup/db-macos db
+    else
+      echo "unknown operating system (only linux and macos supported)"
+    fi
   fi
   """
 help = "Stop the devnet blockchain simulator and reset the database."
@@ -81,7 +95,10 @@ help = "Stop the devnet blockchain simulator and reset the database."
 [[commands]]
 name = "devnet-stop"
 category = "devnet"
-command = "docker compose -f $(git rev-parse --show-toplevel)/devnet/docker-compose.minimal.yaml down"
+command = """
+  cd $(git rev-parse --show-toplevel)/devnet
+  docker compose -f docker-compose.minimal.yaml down
+"""
 help = "Stop the devnet blockchain simulator"
 
 # Tools

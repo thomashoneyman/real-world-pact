@@ -1,6 +1,6 @@
 # Contracts
 
-This directory holds the Charkha smart contracts and the [full protocol tests](./test.repl).
+This directory holds the Charkha smart contracts, the [protocol unit tests](./test.repl), and the [protocol formal verification](./verify.repl).
 
 I recommend reading through the contracts in the same order they are described [in the Charkha guide](../guide/), which is to say in the following order:
 

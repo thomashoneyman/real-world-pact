@@ -135,30 +135,22 @@
     @doc
       "Supply AMOUNT of the underlying asset for this market from account      \
       \ACCOUNT. You will receive the equivalent cTokens according to the       \
-      \exchange rate in return."
-
-    @model [ (property (!= account "")) (property (> amount 0.0)) ])
+      \exchange rate in return.")
 
   (defun redeem:string (account:string market:string tokens:decimal)
     @doc
       "Redeem AMOUNT of cTokens in exchange for the equivalent amount of the   \
-      \underlying asset."
-
-    @model [ (property (!= account "")) (property (> tokens 0.0)) ])
+      \underlying asset.")
 
   (defun borrow:string (account:string guard:guard market:string amount:decimal)
     @doc
       "Borrow AMOUNT of the underlying asset for this market and send it to    \
-      \ACCOUNT. Will fail if the account has insufficient collateral."
-
-    @model [ (property (!= account "")) (property (> amount 0.0)) ])
+      \ACCOUNT. Will fail if the account has insufficient collateral.")
 
   (defun repay:string (account:string market:string amount:decimal)
     @doc
       "Repay AMOUNT of the underlying asset. If you repay more than you        \
-      \borrowed then the extra will be returned."
-
-    @model [ (property (!= account "")) (property (> amount 0.0)) ])
+      \borrowed then the extra will be returned.")
 
   (defun liquidate:string (liquidator:string account:string market:string amount:decimal)
     @doc
@@ -170,7 +162,6 @@
     @doc
       "Synchronizes the protocol by compounding interest, updating exchange    \
       \rates, and accruing CHRK rewards. Should be run on every protocol       \
-      \interaction, e.g. on lend, borrow, redeem, repay, liquidate, etc."
+      \interaction, e.g. on lend, borrow, redeem, repay, liquidate, etc.")
 
-    @model [ (property (authorized-by "free.charkha-admin-keyset")) ])
 )

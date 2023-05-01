@@ -60,7 +60,7 @@
     (enforce (!= receiver "") "Receiver cannot be empty.")
     (enforce-unit amount) ; see (enforce-unit) later in this file for details.
     (enforce-guard (at 'guard (read accounts sender)))
-    (enforce (> amount 0.0) "Transfer limit must be positive."))
+    (enforce (> amount 0.0) "Transfer must be positive."))
 
   ; The TRANSFER-mgr function is required by the fungible-v2 interface as the
   ; counterpart to the TRANSFER capability. It is supposed to reduce the
@@ -158,7 +158,11 @@
     ; Normally we'd have more property tests here, but the fungible-v2 interface
     ; already specifies several which will be run automatically. We only need to
     ; specify additional properties.
-    @model [ (property (= 0.0 (column-delta accounts "balance"))) ]
+    @model
+      [ (property (= 0.0 (column-delta accounts "balance")))
+        (property (> amount 0.0))
+        (property (!= sender receiver))
+      ]
 
     (with-capability (TRANSFER sender receiver amount)
       ; First, we'll debit funds from the sender's account. Recall that
@@ -203,6 +207,7 @@
   ; given account, failing if the account does not exist.
   ; https://github.com/kadena-io/KIPs/blob/8ec1b7c6e2596778e169182339eeda7acbae4abc/kip-0005/fungible-v2.pact#L97-L100
   (defun get-balance:decimal (account:string)
+    (enforce (!= account "") "Account name cannot be empty.")
     (with-read accounts account { "balance" := balance }
       balance))
 
@@ -211,6 +216,7 @@
   ; fungible-v2 interface.
   ; https://github.com/kadena-io/KIPs/blob/8ec1b7c6e2596778e169182339eeda7acbae4abc/kip-0005/fungible-v2.pact#L102-L106
   (defun details:object{fungible-v2.account-details} (account:string)
+    (enforce (!= account "") "Account name cannot be empty.")
     (read accounts account))
 
   ; KIP-0005 requires (precision), which specifies a maximum precision for
@@ -227,6 +233,7 @@
   ; (precision) function required above.
   ; https://github.com/kadena-io/KIPs/blob/8ec1b7c6e2596778e169182339eeda7acbae4abc/kip-0005/fungible-v2.pact#L113-L116
   (defun enforce-unit:bool (amount:decimal)
+    (enforce (>= amount 0.0) "Unit cannot be non-negative.")
     ; https://pact-language.readthedocs.io/en/stable/pact-functions.html#floor
     (enforce (= amount (floor amount 13)) "Amounts cannot exceed 13 decimal places."))
 
@@ -235,6 +242,7 @@
   ; the user account in (transfer) and other operations.
   ; https://github.com/kadena-io/KIPs/blob/8ec1b7c6e2596778e169182339eeda7acbae4abc/kip-0005/fungible-v2.pact#L118-L123
   (defun create-account:string (account:string guard:guard)
+    (enforce (!= account "") "Account name cannot be empty.")
     ; The user creating the account should have to sign the transaction, proving
     ; they indeed want this guard associated with their address. This is similar
     ; to deployments: you don't want a typo to render an account inaccessible!
@@ -250,6 +258,7 @@
   ; guard and then install the new guard.
   ; https://github.com/kadena-io/KIPs/blob/8ec1b7c6e2596778e169182339eeda7acbae4abc/kip-0005/fungible-v2.pact#L125-L131
   (defun rotate:string (account:string new-guard:guard)
+    (enforce (!= account "") "Account name cannot be empty.")
     (with-read accounts account { "guard" := old-guard }
       (enforce-guard old-guard)
       (update accounts account { "guard" : new-guard })))

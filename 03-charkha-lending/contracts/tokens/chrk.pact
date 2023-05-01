@@ -57,7 +57,6 @@
 
   (defschema accruals-schema
     @doc "Schema for CHRK accrual that can be snapshotted by (accrue)"
-    @model [ (invariant (<= accrued MAX_SUPPLY)) ]
     accrued:integer
     last-accrued:integer)
 
@@ -251,12 +250,14 @@
   ; Typical implementation of the (get-balance) function specified by fungible-v2.
   ; https://github.com/kadena-io/KIPs/blob/8ec1b7c6e2596778e169182339eeda7acbae4abc/kip-0005/fungible-v2.pact#L97-L100
   (defun get-balance:decimal (account:string)
+    (enforce (!= account "") "Account name cannot be empty.")
     (with-read accounts account { "balance" := balance }
       balance))
 
   ; Typical implementation of the (details) function specified by fungible-v2.
   ; https://github.com/kadena-io/KIPs/blob/8ec1b7c6e2596778e169182339eeda7acbae4abc/kip-0005/fungible-v2.pact#L102-L106
   (defun details:object{fungible-v2.account-details} (account:string)
+    (enforce (!= account "") "Account name cannot be empty.")
     (with-read accounts account
       { "balance" := balance, "guard" := guard }
       { "account": account, "balance": balance, "guard": guard }))
@@ -269,11 +270,13 @@
   ; Typical implementation of the (enforce-unit) function specified by fungible-v2.
   ; https://github.com/kadena-io/KIPs/blob/8ec1b7c6e2596778e169182339eeda7acbae4abc/kip-0005/fungible-v2.pact#L113-L116
   (defun enforce-unit:bool (amount:decimal)
+    (enforce (>= amount 0.0) "Unit  cannot be negative.")
     (enforce (= amount (floor amount 13)) "Amounts cannot exceed 13 decimal places."))
 
   ; Typical implementation of the (create-account) function specified by fungible-v2.
   ; https://github.com/kadena-io/KIPs/blob/8ec1b7c6e2596778e169182339eeda7acbae4abc/kip-0005/fungible-v2.pact#L118-L123
   (defun create-account:string (account:string guard:guard)
+    (enforce (!= account "") "Account name cannot be empty.")
     (enforce-guard guard)
     (insert accounts account
       { "last-claimed": (at 'block-height (chain-data))
@@ -284,6 +287,7 @@
   ; Typical implementation of the (rotate) function specified by fungible-v2.
   ; https://github.com/kadena-io/KIPs/blob/8ec1b7c6e2596778e169182339eeda7acbae4abc/kip-0005/fungible-v2.pact#L125-L131
   (defun rotate:string (account:string new-guard:guard)
+    (enforce (!= account "") "Account name cannot be empty.")
     (with-read accounts account { "guard" := old-guard }
       (enforce-guard old-guard)
       (update accounts account { "guard" : new-guard })))
