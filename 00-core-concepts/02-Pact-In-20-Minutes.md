@@ -681,7 +681,7 @@ Guards are especially useful because they can be stored in tables. For example, 
   (defun succeed () (enforce true "succeed"))
 
   (defun change-address (name:string new-address:string)
-    (with-capability UPDATE_ADDRESS name
+    (with-capability (UPDATE_ADDRESS name)
       (update account-table name { "address": new-address })))
 )
 
