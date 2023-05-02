@@ -34,9 +34,8 @@
 ;   endpoint for evaluation.
 ;
 ; A typical Pact smart contract executes some top-level setup code by defining
-; one or more keysets and entering a namspaces. Then, it defines a module and/or
-; interface that other modules can reference (or you can execute by sending Pact
-; code to your local Chainweb node). Finally, it executes more top-level code to
+; one or more keysets and entering a namespaces. Then, it defines a module and/or
+; interface that other modules can reference. Finally, it executes more top-level code to
 ; initialize data required by the module, such as creating new tables. Each of
 ; these steps introduces critical concepts for Pact development.
 ;
@@ -52,7 +51,7 @@
 ;
 ; Modules, interfaces, and keysets in Pact must have unique names within a
 ; particular 'namespace'. On a private blockchain you can define your own
-; amespace or use the "root" namespace (ie. no namespace at all). On a public
+; namespace or use the "root" namespace (ie. no namespace at all). On a public
 ; blockchain the root namespace is reserved for built-in contracts (like the
 ; `coin` contract, which we'll see later), and on Chainweb specifically you can
 ; only define a new namespace with the approval of the Kadena team.
@@ -373,8 +372,9 @@
   ;
   ; A guard in Pact defines a rule that must be satisfied for the transaction
   ; to continue. We've seen an example already: keysets are one type of guard.
-  ; But there are others, such as pact guards (used to verify cross-chain
-  ; transactions) and user guards (arbitrary user-defined predicate functions).
+  ; But there are others, such as pact guards (used to guard that transaction
+  ; is executed within a certain multi-step transactions, such as coin.transfer-crosschain)
+  ; and user guards (arbitrary user-defined predicate functions).
   ; In short, guards are pure predicate functions over the given environment,
   ; which can be enforced at any time with (enforce-guard).
   ;
@@ -383,9 +383,9 @@
   ; Capabilities in Pact are an entire system for managing user rights during
   ; the execution of a transaction.
   ;
-  ; You can define a new capability with (defcap). An unmanaged capability
-  ; consists of a name, a list of arguments, optional metadata, and a function
-  ; body that returns a boolean. For example, an ADMIN capability might ensure
+  ; You can define a new capability with (defcap). A capability consists of a name,
+  ; a list of arguments, optional metadata, and a function body that returns a boolean.
+  ; For example, an ADMIN capability might ensure
   ; that a specific keyset must be satisfied in order to take some action:
   ;
   ;   (defcap ADMIN ()
@@ -406,7 +406,7 @@
   ; https://pact-language.readthedocs.io/en/latest/pact-functions.html#require-capability
   ;
   ; Second, you can only grant a capability within the module that defined the
-  ; corresponding capabilitiy. That means, for example, that protecting code
+  ; corresponding capability. That means, for example, that protecting code
   ; with (require-capability) means that code cannot be called from outside the
   ; module, because its required capability can only be granted within the
   ; module. This is a helpful way to make particular functions private.
@@ -415,7 +415,7 @@
   ; either will let you access code protected by (require-capability). However,
   ; unmanaged capabilities are static (they only rely on their parameters and
   ; transaction data to determine whether the capability should be granted),
-  ; whereas managed capabilities are dynamic (they additionally rely on state
+  ; whereas managed capabilities can be dynamic (they additionally rely on state
   ; that can change each time the capability is requested during a given
   ; transaction). By convention, unmanaged capabilities are "granted" and
   ; managed capabilities are "installed". You can tell that a capability is
@@ -430,10 +430,11 @@
   ; more capabilities in the module. This indicates that the signer has agreed
   ; to grant the specified capabilities if they are asked for via the
   ; (with-capability) function, but other capabilities should be denied.
-  ; Managed capabilities must always be signed for; unmanaged capabilities don't
-  ; have to be signed for unless they use a keyset guard. You can see examples
-  ; of scoping a signature to a capability in the faucet.repl file and in the
-  ; various 'send' request files.
+  ; Managed capabilities must always be scoped; unmanaged capabilities don't
+  ; always have to be scoped. When the signer signs with empty capability list,
+  ; unmanaged capabilities required in the transaction will be signed.
+  ; You can see examples of scoping a signature to a
+  ; capability in the faucet.repl file and in the various 'send' request files.
   ;
   ; Our contract will use one capability: SET_LIMIT. It ensures that calls to
   ; change the per-request and per-account limits for a given account *must* be
@@ -651,7 +652,12 @@
   ; write a function that performs the table read.
   (defun get-limits:object (account:string)
     @doc "Read the limits for your account and see how much KDA you can request."
-    (with-read accounts account { "account-limit" := account-limit, "request-limit" := request-limit, "funds-requested" := requested, "funds-returned" := returned }
+    (with-read accounts account
+      { "account-limit" := account-limit
+      , "request-limit" := request-limit
+      , "funds-requested" := requested
+      , "funds-returned" := returned
+      }
       { "account-limit": account-limit
       , "request-limit": request-limit
       , "account-limit-remaining": (- account-limit (- requested returned))
