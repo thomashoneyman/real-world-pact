@@ -214,8 +214,8 @@ The second conditional logic function is `cond`, which is _technically_ a Pact s
   ; none of the pairs match then the final default case is returned.
   (cond
     ((= x 1) "X is 1")
-    ((> x 1) "X is greater than 1")
     ((> x 10) "X is greater than 10")
+    ((> x 1) "X is greater than 1")
     "X is less than 1"
   )
 )
