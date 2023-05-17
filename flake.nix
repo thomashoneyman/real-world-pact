@@ -31,6 +31,7 @@
     flake-utils.lib.eachDefaultSystem (system: let
       pactOverlay = _: _: {
         pact = pact-nix.packages.${system}.pact;
+        kda-tool = pact-nix.packages.${system}.kda-tool;
       };
 
       pkgs = import nixpkgs {

@@ -116,6 +116,12 @@ name = "pact"
 help = "The Pact programming language"
 
 [[commands]]
+package = "kda-tool"
+category = "tools"
+name = "kda"
+help = "The KDA CLI tool"
+
+[[commands]]
 package = "nodePackages.pnpm"
 category = "tools"
 name = "pnpm"
