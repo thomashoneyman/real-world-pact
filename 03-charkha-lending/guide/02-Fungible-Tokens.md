@@ -73,7 +73,7 @@ Bridging back works the same way:
 
 Our implementation will only cover the Chainweb portions of this process, ie. the ability for you and Charkha to mint KETH for your account and the ability for you to burn your KETH (theoretically, in exchange for the equivalent ETH on Ethereum.)
 
-Hence our smart contract is the fungible-v2 interface plus two functions: `(mint)` and `(burn)`. [See the KETH contract for details](../contracts/keth.pact)!
+Hence our smart contract is the fungible-v2 interface plus two functions: `(mint)` and `(burn)`. [See the KETH contract for details](../contracts/tokens/keth.pact)!
 
 ## Market Tokens (cwKDA, cwKETH, cwCHRK)
 
