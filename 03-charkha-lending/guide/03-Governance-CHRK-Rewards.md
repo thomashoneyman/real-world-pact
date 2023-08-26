@@ -14,7 +14,7 @@
 
 ---
 
-Charkha brings lenders and borrowers together in money markets. The main function of the market is to establish an interest rate, whihc serves as the "price" of money in that market. High interest rates incentivize more lenders to participate, and low interest rates incentivize more borrowers to participate.
+Charkha brings lenders and borrowers together in money markets. The main function of the market is to establish an interest rate, which serves as the "price" of money in that market. High interest rates incentivize more lenders to participate, and low interest rates incentivize more borrowers to participate.
 
 The Charkha lending protocol establishes interest rates in each supported money market. Charkha intelligently moves interest rates in response to market activity as described in the Charkha white paper. The rules by which interest rates are set and adjusted will have a huge impact on the markets that lenders and borrowers participate in.
 
