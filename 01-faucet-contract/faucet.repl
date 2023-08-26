@@ -212,7 +212,7 @@
 (free.goliath-faucet.set-request-limit "user" 200.0)
 (env-gaslog)
 ; We can measure how much gas a call to (set-request-limit) takes.
-(let (( expected-gas 405 ))
+(let (( expected-gas 314 ))
   (expect (format "Setting request limit costs {} gas" [expected-gas]) expected-gas (env-gas)))
 ; And we can verify that the limit was indeed raised by calling (get-limits)
 (expect "User request limit has been raised to 200.0." { "account-limit": 100.0, "request-limit": 200.0, "account-limit-remaining": 80.0 } (free.goliath-faucet.get-limits "user"))
@@ -234,7 +234,7 @@
 (env-gaslog)
 (free.goliath-faucet.request-funds "user" (describe-keyset "free.user-keyset") 100.0)
 (env-gaslog)
-(let (( expected-gas 1216 ))
+(let (( expected-gas 1116 ))
   (expect (format "Requesting funds costs {} gas" [expected-gas]) expected-gas (env-gas)))
 (expect "User account has 200.0 KDA." 200.0 (coin.get-balance "user"))
 (commit-tx)
