@@ -13,17 +13,18 @@
 (env-dynref free.charkha-market-iface free.cwKDA)
 (env-dynref free.charkha-controller-iface free.charkha-controller)
 
-; Strangely, verifying the KETH contract is producing an internal Pact error,
+; Strangely, verifying the KETH / CHRK contracts produces an internal Pact error,
 ; though it's possible to verify directly with 'pact tokens/keth.repl'.
 ; test.repl:1:0: singular: empty traversal CallStack (from HasCallStack):   error, called at src/Control/Lens/Traversal.hs:700:46 in lens-5.1.1-6e50c72297cf6c966244f2898e4d136a18b9658082880c54bccabf8eb5d9ce58:Control.Lens.Traversal   singular, called at src-tool/Pact/Analyze/Types/Eval.hs:711:5 in pact-4.4-inplace:Pact.Analyze.Types.Eval   typedCell, called at src-tool/Pact/Analyze/Eval/Term.hs:333:21 in pact-4.4-inplace:Pact.Analyze.Eval.Term
 ;  (verify "free.KETH")
 ;  (print "Verified free.KETH")
 
+;  (verify "free.CHRK")
+;  (print "Verified free.CHRK")
+
 (verify "free.charkha-oracle")
 (print "Verified free.charkha-oracle")
 
-(verify "free.CHRK")
-(print "Verified free.CHRK")
 
 ; The tokens below currently have an infinite hang when verifying. This can be
 ; avoided by removing the (validate-borrowing-capacity) function from transfer.
