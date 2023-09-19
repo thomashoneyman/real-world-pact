@@ -45,7 +45,7 @@ As a quick demonstration: follow the commands below to start a local simulation 
 1. Clone the repository and initialize the `devnet` submodule
 
    ```sh
-   git clone git@github.com:thomashoneyman/real-world-pact
+   git clone https://github.com/thomashoneyman/real-world-pact.git
    cd real-world-pact
    git submodule update --init
    ```
