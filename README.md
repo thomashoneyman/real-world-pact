@@ -55,6 +55,9 @@ As a quick demonstration: follow the commands below to start a local simulation 
    ```sh
    # Use nix-shell if you do not have a version of Nix that supports Nix flakes.
    nix develop
+   
+   # Alternately, you can explicitly opt-in to flake support
+   nix develop --extra-experimental-features "flakes nix-command"
    ```
 
 3. Start the simulation Chainweb (run `devnet-stop` to stop the simulation)
