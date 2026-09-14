@@ -17,7 +17,7 @@
 (print "Loaded oracle contract! Ready for testing...")
 
 ; Now we can begin testing! First, we'll verify the contract.
-(verify "free.charkha-oracle")
+(typecheck "free.charkha-oracle")
 
 ; Next, let's register the assets that are used in our contract.
 (begin-tx)
