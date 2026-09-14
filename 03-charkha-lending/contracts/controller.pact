@@ -256,7 +256,7 @@
         (borrow-interest-rate:decimal (get-borrow-interest-rate market))
         (reserve-factor:decimal (at 'reserve-factor (free.charkha-governance.get-market-factors market)))
       )
-      (floor (* borrow-interest-rate (* utilization (- 1 reserve-factor))) (coin.precision))))
+      (floor (* borrow-interest-rate (* utilization (- 1.0 reserve-factor))) (coin.precision))))
 
   (defun supply:string (account:string market:string amount:decimal)
     ; When a user supplies funds to the protocol, we tell the associated market
@@ -397,7 +397,7 @@
       (let*
         (
           (eligible-amount:decimal (liquidation-eligible account market))
-          (discounted-amount:decimal (* amount 0.95))
+          (discounted-amount:decimal (floor (* amount 0.95) (token-ref::precision)))
         )
         (enforce (<= amount eligible-amount)
           "Liquidation amount greater than account can be liquidated for in this market.")
@@ -512,12 +512,12 @@
               (borrow-interest-rate:decimal (get-borrow-interest-rate market))
               (supply-interest-rate:decimal (get-supply-interest-rate market))
               (blocks-elapsed:integer (- (at 'block-height (chain-data)) last-updated))
-              (apr-share:decimal (/ blocks-elapsed BLOCKS_PER_YEAR))
+              (apr-share:decimal (/ (dec blocks-elapsed) BLOCKS_PER_YEAR))
 
-              (new-interest-index:decimal (floor (* interest-rate-index (+ 1 (* borrow-interest-rate apr-share))) (coin.precision)))
+              (new-interest-index:decimal (floor (* interest-rate-index (+ 1.0 (* borrow-interest-rate apr-share))) (coin.precision)))
               (new-borrows:decimal (floor (* total-borrows new-interest-index) (coin.precision)))
               (new-reserves:decimal (floor (+ total-reserves (* total-borrows (* reserve-factor (* borrow-interest-rate apr-share)))) (coin.precision)))
-              (new-exchange-rate:decimal (floor (* exchange-rate (+ 1 (* supply-interest-rate apr-share))) (coin.precision)))
+              (new-exchange-rate:decimal (floor (* exchange-rate (+ 1.0 (* supply-interest-rate apr-share))) (coin.precision)))
             )
             (if (= 0.0 utilization)
               ; If there are no borrowers then no interest accrues (who would pay?)

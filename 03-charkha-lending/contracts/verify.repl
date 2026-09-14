@@ -1,39 +1,37 @@
-; This file formally verifies the Charkha lending protocol by verifying each
-; contract in turn.
+; Static typechecking of every Charkha contract.
+;
+; On Pact 4 this file ran formal verification with (verify) and (env-dynref),
+; which invoked the Z3 prover on each module's @model properties. Pact 5
+; removed both REPL functions. What remains is (typecheck), which checks types
+; statically (and is stricter than Pact 4 about mixing integer and decimal)
+; but does NOT evaluate @model properties, which are now documentation only.
+; This file runs on both Pact 4.13 and Pact 5.4.
 (load "setup.repl")
 (env-data {})
 (env-sigs [])
 
-(print "\n----- FORMAL VERIFICATION -----\n")
-(print "Setting up dynamic references...")
+(print "\n----- TYPECHECK -----\n")
 
-; We need to use the (env-dynref) repl-only function to tell formal verification
-; what contract to use when it encounters a modref.
-(env-dynref fungible-v2 coin)
-(env-dynref free.charkha-market-iface free.cwKDA)
-(env-dynref free.charkha-controller-iface free.charkha-controller)
+(typecheck "free.charkha-oracle")
+(print "typecheck OK: free.charkha-oracle")
 
-; Strangely, verifying the KETH / CHRK contracts produces an internal Pact error,
-; though it's possible to verify directly with 'pact tokens/keth.repl'.
-; test.repl:1:0: singular: empty traversal CallStack (from HasCallStack):   error, called at src/Control/Lens/Traversal.hs:700:46 in lens-5.1.1-6e50c72297cf6c966244f2898e4d136a18b9658082880c54bccabf8eb5d9ce58:Control.Lens.Traversal   singular, called at src-tool/Pact/Analyze/Types/Eval.hs:711:5 in pact-4.4-inplace:Pact.Analyze.Types.Eval   typedCell, called at src-tool/Pact/Analyze/Eval/Term.hs:333:21 in pact-4.4-inplace:Pact.Analyze.Eval.Term
-;  (verify "free.KETH")
-;  (print "Verified free.KETH")
+(typecheck "free.KETH")
+(print "typecheck OK: free.KETH")
 
-;  (verify "free.CHRK")
-;  (print "Verified free.CHRK")
+(typecheck "free.CHRK")
+(print "typecheck OK: free.CHRK")
 
-(verify "free.charkha-oracle")
-(print "Verified free.charkha-oracle")
+(typecheck "free.cwKDA")
+(print "typecheck OK: free.cwKDA")
 
+(typecheck "free.cwKETH")
+(print "typecheck OK: free.cwKETH")
 
-; The tokens below currently have an infinite hang when verifying. This can be
-; avoided by removing the (validate-borrowing-capacity) function from transfer.
-;  (verify "free.cwKDA")
-;  (verify "free.cwCHRK")
-;  (verify "free.cwKETH")
+(typecheck "free.cwCHRK")
+(print "typecheck OK: free.cwCHRK")
 
-(verify "free.charkha-governance")
-(print "Verified free.charkha-governance")
+(typecheck "free.charkha-governance")
+(print "typecheck OK: free.charkha-governance")
 
-(verify "free.charkha-controller")
-(print "Verified free.charkha-controller")
+(typecheck "free.charkha-controller")
+(print "typecheck OK: free.charkha-controller")

@@ -87,7 +87,7 @@
 ; the cwKDA contract. This demonstrates that we can register markets for any
 ; token that supports the fungible-v2 interface, so long as we also implement a
 ; market interface for it. We can support any fungible-v2 token on Chainweb.
-(env-sigs [ { "key": "charkha-admin-key", "caps": [ (free.charkha-controller.ADMIN) ] } ])
+(env-sigs [ { "key": "charkha-admin-key", "caps": [ (free.charkha-controller.ADMIN) (free.charkha-governance.ADMIN) ] } ])
 (env-gas 0)
 (free.charkha-controller.register-market "KDA" coin free.cwKDA)
 (print (format "(charkha-controller.register-market) gas cost: {}" [(env-gas)]))
@@ -507,7 +507,7 @@
 
 ; And they received it at a discount — their supply is worth 0.848 KETH, but they
 ; only actually transferred 0.7632 KETH for it.
-(expect "sender02 only transferred 0.7655 KETH" (- 10.0 0.76551855839099375) (free.KETH.get-balance "sender02"))
+(expect "sender02 only transferred 0.7655 KETH" (- 10.0 0.7655185583909) (free.KETH.get-balance "sender02"))
 (commit-tx)
 
 ; ----------
@@ -530,7 +530,7 @@
 ; In USD, at a price of $1400 per KETH, sender02 pocketed a profit of $56.40 for
 ; their liquidation (the 0.04029 KETH they earned).
 (expect "sender02 has redeemed their ctokens and have none left" 0.0 (round (free.cwKETH.get-supply "sender02") 10))
-(expect "sender02 has earned a profit" 10.04029045044100625 (free.KETH.get-balance "sender02"))
+(expect "sender02 has earned a profit" 10.0402904504411 (free.KETH.get-balance "sender02"))
 
 ; Finally, let's have sender01 repay some of their debts.
 (env-sigs [ { "key": test-keys.SENDER01, "caps": [ (coin.TRANSFER "sender01" "charkha" 10000.0) ] } ])

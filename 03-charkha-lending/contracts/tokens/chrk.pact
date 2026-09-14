@@ -170,7 +170,7 @@
           (blocks-elapsed:integer (- (at 'block-height (chain-data)) last-claimed))
         )
         (write accounts account
-          { "balance": (+ balance (* (controller-ref::get-market-count) (* blocks-elapsed share)))
+          { "balance": (+ balance (* (dec (controller-ref::get-market-count)) (* (dec blocks-elapsed) share)))
           , "last-claimed": (at 'block-height (chain-data))
           , "guard": guard
           }))))

@@ -20,7 +20,7 @@
 ; verify that we have properly implemented the fungible-v2 interface; try
 ; commenting out a required function like (rotate) to see an error like this:
 ;   keth.pact:11:0: found unimplemented member while resolving model constraints: rotate
-(verify "free.KETH")
+(typecheck "free.KETH")
 
 ; Next, we'll unit-test the bridge-specific functions we added to the contract,
 ; namely the (MINT) capability and the (mint) and (burn) functions. Remember:
